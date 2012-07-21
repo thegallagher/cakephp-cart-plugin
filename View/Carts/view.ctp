@@ -26,6 +26,8 @@
 										'default' => $item['quantity'],
 										'class' => 'input-small'));
 								}
+								echo $this->Form->hidden('CartsItem.' . $key . '.model');
+								echo $this->Form->hidden('CartsItem.' . $key . '.foreign_key');
 							?>
 						</td>
 					</tr>

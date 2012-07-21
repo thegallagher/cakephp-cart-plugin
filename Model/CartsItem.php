@@ -40,11 +40,11 @@ class CartsItem extends CartAppModel {
 				'rule' => array('notEmpty'),
 				'required' => true,
 				'allowEmpty' => false)),
-		'cart_id' => array(
+		'price' => array(
 			'required' => array(
 				'rule' => array('notEmpty'),
 				'required' => true,
-				'allowEmpty' => false))
+				'allowEmpty' => false)),
 		'quantity' => array(
 			'required' => array(
 				'rule' => array('notEmpty'),
@@ -53,7 +53,9 @@ class CartsItem extends CartAppModel {
 	);
 
 /**
- * 
+ * validateItem
+ *
+ * @return void
  */
 	public function validateItem($data) {
 		$this->set($data);
@@ -65,7 +67,55 @@ class CartsItem extends CartAppModel {
 	}
 
 /**
- * 
+ * Adds and updates an item if it already exists in the cart
+ *
+ * @param string $cartId
+ * @param array $itemData
+ */
+	public function addItem($cartId, $itemData) {
+		$item = $this->find('first', array(
+			'contain' => array(),
+			'conditions' => array(
+				'cart_id' => $cartId,
+				'model' => $itemData['model'],
+				'foreign_key' => $itemData['foreign_key'])));
+
+		if (empty($item)) {
+			$item = array($this->alias => $itemData);
+			$item[$this->alias]['cart_id'] = $cartId;
+			$this->create();
+		} else {
+			$item[$this->alias] = Set::merge($item['CartsItem'], $itemData);
+		}
+	
+		return $this->save($item);
+	}
+
+/**
+ * Called from the CartManagerComponent when an item is removed from the cart
+ *
+ * @param string $cartId Cart UUID
+ * @parma $itemData
+ */
+	public function removeItem($cartId, $itemData) {
+		$item = $this->find('first', array(
+			'contain' => array(),
+			'conditions' => array(
+				'cart_id' => $cartId,
+				'model' => $itemData['model'],
+				'foreign_key' => $itemData['foreign_key'])));
+
+		if (empty($item)) {
+			return false;
+		}
+
+		return $this->delete($item['CartsItem']['id']);
+	}
+
+/**
+ * Add
+ *
+ * @return void
  */
 	public function add($data) {
 		$result = $this->find('first', array(

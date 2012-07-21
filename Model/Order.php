@@ -63,6 +63,13 @@ class Order extends CartAppModel {
 	);
 
 /**
+ * 
+ */
+	public function beforeValidate() {
+		return true;
+	}
+
+/**
  * beforeSave callback
  *
  * @return boolean
@@ -117,23 +124,46 @@ class Order extends CartAppModel {
  * 
  * @todo finish me
  */
-	public function cartToOrder($data) {
+	public function createOrder($cartData, $status = 'pending') {
 		$data[$this->alias]['cart_snapshot'] = serialize($data);
 
-		$this->BillingAddress->set($data);
-		$this->BillingAddress->validates();
+		// Shipping and Billing Address validation if the cart requires shipping
+		if (isset($cartData['Cart']['requires_shipping']) && $cartData['Cart']['requires_shipping'] == 1) {
+			$this->ShippingAddress->set($data);
+			$this->ShippingAddress->validates();
 
-		$this->ShippingAddress->set($data);
-		$this->ShippingAddress->validates();
+			if (isset($cartData['BillingAddress']['same_as_shipping']) && $cartData['BillingAddress']['same_as_shipping'] == 1) {
+				$cartData['BillingAddress'] = $cartData['ShippingAddress'];
+			} else {
+				$this->BillingAddress->set($data);
+				$this->BillingAddress->validates();
+			}
+		}
+
+		$order = array(
+			$this->alias => array(
+				'cart_id' => $cartData['Cart']['cart_id'],
+				'user_id' => $cartData['Cart']['user_id'],
+				'cart_snapshop' => serialize($cartData)));
 
 		$this->create();
-		$result = $this->save($data);
+		$result = $this->save($order);
+
+		if (isset($cartData['Cart']['requires_shipping']) && $cartData['Cart']['requires_shipping'] == 1) {
+			$cartData['BillingAddress']['order_id'] = $this->getLastInsertId();
+			$cartData['ShippingAddress']['order_id'] = $this->getLastInsertId();
+			$this->BillingAddress->create();
+			$this->BillingAddress->save($cartData);
+			$this->ShippingAddress->create();
+			$this->ShippingAddress->save($cartData);
+		}
 
 		if ($result) {
 			$result[$this->alias][$this->primaryKey] = $this->getLastInsertId();
 			CakeEventManager::dispatch(new CakeEvent('Order.newOrder', $this, array($data)));
 		}
 
+		return $result;
 	}
 
 	public function fireAfterBuyCallback($cartData) {

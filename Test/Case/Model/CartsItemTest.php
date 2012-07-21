@@ -36,7 +36,7 @@ class CartsItemTest extends CakeTestCase {
  */
 	public function endTest() {
 		ClassRegistry::flush();
-		unset($this->Cart);
+		unset($this->CartsItem);
 	}
 
 /**
@@ -48,4 +48,15 @@ class CartsItemTest extends CakeTestCase {
 		$this->assertTrue(is_a($this->CartsItem, 'CartsItem'));
 	}
 
+/**
+ * testValidateItem
+ *
+ * @return void
+ */
+	public function testValidateItem() {
+		$data = array(
+			'foo' => 'bar');
+		$result = $this->CartsItem->validateItem($data);
+		debug($this->CartsItem->invalidFields());
+	}
 }

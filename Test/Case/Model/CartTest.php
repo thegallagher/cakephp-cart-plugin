@@ -49,14 +49,33 @@ class CartTest extends CakeTestCase {
 	}
 
 /**
- * 
- * 
+ * testAddItem
+ *
  * @return void
  */
 	public function testAddItem() {
 		$this->Cart->cartId = 1;
 		$result = $this->Cart->addItem(1, array('CartsItem' => array()));
 		debug($result);
+	}
+
+/**
+ * testRequiresShipping
+ *
+ * @return void
+ */
+	public function testRequiresShipping() {
+		$items = array(
+			array('foobar' => 'test'));
+		$this->assertTrue($this->Cart->requiresShipping($items));
+
+		$items = array(
+			array('virtual' => 0));
+		$this->assertTrue($this->Cart->requiresShipping($items));
+
+		$items = array(
+			array('virtual' => 1));
+		$this->assertFalse($this->Cart->requiresShipping($items));
 	}
 
 }

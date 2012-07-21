@@ -15,6 +15,22 @@ If you're interested please send me a message on github and fork it.
  * CakePHP 2.x
  * CakeDC Search Plugin for CakePHP https://github.com/cakedc/search
 
+## Parts of the Plugin explained 
+
+### Cart Manager Component
+
+The Cart Manager is a component thought to capture post and get requests to a specified action, by default "buy" and add the result of this to the cart.
+
+The Session, Cookie and Database Storage of the Cart Manager is pretty much decoupled.
+
+Planed features
+
+ * Add any record from any model as item to the cart
+ * Tax Rules
+ * Discount Rules
+ * Downloadable/virtual item handling
+ * 
+
 ## Setup
 
 TBD

@@ -106,6 +106,7 @@ class CartManagerComponentTest extends CakeTestCase {
  * @return void
  */
 	public function testPostBuy() {
+		$this->Controller->request->data = array('test');
 		$this->CartManager->initialize($this->Controller, array());
 		$this->assertFalse($this->CartManager->postBuy());
 

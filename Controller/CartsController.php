@@ -51,8 +51,17 @@ class CartsController extends CartAppController {
 	public function view($cartId = null) {
 		if (!empty($this->request->data)) {
 			//debug($this->request->data);
+			$cart = $this->CartManager->content();
+			foreach ($this->request->data['CartsItem'] as $key => $cartItem) {
+				$cartItem = Set::merge($cart['CartsItem'][$key], $cartItem);
+				$this->CartManager->addItem($cartItem);
+			}
 		}
-		$this->set('cart', $this->CartManager->content());
+
+		$cart = $this->CartManager->content();
+		//die(debug($cart));
+		$this->request->data = $cart;
+		$this->set('cart', $cart);
 	}
 
 /**

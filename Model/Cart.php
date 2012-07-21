@@ -95,7 +95,10 @@ class Cart extends CartAppModel {
 	}
 
 /**
- * 
+ * Returns a cart and its contents
+ *
+ * @param string $cartId
+ * @param string $userId
  */
 	public function view($cartId = null, $userId = null) {
 		$result = $this->find('first', array(
@@ -120,22 +123,7 @@ class Cart extends CartAppModel {
  * @param array $itemData
  */
 	public function addItem($cartId, $itemData) {
-		$item = $this->CartsItem->find('first', array(
-			'contain' => array(),
-			'conditions' => array(
-				'cart_id' => $cartId,
-				'model' => $itemData['model'],
-				'foreign_key' => $itemData['foreign_key'])));
-
-		if (empty($item)) {
-			$item = array('CartsItem' => $itemData);
-			$item['CartsItem']['cart_id'] = $cartId;
-			$this->CartsItem->create();
-		} else {
-			$item['CartsItem'] = Set::merge($item['CartsItem'], $itemData);
-		}
-
-		return $this->CartsItem->save($item);
+		return $this->CartsItem->addItem($cartId, $itemData);
 	}
 
 /**
@@ -145,18 +133,7 @@ class Cart extends CartAppModel {
  * @parma $itemData
  */
 	public function removeItem($cartId, $itemData) {
-		$item = $this->CartsItem->find('first', array(
-			'contain' => array(),
-			'conditions' => array(
-				'cart_id' => $cartId,
-				'model' => $itemData['model'],
-				'foreign_key' => $itemData['foreign_key'])));
-
-		if (empty($item)) {
-			return false;
-		}
-
-		return $this->CartsItem->delete($item['CartsItem']['id']);
+		return $this->CartsItem->removeItem($cartId, $itemData);
 	}
 
 /**
@@ -169,15 +146,20 @@ class Cart extends CartAppModel {
 	}
 
 /**
- * Check if all items in the cart are virtual items or not and by this if the customer must select a shipping method
+ * Checks if one of the items in the cart is not flagged as a virtual item and 
+ * requires by this shipping.
  *
- * @param array $cartItems
+ * Virtual means that it can be a download or a service or whatever else.
+ *
+ * @param array $cartItems Array of items in the cart
  * @return boolean
  */
-	public function requiresShipping($cartItems) {
-		foreach ($cartItems as $cartKey => $cartItem) {
-			if (isset($cartItem['virtual']) && $cartItem['virtual'] == 0) {
-				return true;
+	public function requiresShipping($cartItems = array()) {
+		if (!empty($cartItems)) {
+			foreach ($cartItems as $cartKey => $cartItem) {
+				if (!isset($cartItem['virtual']) || isset($cartItem['virtual']) && $cartItem['virtual'] == 0) {
+					return true;
+				}
 			}
 		}
 		return false;
@@ -197,10 +179,7 @@ class Cart extends CartAppModel {
 			return $cartData['Cart']['total'] = 0.00;
 		}
 
-		$cart['Cart']['requires_shipping'] = 0;
-		if ($this->requiresShipping($cartData['CartsItem'])) {
-			$cart['Cart']['requires_shipping'] = 1;
-		}
+		$cart['Cart']['requires_shipping'] = $this->requiresShipping($cartData['CartsItem']);
 
 		$cartData = $this->applyDiscounts($cartData);
 		$cartData = $this->applyTaxRules($cartData);

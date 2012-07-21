@@ -27,6 +27,21 @@ class OrderAddress extends CartAppModel {
 		'last_name' => array(
 			'notEmpty' => array(
 				'rule' => 'notEmpty')),
+		'street' => array(
+			'notEmpty' => array(
+				'rule' => 'notEmpty')),
+		'city' => array(
+			'notEmpty' => array(
+			'rule' => 'notEmpty')),
+		'zip' => array(
+			'notEmpty' => array(
+			'rule' => 'notEmpty')),
+		'country' => array(
+			'notEmpty' => array(
+			'rule' => 'notEmpty')),
+		'type' => array(
+			'notEmpty' => array(
+			'rule' => 'notEmpty')),
 	);
 
 }

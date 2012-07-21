@@ -48,4 +48,18 @@ class OrderTest extends CakeTestCase {
 		$this->assertTrue(is_a('Order', $this->Order));
 	}
 
+/**
+ * testCreateOrder
+ *
+ * @return void
+ */
+	public function testCreateOrder() {
+		$cartData = array(
+			'Cart' => array(
+				'' => ''),
+			'CartItems' => array(
+				'' => ''));
+		$result = $this->Order->createOrder($cartData);
+	}
+
 }

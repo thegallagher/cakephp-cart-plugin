@@ -71,9 +71,7 @@ class D287dbf03fef11e1b86c0800200c9a66 extends CakeMigration {
 					'status' => array('type'=>'string', 'null' => true, 'default' => NULL, 'length' => 16, 'comment' => 'internal status, up to the app'), // completed, refunded, partial-refund, cancelled, shipped
 					'transaction_status' => array('type'=>'string', 'null' => true, 'default' => NULL, 'length' => 16, 'status of the transaction'),
 					'transaction_fee' => array('type'=>'float', 'null' => true, 'default' => NULL, 'length' => 6,2),
-					'billing_address_id' => array('type'=>'string', 'null' => false, 'default' => NULL, 'length' => 36),
 					'billing_address' => array('type'=>'text', 'null' => true, 'default' => NULL),
-					'shipping_address_id' => array('type'=>'string', 'null' => false, 'default' => NULL, 'length' => 36),
 					'shipping_address' => array('type'=>'text', 'null' => true, 'default' => NULL),
 					'total' => array('type'=>'float', 'null' => true, 'default' => NULL),
 					'created' => array('type'=>'datetime', 'null' => true, 'default' => NULL),
@@ -106,8 +104,8 @@ class D287dbf03fef11e1b86c0800200c9a66 extends CakeMigration {
 					'id' => array('type'=>'string', 'null' => false, 'default' => NULL, 'length' => 36, 'key' => 'primary'),
 					'name' => array('type'=>'string', 'null' => true, 'default' => NULL),
 					'price' => array('type'=>'float', 'null' => true, 'default' => NULL, 'length' => 6,2),
-					'currency' => array('type' => 'integer',  'null' => true, 'default' => NULL),
-					'position' => array('type' => 'integer',  'null' => true, 'default' => NULL),
+					'currency' => array('type' => 'integer', 'null' => true, 'default' => NULL),
+					'position' => array('type' => 'integer', 'null' => true, 'default' => NULL),
 					'created' => array('type'=>'datetime', 'null' => true, 'default' => NULL),
 					'modified' => array('type'=>'datetime', 'null' => true, 'default' => NULL),
 					'indexes' => array(
