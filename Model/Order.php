@@ -51,6 +51,15 @@ class Order extends CartAppModel {
 			'conditions' => array('type' => 'shipping')));
 
 /**
+ * hasMany associations
+ *
+ * @var array
+ */
+	public $hasMany = array(
+		'OrderItem' => array(
+			'className' => 'Cart.OrderItem'));
+
+/**
  * Filters args for search
  *
  * @var array
@@ -76,7 +85,7 @@ class Order extends CartAppModel {
  */
 	public function beforeSave() {
 		if (!empty($this->data[$this->alias]['cart_snapshop'])) {
-			$this->data[$this->alias]['cart_snapshop'] = serialize($this->data[$this->alias]['cart_snapshop');
+			$this->data[$this->alias]['cart_snapshop'] = serialize($this->data[$this->alias]['cart_snapshop']);
 		}
 		return true;
 	}
@@ -110,6 +119,8 @@ class Order extends CartAppModel {
  */
 	public function view($orderId, $userId = null) {
 		$order = $this->find('first', array(
+			'contain' => array(
+				'OrderItem'),
 			'conditions' => array(
 				$this->alias . '.' . $this->primaryKey => $orderId,
 				$this->alias . '.user_id' => $userId)));
@@ -121,37 +132,56 @@ class Order extends CartAppModel {
 	}
 
 /**
- * 
+ * createOrder
+ *
  * @todo finish me
  */
-	public function createOrder($cartData, $status = 'pending') {
-		$data[$this->alias]['cart_snapshot'] = serialize($data);
+	public function createOrder($cartData, $paymentStatus = 'pending') {
+		$data[$this->alias]['cart_snapshot'] = serialize($cartData);
 
 		// Shipping and Billing Address validation if the cart requires shipping
+		$validBillingAddress = true;
+		$validShippingAddress = true;
+
 		if (isset($cartData['Cart']['requires_shipping']) && $cartData['Cart']['requires_shipping'] == 1) {
 			$this->ShippingAddress->set($data);
-			$this->ShippingAddress->validates();
+			$validShippingAddress = $this->ShippingAddress->validates();
 
 			if (isset($cartData['BillingAddress']['same_as_shipping']) && $cartData['BillingAddress']['same_as_shipping'] == 1) {
 				$cartData['BillingAddress'] = $cartData['ShippingAddress'];
 			} else {
-				$this->BillingAddress->set($data);
-				$this->BillingAddress->validates();
+				$this->BillingAddress->set($cartData);
+				$validBillingAddress = $this->BillingAddress->validates();
 			}
 		}
 
 		$order = array(
 			$this->alias => array(
+				'payment_status' => $paymentStatus,
 				'cart_id' => $cartData['Cart']['cart_id'],
 				'user_id' => $cartData['Cart']['user_id'],
 				'cart_snapshop' => serialize($cartData)));
 
+		$this->set($order);
+		$validOrder = $this->validates();
+
+		if (!$validOrder || !$validBillingAddress || !$validShippingAddress) {
+			return false;
+		}
+
 		$this->create();
 		$result = $this->save($order);
+		$orderId = $this->getLastInsertId();
+
+		foreach ($cartData['CartsItem'] as $item) {
+			$item['order_id'] = $orderId;
+			$this->OrderItem->create();
+			$this->OrderItem->save($item);
+		}
 
 		if (isset($cartData['Cart']['requires_shipping']) && $cartData['Cart']['requires_shipping'] == 1) {
-			$cartData['BillingAddress']['order_id'] = $this->getLastInsertId();
-			$cartData['ShippingAddress']['order_id'] = $this->getLastInsertId();
+			$cartData['BillingAddress']['order_id'] = $orderId;
+			$cartData['ShippingAddress']['order_id'] = $orderId;
 			$this->BillingAddress->create();
 			$this->BillingAddress->save($cartData);
 			$this->ShippingAddress->create();

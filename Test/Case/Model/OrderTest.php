@@ -17,6 +17,7 @@ class OrderTest extends CakeTestCase {
 		'plugin.Cart.Cart',
 		'plugin.Cart.Item',
 		'plugin.Cart.Order',
+		'plugin.Cart.OrderItem',
 		'plugin.Cart.CartsItem',
 	);
 
@@ -25,7 +26,7 @@ class OrderTest extends CakeTestCase {
  *
  * @return void
  */
-	public function startUp() {
+	public function startTest() {
 		$this->Order = ClassRegistry::init('Cart.Order');
 	}
 
@@ -45,7 +46,7 @@ class OrderTest extends CakeTestCase {
  * @return void
  */
 	public function testInstance() {
-		$this->assertTrue(is_a('Order', $this->Order));
+		$this->assertTrue(is_a($this->Order, 'Order'));
 	}
 
 /**
@@ -56,10 +57,26 @@ class OrderTest extends CakeTestCase {
 	public function testCreateOrder() {
 		$cartData = array(
 			'Cart' => array(
-				'' => ''),
-			'CartItems' => array(
-				'' => ''));
+				'cart_id' => 'cart-1',
+				'requires_shipping' => false,
+				'user_id' => 'user-1',
+				'total' => 20.95),
+			'CartsItem' => array(
+				array(
+					'name' => 'CakePHP',
+					'foreign_key' => 'item-1',
+					'model' => 'Item',
+					'quantity' => 1,
+					'price' => 10),
+				array(
+					'name' => 'Developer',
+					'foreign_key' => 'item-2',
+					'model' => 'Item',
+					'quantity' => 2,
+					'price' => 10)));
+
 		$result = $this->Order->createOrder($cartData);
+
 	}
 
 }

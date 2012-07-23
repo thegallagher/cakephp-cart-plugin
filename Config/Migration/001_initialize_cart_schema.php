@@ -79,6 +79,23 @@ class D287dbf03fef11e1b86c0800200c9a66 extends CakeMigration {
 					'indexes' => array(
 						'PRIMARY' => array('column' => 'id', 'unique' => 1))
 				),
+				'order_items' => array(
+					'id' => array('type'=>'string', 'null' => false, 'default' => NULL, 'length' => 36, 'key' => 'primary'),
+					'order_id' => array('type'=>'string', 'null' => true, 'default' => NULL, 'length' => 36),
+					'foreign_key' => array('type'=>'string', 'null' => true, 'default' => NULL, 'length' => 36),
+					'model' => array('type'=>'string', 'null' => true, 'default' => NULL, 'length' => 64),
+					'quantity' => array('type'=>'integer', 'null' => true, 'default' => NULL, 'length' => 4),
+					'name' => array('type'=>'string', 'null' => true, 'default' => NULL),
+					'price' => array('type'=>'float', 'null' => true, 'default' => NULL),
+					'virtual' => array('type'=>'boolean', 'null' => true, 'default' => '0', 'comment' => 'Virtual as a download or a service'),
+					'status' => array('type'=>'string', 'null' => true, 'default' => NULL, 'length' => 16, 'comment' => 'internal status, up to the app'), // shipped, delivered, returned, refunded...
+					'shipped' => array('type'=>'boolean', 'null' => true, 'default' => '0', 'comment' => 'Virtual as a download or a service'),
+					'shipping_date' => array('type'=>'datetime', 'null' => true, 'default' => NULL),
+					'created' => array('type'=>'datetime', 'null' => true, 'default' => NULL),
+					'modified' => array('type'=>'datetime', 'null' => true, 'default' => NULL),
+					'indexes' => array(
+						'PRIMARY' => array('column' => 'id', 'unique' => 1))
+				),
 				'cart_rules' => array(
 					'id' => array('type'=>'string', 'null' => false, 'default' => NULL, 'length' => 36, 'key' => 'primary'),
 					'name' => array('type'=>'string', 'null' => true, 'default' => NULL, 'length' => 255),
@@ -87,7 +104,7 @@ class D287dbf03fef11e1b86c0800200c9a66 extends CakeMigration {
 					'created' => array('type'=>'datetime', 'null' => true, 'default' => NULL),
 					'modified' => array('type'=>'datetime', 'null' => true, 'default' => NULL),
 					'indexes' => array(
-							'PRIMARY' => array('column' => 'id', 'unique' => 1))
+						'PRIMARY' => array('column' => 'id', 'unique' => 1))
 				),
 				'cart_rule_conditions' => array(
 					'id' => array('type'=>'string', 'null' => false, 'default' => NULL, 'length' => 36, 'key' => 'primary'),
@@ -124,7 +141,7 @@ class D287dbf03fef11e1b86c0800200c9a66 extends CakeMigration {
 		),
 		'down' => array(
 			'drop_table' => array(
-				'carts', 'carts_items', 'orders', 'shipping_methods', 'order_addresses', 'cart_rules', 'cart_rule_conditions', 'payment_api_transactions'),
+				'carts', 'carts_items', 'orders', 'order_items', 'shipping_methods', 'order_addresses', 'cart_rules', 'cart_rule_conditions', 'payment_api_transactions'),
 		)
 	);
 
