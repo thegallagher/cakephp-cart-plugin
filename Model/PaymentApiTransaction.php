@@ -12,11 +12,10 @@ class PaymentApiTransaction extends CartAppModel {
  */
 	public $validate = array();
 
-
-	public function initialize($processorName) {
+	public function initialize($processorClass) {
 		$token = str_replace('-', '', String::uuid());
 		CakeSession::write('Payment.token', $token);
-		CakeSession::write('Payment.processor', $processorName);
+		CakeSession::write('Payment.processor', $processorClass);
 		return $token;
 	}
 

@@ -59,7 +59,7 @@ class CartsController extends CartAppController {
 		}
 
 		$cart = $this->CartManager->content();
-		//die(debug($cart));
+
 		$this->request->data = $cart;
 		$this->set('cart', $cart);
 	}
@@ -111,7 +111,14 @@ class CartsController extends CartAppController {
  * @param 
  * @return void
  */
-	public function checkout($processor, $action = Null) {
+	public function checkout($processor = null, $action = Null) {
+		$cartData = $this->CartManager->content();
+
+		if (empty($cartData['CartsItem'])) {
+			$this->Session->setFlash(__d('cart', 'Your cart is empty.'));
+			$this->redirect(array('action' => 'view'));
+		}
+
 		if (!class_exists(Inflector::classify($processor) . 'Processor')) {
 			$this->Session->setFlash(__('Invalid payment method!'));
 			$this->redirect(array('action' => 'view'));
@@ -119,12 +126,12 @@ class CartsController extends CartAppController {
 
 		$this->__anonymousCheckoutIsAllowed();
 
-		$cartData = $this->CartManager->content();
-		if (empty($cartData['CartsItem'])) {
-			$this->Session->setFlash(__d('cart', 'Your cart is empty.'));
-			$this->redirect(array('action' => 'view'));
+		$Order = ClassRegistry::init('Cart.Order');
+		$newOrder = $Order->createOrder($cartData);
+
+		if ($newOrder) { 
+			$this->CartManager->emptyCart();
 		}
-		CakeEventManager::dispatch(new CakeEvent('Carts.checkout', $this, array($cartData, $action)));
 	}
 
 /**

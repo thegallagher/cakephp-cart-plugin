@@ -125,7 +125,7 @@ class CartSessionComponent extends Component {
  *
  * @return boolean
  */
-	public function dropCart() {
+	public function emptyCart() {
 		return $this->Session->delete($this->sessionKey);
 	}
 }

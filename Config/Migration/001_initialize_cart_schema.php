@@ -128,6 +128,18 @@ class D287dbf03fef11e1b86c0800200c9a66 extends CakeMigration {
 					'indexes' => array(
 						'PRIMARY' => array('column' => 'id', 'unique' => 1))
 				),
+				'payment_methods' => array(
+					'id' => array('type'=>'string', 'null' => false, 'default' => NULL, 'length' => 36, 'key' => 'primary'),
+					'name' => array('type'=>'string', 'null' => true, 'default' => NULL),
+					'price' => array('type'=>'float', 'null' => true, 'default' => NULL, 'length' => 6,2),
+					'active' => array('type'=>'boolean', 'null' => true, 'default' => '0', 'comment' => 'Virtual as a download or a service'),
+					'description' => array('type'=>'string', 'null' => true, 'default' => NULL),
+					'position' => array('type' => 'integer', 'null' => true, 'default' => NULL),
+					'created' => array('type'=>'datetime', 'null' => true, 'default' => NULL),
+					'modified' => array('type'=>'datetime', 'null' => true, 'default' => NULL),
+					'indexes' => array(
+							'PRIMARY' => array('column' => 'id', 'unique' => 1))
+				),
 				'payment_api_transactions' => array(
 					'id' => array('type'=>'string', 'null' => false, 'default' => NULL, 'length' => 36, 'key' => 'primary'),
 					'token' => array('type'=>'string', 'null' => false, 'default' => NULL),

@@ -15,6 +15,17 @@ class PaymentMethod extends CartsAppController {
 /**
  * 
  */
+	public function getActiveMethods() {
+		return $this->find('all', array(
+			'contain' => array(),
+			'conditions' => array(
+				$this->alias . '.active' => 1),
+			'order' => $this->alias . '.position ASC'));
+	}
+
+/**
+ * 
+ */
 	public function getPaymentMethods() {
 		$configured = Configure::read('Cart.paymentProcessors');
 		$data = array();

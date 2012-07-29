@@ -1,5 +1,4 @@
 <?php
-App::uses('CartsAppController', 'Cart.Controller');
 App::uses('CartAppController', 'Cart.Controller');
 /**
  * Payment Methods Controller
@@ -13,7 +12,14 @@ class PaymentMethodsController extends CartsAppController {
  *
  */
 	public function index() {
+		$this->find('all', $this->PaymentMethod->getPaymentMethods());
+	}
 
+/**
+ * 
+ */
+	public function admin_index() {
+		$this->set('paymentMethods', $this->Paginator->paginate());
 	}
 
 }

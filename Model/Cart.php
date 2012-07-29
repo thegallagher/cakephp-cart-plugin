@@ -141,7 +141,7 @@ class Cart extends CartAppModel {
  *
  * @return boolean
  */
-	public function dropCart($cartId) {
+	public function emptyCart($cartId) {
 		return $this->delete($cartId);
 	}
 

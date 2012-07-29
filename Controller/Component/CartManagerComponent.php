@@ -154,7 +154,7 @@ class CartManagerComponent extends Component {
 			if ($item) {
 				if ($this->Controller->request->is('ajax')) {
 					$this->Controller->set('item', $item);
-					$this->Controller->render($buyAction);
+					$this->Controller->set('_serialize', array('item'));
 				} else {
 					$this->afterAddItemRedirect($item);
 				}
@@ -241,7 +241,9 @@ class CartManagerComponent extends Component {
  */
 	public function addItem($data) {
 		extract($this->settings);
+
 		$data = $this->Controller->{$model}->beforeAddToCart($data);
+
 		if ($this->isLoggedIn) {
 			$data = $this->CartModel->addItem($this->cartId, $data);
 			if ($data === false) {
@@ -249,24 +251,8 @@ class CartManagerComponent extends Component {
 			}
 		}
 
-		$result = $this->CartSession->addItem($data['CartsItem']);
+		$result = $this->CartSession->addItem($data);
 		$this->calculateCart();
-		return $result;
-	}
-
-/**
- * Drops all items and re-initializes the cart
- *
- * @param array $data
- * @return void
- */
-	public function dropCart($data) {
-		if ($this->isLoggedIn) {
-			$this->CartModel->dropCart($this->cartId);
-		}
-		$result = $this->CartSession->dropCart($data);
-
-		$this->initalizeCart();
 		return $result;
 	}
 
@@ -283,6 +269,22 @@ class CartManagerComponent extends Component {
 		}
 		$result = $this->CartSession->removeItem($data);
 		$this->calculateCart();
+		return $result;
+	}
+
+/**
+ * Drops all items and re-initializes the cart
+ *
+ * @param array $data
+ * @return void
+ */
+	public function emptyCart($data) {
+		if ($this->isLoggedIn) {
+			$this->CartModel->emptyCart($this->cartId);
+		}
+		$result = $this->CartSession->emptyCart($data);
+
+		$this->initalizeCart();
 		return $result;
 	}
 
