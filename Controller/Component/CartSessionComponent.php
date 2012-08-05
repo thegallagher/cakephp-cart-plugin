@@ -80,9 +80,9 @@ class CartSessionComponent extends Component {
 /**
  * Checks if an item already is in the cart and if yes returns the array key
  *
- * @param 
- * @param 
- * @return mixed
+ * @param mixed $id integer or string uuid
+ * @param string $model Model name
+ * @return mixed False or key of the array entry in the cart session
  */
 	protected function _findItem($id, $model) {
 		$cart = $this->read();
@@ -94,6 +94,17 @@ class CartSessionComponent extends Component {
 			}
 		}
 		return false;
+	}
+
+/**
+ * Public method to find if an item already exists in the cart
+ *
+ * @param mixed $id integer or string uuid
+ * @param string $model Model name
+ * @return mixed False or key of the array entry in the cart session
+ */
+	public function contains($id, $model) {
+		return $this->_findItem($id, $model);
 	}
 
 /**

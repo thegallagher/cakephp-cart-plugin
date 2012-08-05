@@ -136,7 +136,7 @@ class Order extends CartAppModel {
  *
  * @todo finish me
  */
-	public function createOrder($cartData, $paymentStatus = 'pending') {
+	public function createOrder($cartData, $processorClass, $paymentStatus = 'pending') {
 		$data[$this->alias]['cart_snapshot'] = serialize($cartData);
 
 		// Shipping and Billing Address validation if the cart requires shipping
@@ -157,10 +157,12 @@ class Order extends CartAppModel {
 
 		$order = array(
 			$this->alias => array(
+				'processor' => $processorClass,
 				'payment_status' => $paymentStatus,
-				'cart_id' => $cartData['Cart']['cart_id'],
+				'cart_id' => $cartData['Cart']['id'],
 				'user_id' => $cartData['Cart']['user_id'],
-				'cart_snapshop' => serialize($cartData)));
+				'cart_snapshop' => $cartData,
+				'total' => $cartData['Cart']['total']));
 
 		$this->set($order);
 		$validOrder = $this->validates();
@@ -193,6 +195,7 @@ class Order extends CartAppModel {
 			CakeEventManager::dispatch(new CakeEvent('Order.newOrder', $this, array($data)));
 		}
 
+		$result = Set::merge($result, unserialize($result[$this->alias]['cart_snapshop']));
 		return $result;
 	}
 

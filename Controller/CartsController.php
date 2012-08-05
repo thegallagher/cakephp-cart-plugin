@@ -62,6 +62,7 @@ class CartsController extends CartAppController {
 
 		$this->request->data = $cart;
 		$this->set('cart', $cart);
+		$this->set('paymentMethods', ClassRegistry::init('Cart.PaymentMethod')->getPaymentMethods());
 	}
 
 /**
@@ -108,6 +109,9 @@ class CartsController extends CartAppController {
 /**
  * Triggers the checkout
  *
+ * - checks if the cart is not empty
+ * - checks if the payment processor is valid
+ *
  * @param 
  * @return void
  */
@@ -119,19 +123,27 @@ class CartsController extends CartAppController {
 			$this->redirect(array('action' => 'view'));
 		}
 
-		if (!class_exists(Inflector::classify($processor) . 'Processor')) {
-			$this->Session->setFlash(__('Invalid payment method!'));
+		$this->__anonymousCheckoutIsAllowed();
+
+		try {
+			$ProcessorCollection = new PaymentProcessorCollection();
+			$Processor = $ProcessorCollection->load($processor);
+		} catch (Exception $e) {
+			$this->Session->setFlash($e->getMessage());
 			$this->redirect(array('action' => 'view'));
 		}
 
-		$this->__anonymousCheckoutIsAllowed();
-
 		$Order = ClassRegistry::init('Cart.Order');
-		$newOrder = $Order->createOrder($cartData);
+		$ApiLog = ClassRegistry::init('Cart.PaymentApiTransaction');
+		$newOrder = $Order->createOrder($cartData, $processor);
 
-		if ($newOrder) { 
+		if ($newOrder) {
 			$this->CartManager->emptyCart();
+			$Processor->checkout($this, $newOrder);
 		}
+
+		$this->Session->setFlash(__d('cart', 'There was a problem creating your order.'));
+		$this->redirect(array('action' => 'view'));
 	}
 
 /**
@@ -139,7 +151,7 @@ class CartsController extends CartAppController {
  *
  * @return void
  */
-	public function confirm_checkout($processor, $token) {
+	public function confirm_checkout($processor = null, $token = null) {
 		if ($this->Cart->confirmCheckout($this->data)) {
 			CakeEventManager::dispatch(new CakeEvent('Carts.confirmCheckout', $this, array()));
 		}

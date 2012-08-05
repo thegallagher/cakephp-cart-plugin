@@ -249,6 +249,7 @@ class CartManagerComponent extends Component {
 			if ($data === false) {
 				return false;
 			}
+			$data = $data['CartsItem'];
 		}
 
 		$result = $this->CartSession->addItem($data);
@@ -278,11 +279,11 @@ class CartManagerComponent extends Component {
  * @param array $data
  * @return void
  */
-	public function emptyCart($data) {
+	public function emptyCart() {
 		if ($this->isLoggedIn) {
 			$this->CartModel->emptyCart($this->cartId);
 		}
-		$result = $this->CartSession->emptyCart($data);
+		$result = $this->CartSession->emptyCart();
 
 		$this->initalizeCart();
 		return $result;
@@ -296,6 +297,17 @@ class CartManagerComponent extends Component {
 	public function content() {
 		$this->calculateCart();
 		return $this->Session->read($this->settings['sessionKey']);
+	}
+
+/**
+ * Find if an item already exists in the cart
+ *
+ * @param mixed $id integer or string uuid
+ * @param string $model Model name
+ * @return mixed False or key of the array entry in the cart session
+ */
+	public function contains($id, $model) {
+		return $this->CartSession->contains($id, $model);
 	}
 
 /**

@@ -43,22 +43,7 @@
 	<?php echo $this->Form->submit(__d('cart', 'Update cart')); ?>
 	<?php echo $this->Form->end();?>
 
-	<h3><?php echo __d('cart', 'Payment method'); ?></h3>
-	<ul class="payment-methods">
-		<?php $paymentMethods = Configure::read('Cart.PaymentMethod'); ?>
-		<?php foreach ($paymentMethods as $paymentMethod) : ?>
-		<li>
-			<?php
-				if (empty($paymentMethod['logo'])) {
-					echo $this->Html->link($paymentMethod['name'], $paymentMethod['checkoutUrl']);
-				} else {
-					$image = $this->Html->image($paymentMethod['logo'], array('alt' => $paymentMethod['name']));
-					echo $this->Html->link($image, $paymentMethod['checkoutUrl'], array('escape' => false));
-				}
-			?>
-		</li>
-		<?php endforeach;?>
-	</ul>
+	<?php echo $this->element('Cart.payment_methods'); ?>
 <?php else : ?>
 	<p><?php echo __d('cart', 'Your cart is empty.'); ?></p>
 <?php endif; ?>

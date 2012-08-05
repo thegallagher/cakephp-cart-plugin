@@ -2,29 +2,35 @@
 App::uses('ObjectCollection', 'Utility');
 App::uses('CakeEventListener', 'Event');
 /**
- * PaymentListener
+ * PaymentProcessorCollection
  *
  * @author Florian Krämer
  * @copyright 2012 Florian Krämer
  * @license MIT
  */
-class PaymentListener extends ObjectCollection implements CakeEventListener {
-
-	protected $processors = array();
-
+class PaymentProcessorCollection extends ObjectCollection implements CakeEventListener {
+/**
+ * Loads a new payment processor
+ *
+ * @param string
+ * @param array $options
+ * @return 
+ */
 	public function load($processor, $options = array()) {
 		list($plugin, $name) = pluginSplit($processor, true);
 		$class = $name . 'Processor';
 
-		App::uses($class, $plugin . 'Payment');
+		App::uses($class, $plugin . 'Lib/Payment');
+/*
 		if (!class_exists($class)) {
 			throw new MissingPaymentProcessorException(array(
 				'class' => $class,
 				'plugin' => substr($plugin, 0, -1)));
 		}
-
-		$this->_loaded[$name] = new $class();
+*/
+		$this->_loaded[$name] = new $class($options);
 		$this->enable($name);
+		return $this->_loaded[$name];
 	}
 
 /**
