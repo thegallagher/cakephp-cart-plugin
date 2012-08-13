@@ -5,17 +5,23 @@ App::uses('Model', 'Model');
  * CartTestItemModel
  */
 class CartTestItemModel extends Model {
+
+	public $useTable = 'items';
+	public $alias = 'Item';
+
 /**
  * Behaviors
  *
  * @var array
  */
 	public $actsAs = array(
-		'Cart.Buyable');
+		'Cart.Buyable' => array());
 }
+
 /**
  * CartsItem Test
- * 
+ *
+ * @property mixed Model
  * @author Florian Krämer
  * @copyright 2012 Florian Krämer
  * @license MIT
@@ -30,8 +36,7 @@ class BuyableBehaviorTest extends CakeTestCase {
 		'plugin.Cart.Cart',
 		'plugin.Cart.Item',
 		'plugin.Cart.Order',
-		'plugin.Cart.CartsItem',
-	);
+		'plugin.Cart.CartsItem');
 
 /**
  * startUp
@@ -57,7 +62,7 @@ class BuyableBehaviorTest extends CakeTestCase {
  * 
  */
 	public function testBindCartModel() {
-		$this->bindCartModel()
+		$this->Model->bindCartModel();
 	}
 
 }

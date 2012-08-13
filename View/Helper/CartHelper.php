@@ -53,10 +53,8 @@ class CartHelper extends AppHelper {
 		return in_array($item, $this->_itemsInCart);
 	}
 
-	public function input($id, $model, $options) {
+	public function input($id, $model, $options = array()) {
 		$defaults = array('form');
-
-		
 
 		$string = $this->Form->input('Cart.' . $this->iterator . '.quantity', array(
 			'type' => 'text',
@@ -69,7 +67,7 @@ class CartHelper extends AppHelper {
 
 		
 
-		if ($options['div'] !== false) {
+		if (isset($options['div']) && $options['div'] !== false) {
 			if (is_array($options['div'])) {
 				$this->Html->div($string, $options['div']);
 			} else {

@@ -2,10 +2,13 @@
 App::uses('Cart', 'Cart.Model');
 /**
  * Cart Test
- * 
+ *
+ *
  * @author Florian Krämer
  * @copyright 2012 Florian Krämer
  * @license MIT
+ *
+ * @property Cart Cart
  */
 class CartTest extends CakeTestCase {
 /**
@@ -55,8 +58,8 @@ class CartTest extends CakeTestCase {
  */
 	public function testAddItem() {
 		$this->Cart->cartId = 1;
-		$result = $this->Cart->addItem(1, array('CartsItem' => array()));
-		debug($result);
+		$result = $this->Cart->addItem(1, array('CartsItem' => array(), 'model' => 'CartsItem', 'foreign_key' => '1'));
+		//debug($result);
 	}
 
 /**

@@ -10,7 +10,7 @@ class ShippingMethodTestCase extends AppTestCase {
  * @var string
  * @access public
  */
-	public $plugin = 'app';
+	public $plugin = 'Cart';
 
 /**
  * Test to run for the test case (e.g array('testFind', 'testView'))

@@ -8,6 +8,8 @@ App::uses('CakeEventManager', 'Event');
  * @author Florian Krämer
  * @copyright 2012 Florian Krämer
  * @license MIT
+ *
+ * @property CartsItem CartsItem
  */
 class Cart extends CartAppModel {
 /**

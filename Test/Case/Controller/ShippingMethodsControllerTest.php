@@ -3,6 +3,9 @@
 App::import('Controller', 'Cart.ShippingMethods');
 
 App::import('Lib', 'Templates.AppControllerTestCase');
+/**
+ * @property ShippingMethodsController ShippingMethods
+ */
 class ShippingMethodsControllerTestCase extends AppControllerTestCase {
 /**
  * Autoload entrypoint for fixtures dependecy solver
@@ -10,16 +13,7 @@ class ShippingMethodsControllerTestCase extends AppControllerTestCase {
  * @var string
  * @access public
  */
-	public $plugin = 'app';
-
-/**
- * Test to run for the test case (e.g array('testFind', 'testView'))
- * If this attribute is not empty only the tests from the list will be executed
- *
- * @var array
- * @access protected
- */
-	protected $_testsToRun = array();
+	public $plugin = 'Cart';
 
 /**
  * Start Test callback
@@ -59,18 +53,6 @@ class ShippingMethodsControllerTestCase extends AppControllerTestCase {
 	}
 
 /**
- * Convenience method to assert Flash messages
- *
- * @return void
- * @access public
- */
-	// public function assertFlash($message) {
-		// $flash = $this->ShippingMethods->Session->read('Message.flash');
-		// $this->assertEqual($flash['message'], $message);
-		// $this->ShippingMethods->Session->delete('Message.flash');
-	// }
-
-/**
  * Test object instances
  *
  * @return void
@@ -104,7 +86,6 @@ class ShippingMethodsControllerTestCase extends AppControllerTestCase {
 		$this->expectRedirect($this->ShippingMethods, array('action' => 'index'));
 		$this->assertFlash($this->ShippingMethods, 'The shipping method has been saved');
 		$this->ShippingMethods->add();
-		//$this->ShippingMethods->expectExactRedirectCount();
 	}
 
 /**
@@ -121,7 +102,6 @@ class ShippingMethodsControllerTestCase extends AppControllerTestCase {
 		$this->expectRedirect($this->ShippingMethods, array('action' => 'view', 'shippingmethod-1'));
 		$this->assertFlash($this->ShippingMethods, 'Shipping Method saved');
 		$this->ShippingMethods->edit('shippingmethod-1');
-		//$this->ShippingMethods->expectExactRedirectCount();
 	}
 
 /**
@@ -138,7 +118,6 @@ class ShippingMethodsControllerTestCase extends AppControllerTestCase {
 		$this->expectRedirect($this->ShippingMethods, array('action' => 'index'));
 		$this->assertFlash($this->ShippingMethods, 'Invalid Shipping Method');
 		$this->ShippingMethods->view('WRONG-ID');
-		//$this->ShippingMethods->expectExactRedirectCount();
 	}
 
 /**
@@ -160,7 +139,6 @@ class ShippingMethodsControllerTestCase extends AppControllerTestCase {
 		$this->expectRedirect($this->ShippingMethods, array('action' => 'index'));
 		$this->assertFlash($this->ShippingMethods, 'Shipping method deleted');
 		$this->ShippingMethods->delete('shippingmethod-1');
-		//$this->ShippingMethods->expectExactRedirectCount();
 	}
 
 
@@ -204,7 +182,6 @@ class ShippingMethodsControllerTestCase extends AppControllerTestCase {
 		$this->expectRedirect($this->ShippingMethods, array('action' => 'view', 'shippingmethod-1'));
 		$this->assertFlash($this->ShippingMethods, 'Shipping Method saved');
 		$this->ShippingMethods->admin_edit('shippingmethod-1');
-		//$this->ShippingMethods->expectExactRedirectCount();
 	}
 
 /**
@@ -221,7 +198,6 @@ class ShippingMethodsControllerTestCase extends AppControllerTestCase {
 		$this->expectRedirect($this->ShippingMethods, array('action' => 'index'));
 		$this->assertFlash($this->ShippingMethods, 'Invalid Shipping Method');
 		$this->ShippingMethods->admin_view('WRONG-ID');
-		//$this->ShippingMethods->expectExactRedirectCount();
 	}
 
 /**
@@ -243,10 +219,6 @@ class ShippingMethodsControllerTestCase extends AppControllerTestCase {
 		$this->expectRedirect($this->ShippingMethods, array('action' => 'index'));
 		$this->assertFlash($this->ShippingMethods, 'Shipping method deleted');
 		$this->ShippingMethods->admin_delete('shippingmethod-1');
-		//$this->ShippingMethods->expectExactRedirectCount();
 	}
 
-
-
-	
 }

@@ -6,7 +6,7 @@ class CartRule extends CartAppModel {
  * @var array
  */
 	public $hasMany = array(
-		'RuleCondition' => array(
+		'CartRuleCondition' => array(
 			'foreignKey' => 'cart_rule_id',
 			'order' => 'position'));
 
@@ -42,7 +42,7 @@ class CartRule extends CartAppModel {
 	public function applyRules($cartData) {
 		$rules = $this->find('all', array(
 			'contain' => array(
-				'RuleCondition'),
+				'CartRuleCondition'),
 			'conditions' => array(
 				$this->alias . '.active' => 1)));
 
@@ -51,7 +51,7 @@ class CartRule extends CartAppModel {
 		}
 
 		foreach ($rules as $rule) {
-			foreach ($rule['RuleCondition'] as $condition) {
+			foreach ($rule['CartRuleCondition'] as $condition) {
 				$this->evaluateCondition($cartData, $condition, $type);
 			}
 		}
