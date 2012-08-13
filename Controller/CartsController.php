@@ -151,11 +151,33 @@ class CartsController extends CartAppController {
  *
  * @return void
  */
-	public function confirm_checkout($processor = null, $token = null) {
+	public function confirm_order($processor = null, $token = null) {
+		//debug($this->here);
+		try {
+			$ProcessorCollection = new PaymentProcessorCollection();
+			$Processor = $ProcessorCollection->load($processor);
+		} catch (Exception $e) {
+			$this->Session->setFlash($e->getMessage());
+			$this->redirect(array('action' => 'view'));
+		}
+
+		if (!empty($this->request->data)) {
+			debug($this->request->data);
+			/*
+			if (!method_exists($Processor, 'confirmOrder')) {
+				$this->Session->setFlash(__('Unsupported payment processor for this type of checkout!'));
+				$this->redirect(array('action' => 'view'));
+			}
+			$Processor->confirmOrder($this, $newOrder);
+			*/
+		}
+
+		/*
 		if ($this->Cart->confirmCheckout($this->data)) {
 			CakeEventManager::dispatch(new CakeEvent('Carts.confirmCheckout', $this, array()));
 		}
 		$this->set('cart', $this->CartManager->content());
+		*/
 	}
 
 /**

@@ -39,14 +39,14 @@ abstract class BasePaymentProcessor extends Object {
  *
  * @var mixed array or string url, parseable by the Router
  */
-	public $returnUrl = array('admin' => false, 'plugin' => 'cart', 'controller' => 'cart', 'action' => 'confirm_order');
+	public $returnUrl = array('admin' => false, 'plugin' => 'cart', 'controller' => 'carts', 'action' => 'confirm_order');
 
 /**
  * Cancel Url
  *
  * @var mixed array or string url, parseable by the Router
  */
-	public $cancelUrl = array('admin' => false, 'plugin' => 'cart', 'controller' => 'carts', 'action' => 'cancel_checkout');
+	public $cancelUrl = array('admin' => false, 'plugin' => 'cart', 'controller' => 'carts', 'action' => 'cancel_order');
 
 /**
  * Redirect

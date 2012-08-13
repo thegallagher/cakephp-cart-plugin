@@ -213,9 +213,14 @@ class CartManagerComponent extends Component {
 					'foreign_key' => $this->Controller->request->params['named']['item'],
 					'model' => get_class($this->Controller->{$model})));
 
+			if (isset($this->Controller->request->params['named']['model'])) {
+				$data['CartsItem']['model'] = $this->Controller->request->params['named']['model'];
+			}
+
 			if (isset($this->Controller->request->params['named']['quantity'])) {
 				$data['CartsItem']['quantity'] = $this->Controller->request->params['named']['quantity'];
 			}
+
 			return $data;
 		}
 		return false;

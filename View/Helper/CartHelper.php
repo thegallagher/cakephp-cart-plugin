@@ -53,6 +53,35 @@ class CartHelper extends AppHelper {
 		return in_array($item, $this->_itemsInCart);
 	}
 
+	public function input($id, $model, $options) {
+		$defaults = array('form');
+
+		
+
+		$string = $this->Form->input('Cart.' . $this->iterator . '.quantity', array(
+			'type' => 'text',
+			'label' => false,
+			'default' => 1));
+		$string .= $this->Form->hidden('Cart.' . $this->iterator . '.Model', array(
+			'value' => $model));
+		$string .= $this->Form->hidden('Cart.' . $this->iterator . '.foreign_key', array(
+			'value' => $id));
+
+		
+
+		if ($options['div'] !== false) {
+			if (is_array($options['div'])) {
+				$this->Html->div($string, $options['div']);
+			} else {
+				$this->Html->div($string, array(
+					'class' => 'cart-item-form'));
+			}
+		}
+	}
+
+/**
+ * 
+ */
 	public function multiInput($id, $model = '') {
 		$string = $this->Form->input('Cart.' . $this->iterator . '.quantity', array(
 			'type' => 'text',
@@ -63,9 +92,13 @@ class CartHelper extends AppHelper {
 		$string .= $this->Form->hidden('Cart.' . $this->iterator . '.foreign_key', array(
 			'value' => $id));
 		$this->iterator++;
+
 		return $string;
 	}
 
+/**
+ * 
+ */
 	public function link($title, $url = array(), $options = array()) {
 		$urlDefaults = array(
 			'controller' => $this->params['controller'],
@@ -74,6 +107,11 @@ class CartHelper extends AppHelper {
 			'class' => 'buy-link');
 		$url = Set::merge($urlDefaults, $url);
 		$options = Set::merge($optionDefaults, $options);
+
+		if (!isset($url['item'])) {
+			throw new InvalidArgumentException(__('The 2nd argument $url array requires the item key to be present!'));
+		}
+
 		return $this->Html->link($title, $url, $options);
 	}
 
