@@ -83,11 +83,19 @@ class CartManagerComponent extends Component {
 
 		$this->sessionKey = $this->settings['sessionKey'];
 
-		if ($this->Controller->Auth->user()) {
+		$this->__setLoggedInStatus();
+		$this->initalizeCart();
+	}
+
+/**
+ * Extend the CartManagerComponent and Override this method if needed
+ *
+ * @return void
+ */
+	protected function __setLoggedInStatus() {
+		if (is_a($this->Controller->Auth, 'AuthComponent') && $this->Controller->Auth->user()) {
 			$this->isLoggedIn = true;
 		}
-
-		$this->initalizeCart();
 	}
 
 /**
