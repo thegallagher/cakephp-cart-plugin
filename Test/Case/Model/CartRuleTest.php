@@ -1,4 +1,7 @@
 <?php
+/**
+ * @property CartRule CartRule
+ */
 class CartRuleTest extends CakeTestCase {
 /**
  * Fixtures
@@ -7,14 +10,15 @@ class CartRuleTest extends CakeTestCase {
  */
 	public $fixtures  = array(
 		'plugin.cart.cart_rule',
-		'plugin.cart.cart_rule_conditions');
+		'plugin.cart.cart_rule_condition');
 
 /**
  * startUp
  *
  * @return void
  */
-	public function startUp() {
+	public function startTest($method) {
+        parent::startTest($method);
 		$this->CartRule = ClassRegistry::init('Cart.CartRule');
 	}
 

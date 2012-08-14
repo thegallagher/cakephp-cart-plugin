@@ -19,7 +19,7 @@ class ShippingMethodsController extends CartAppController {
 	public function beforeFilter() {
 		parent::beforeFilter();
 
-		if (Configure::read('Cart.anonymousCheckout') == true) 
+		if (Configure::read('Cart.anonymousCheckout') == true) {
 			$this->Auth->allow('*');
 		}
 	}
