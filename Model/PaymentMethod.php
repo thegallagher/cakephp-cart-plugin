@@ -7,12 +7,6 @@ App::uses('CartAppModel', 'Cart.Model');
  * @copyright 2012 Florian Krämer
  */
 class PaymentMethod extends CartAppModel {
-
-/**
- * 
- */
-	public $useTable = false;
-
 /**
  * 
  */
@@ -32,8 +26,11 @@ class PaymentMethod extends CartAppModel {
 	}
 
 /**
- * 
- * @return string
+ * Gets the processor class name for a payment method based on id, alias or 
+ * classname. This will return it only if the payment method is active.
+ *
+ * @param $processorAlias
+ * @return mixed string on success or false
  */
 	public function getMappedClassName($processorAlias = null) {
 		$result = $this->find('first', array(
