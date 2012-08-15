@@ -1,5 +1,6 @@
 <?php
 App::uses('BasePaymentProcessor', 'Cart.Lib/Payment');
+App::uses('ExpressCheckoutProcessor', 'Cart.Lib/Interface');
 /**
  * Dummy Express Checkout Processor
  *
@@ -7,7 +8,7 @@ App::uses('BasePaymentProcessor', 'Cart.Lib/Payment');
  * @copyright 2012 Florian Krämer
  * @license MIT
  */
-class DummyEcProcessor extends BasePaymentProcessor implements ExpressCheckoutInterface {
+class DummyEcProcessor extends BasePaymentProcessor implements ExpressCheckoutProcessor {
 /**
  * 
  */

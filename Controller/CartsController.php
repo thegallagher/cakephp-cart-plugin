@@ -104,7 +104,7 @@ class CartsController extends CartAppController {
 			$this->cakeError(404);
 		}
 
-		CakeEventManager::dispatch(new CakeEvent('Payment.callack', $this->request));
+		CakeEventManager::dispatch(new CakeEvent('Payment.callback', $this->request));
 	}
 
 /**
