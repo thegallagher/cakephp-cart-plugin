@@ -131,7 +131,9 @@ class D287dbf03fef11e1b86c0800200c9a66 extends CakeMigration {
 				'payment_methods' => array(
 					'id' => array('type'=>'string', 'null' => false, 'default' => NULL, 'length' => 36, 'key' => 'primary'),
 					'name' => array('type'=>'string', 'null' => true, 'default' => NULL),
-					'price' => array('type'=>'float', 'null' => true, 'default' => NULL, 'length' => 6,2),
+					'alias' => array('type'=>'string', 'null' => true, 'default' => NULL),
+					'class' => array('type'=>'string', 'null' => true, 'default' => NULL),
+					'fee' => array('type'=>'float', 'null' => true, 'default' => NULL, 'length' => 6,2, 'comment' => 'Can be used to charge a fee for that processor'),
 					'active' => array('type'=>'boolean', 'null' => true, 'default' => '0', 'comment' => 'Virtual as a download or a service'),
 					'description' => array('type'=>'string', 'null' => true, 'default' => NULL),
 					'position' => array('type' => 'integer', 'null' => true, 'default' => NULL),
@@ -153,7 +155,7 @@ class D287dbf03fef11e1b86c0800200c9a66 extends CakeMigration {
 		),
 		'down' => array(
 			'drop_table' => array(
-				'carts', 'carts_items', 'orders', 'order_items', 'shipping_methods', 'order_addresses', 'cart_rules', 'cart_rule_conditions', 'payment_api_transactions'),
+				'carts', 'carts_items', 'orders', 'order_items', 'shipping_methods', 'order_addresses', 'cart_rules', 'cart_rule_conditions', 'payment_api_transactions', 'payment_methods'),
 		)
 	);
 

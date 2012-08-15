@@ -2,6 +2,7 @@
 App::uses('CartAppController', 'Cart.Controller');
 App::uses('CakeEventManager', 'Event');
 App::uses('CakeEvent', 'Event');
+App::uses('PaymentProcessors', 'Cart.Payment');
 /**
  * Carts Controller
  *
@@ -98,12 +99,12 @@ class CartsController extends CartAppController {
 		$this->log($_GET, 'cart-callback');
 
 		// @todo check for valid processor?
+		//$Processor = PaymentProcessors::load($processor);
 		if (empty($processor)) {
 			$this->cakeError(404);
 		}
 
-		CakeEventManager::dispatch(new CakeEvent('Carts.callback', $this, array($this->CartManager->content(), $action)));
-		CakeEventManager::dispatch(new CakeEvent('Payment.' . $action, $this, array($this->CartManager->content())));
+		CakeEventManager::dispatch(new CakeEvent('Payment.callack', $this->request));
 	}
 
 /**
@@ -116,6 +117,8 @@ class CartsController extends CartAppController {
  * @return void
  */
 	public function checkout($processor = null, $action = Null) {
+		$processor = $this->__mapProcessorClass($processor);
+
 		$cartData = $this->CartManager->content();
 
 		if (empty($cartData['CartsItem'])) {
@@ -126,8 +129,7 @@ class CartsController extends CartAppController {
 		$this->__anonymousCheckoutIsAllowed();
 
 		try {
-			$ProcessorCollection = new PaymentProcessorCollection();
-			$Processor = $ProcessorCollection->load($processor);
+			$Processor = PaymentProcessors::load($processor);
 		} catch (Exception $e) {
 			$this->Session->setFlash($e->getMessage());
 			$this->redirect(array('action' => 'view'));
@@ -152,32 +154,57 @@ class CartsController extends CartAppController {
  * @return void
  */
 	public function confirm_order($processor = null, $token = null) {
-		//debug($this->here);
+		$processor = $this->__mapProcessorClass($processor);
+
 		try {
-			$ProcessorCollection = new PaymentProcessorCollection();
-			$Processor = $ProcessorCollection->load($processor);
+			$Processor = PaymentProcessors::load($processor);
+		} catch (MissingPaymentProcessorException $e) {
+			$this->Session->setFlash(__d('cart', 'The payment method does not exist!'));
+			$this->redirect(array('action' => 'view'));
 		} catch (Exception $e) {
 			$this->Session->setFlash($e->getMessage());
 			$this->redirect(array('action' => 'view'));
 		}
 
+		die(Debug($this->request));
 		if (!empty($this->request->data)) {
 			debug($this->request->data);
-			/*
+
 			if (!method_exists($Processor, 'confirmOrder')) {
 				$this->Session->setFlash(__('Unsupported payment processor for this type of checkout!'));
 				$this->redirect(array('action' => 'view'));
 			}
-			$Processor->confirmOrder($this, $newOrder);
-			*/
+			//$Processor->confirmOrder($this, $newOrder);
 		}
 
-		/*
-		if ($this->Cart->confirmCheckout($this->data)) {
-			CakeEventManager::dispatch(new CakeEvent('Carts.confirmCheckout', $this, array()));
+	}
+
+/**
+ * Checks if the processor name is mapped in the static configure class or if 
+ * it is mapped in the PaymentMethod model.
+ *
+ * The payment method model gives you greater flexibility to en/disable processors
+ * on the fly through the admin backend.
+ *
+ * If no mapped processor classname is found it will return the passed name and
+ * the PaymentProcessors::load() method will throw an exception if it cant find
+ * that processor.
+ *
+ * @param string $processorAlias
+ * @return string
+ */
+	protected function __mapProcessorClass($processorAlias) {
+		$this->log($processorAlias, 'processor-alias');
+		$this->log($this->request, 'processor-alias');
+		$processorClass = Configure::read('Cart.PaymentMethod.'. $processorAlias . '.processor');
+		if (!empty($processorClass)) {
+			return $processorClass;
 		}
-		$this->set('cart', $this->CartManager->content());
-		*/
+		$processorClass = ClassRegistry::init('Cart.PaymentMethod')->getMappedClassName($processorAlias);
+		if (!empty($processorClass)) {
+			return $processorClass;
+		}
+		return $processorAlias;
 	}
 
 /**
