@@ -12,6 +12,13 @@ class DummyEcProcessor extends BasePaymentProcessor implements ExpressCheckoutPr
 /**
  * 
  */
+	public function checkout($order) {
+		$this->ecInitAndRedirect($order);
+	}
+
+/**
+ * 
+ */
 	public function ecInitAndRedirect($cart, $options = array()) {
 		$this->redirect(array('plugin' => 'cart', 'admin' => false, 'controller' => 'dummy_controller', 'ec_checkout'));
 	}

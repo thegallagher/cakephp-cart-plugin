@@ -4,6 +4,7 @@ App::uses('CakeResponse', 'Network');
 App::uses('PaymentProcessorException', 'Cart.Error');
 App::uses('PaymentApiException', 'Cart.Error');
 App::uses('ClassRegistry', 'Utility');
+App::uses('CakeSession', 'Model/Datasource');
 
 /**
  * BasePaymentProcessor
@@ -70,6 +71,22 @@ abstract class BasePaymentProcessor extends Object {
  * @var mixed array or string url, parseable by the Router
  */
 	public $cancelUrl = array('admin' => false, 'plugin' => 'cart', 'controller' => 'carts', 'action' => 'cancel_order');
+
+/**
+ * Constructor
+ *
+ * @return void
+ */
+	public function __construct($options = array()) {
+		$this->response = new CakeResponse();
+		if (!isset($options['cartModel'])) {
+			$options['cartModel'] = 'Cart.Cart';
+		}
+		$this->CartModel = ClassRegistry::init($options['cartModel']);
+		$this->OrderModel = ClassRegistry::init('Cart.Order');
+
+		
+	}
 
 /**
  * Redirect
