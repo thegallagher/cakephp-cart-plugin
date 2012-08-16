@@ -18,7 +18,7 @@
  * Note: the callback "public function afterOrder($orderId);" can also be implemented.
  * 	It will be called after the Order was successfully created
  */
-interface ExpressCheckout {
+interface ExpressCheckoutProcessor {
 /**
  * Step 1 of the Express Checkout
  * Initializes the command on Payment provider side, and redirects to its website. If an error occurred an exception must be thrown

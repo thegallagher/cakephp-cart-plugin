@@ -99,7 +99,7 @@ class CartsController extends CartAppController {
 		$this->log($_GET, 'cart-callback');
 
 		// @todo check for valid processor?
-		//$Processor = PaymentProcessors::load($processor);
+		//$Processor = PaymentProcessors::load($processor, array('request' => $this->request, 'response' => $this->response));
 		if (empty($processor)) {
 			$this->cakeError(404);
 		}
@@ -129,7 +129,7 @@ class CartsController extends CartAppController {
 		$this->__anonymousCheckoutIsAllowed();
 
 		try {
-			$Processor = PaymentProcessors::load($processor);
+			$Processor = PaymentProcessors::load($processor, array('request' => $this->request, 'response' => $this->response));
 		} catch (Exception $e) {
 			$this->Session->setFlash($e->getMessage());
 			$this->redirect(array('action' => 'view'));
@@ -157,7 +157,7 @@ class CartsController extends CartAppController {
 		$processor = $this->__mapProcessorClass($processor);
 
 		try {
-			$Processor = PaymentProcessors::load($processor);
+			$Processor = PaymentProcessors::load($processor, array('request' => $this->request, 'response' => $this->response));
 		} catch (MissingPaymentProcessorException $e) {
 			$this->Session->setFlash(__d('cart', 'The payment method does not exist!'));
 			$this->redirect(array('action' => 'view'));

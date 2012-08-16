@@ -14,12 +14,35 @@ App::uses('ClassRegistry', 'Utility');
  */
 abstract class BasePaymentProcessor extends Object {
 /**
+ * CakeRequest object instance
+ * 
+ * @var CakeRequest
+ */
+	protected $_request;
+
+/**
+ * CakeResponse object instance
+ * 
+ * @var CakeResponse
+ */
+	protected $_response;
+
+/**
  * Constructor
  *
  * @return void
  */
 	public function __construct($options = array()) {
-		$this->response = new CakeResponse();
+		if (!empty($options['request'])) {
+			$this->_request = $options['request'];
+		} else {
+			$this->_request = new CakeRequest();
+		}
+		if (!empty($options['response'])) {
+			$this->_response = $options['response'];
+		} else {
+			$this->_response = new CakeResponse();
+		}
 		if (!isset($options['cartModel'])) {
 			$options['cartModel'] = 'Cart.Cart';
 		}
