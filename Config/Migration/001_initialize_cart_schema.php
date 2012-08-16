@@ -140,16 +140,19 @@ class D287dbf03fef11e1b86c0800200c9a66 extends CakeMigration {
 					'created' => array('type'=>'datetime', 'null' => true, 'default' => NULL),
 					'modified' => array('type'=>'datetime', 'null' => true, 'default' => NULL),
 					'indexes' => array(
-							'PRIMARY' => array('column' => 'id', 'unique' => 1))
+						'PRIMARY' => array('column' => 'id', 'unique' => 1))
 				),
 				'payment_api_transactions' => array(
 					'id' => array('type'=>'string', 'null' => false, 'default' => NULL, 'length' => 36, 'key' => 'primary'),
+					'order_id' => array('type'=>'string', 'null' => false, 'default' => NULL, 'length' => 36),
 					'token' => array('type'=>'string', 'null' => false, 'default' => NULL),
 					'processor' => array('type'=>'string', 'null' => false, 'default' => NULL),
-					'response' => array('type'=>'text', 'null' => false, 'default' => NULL),
+					'type' => array('type'=>'string', 'null' => false, 'default' => NULL),
+					'message' => array('type'=>'text', 'null' => false, 'default' => NULL),
 					'created' => array('type'=>'datetime', 'null' => true, 'default' => NULL),
 					'indexes' => array(
-						'PRIMARY' => array('column' => 'id', 'unique' => 1))
+						'PRIMARY' => array('column' => 'id', 'unique' => 1),
+						'ORDER_INDEX' => array('column' => 'order_id')),
 				),
 			),
 		),

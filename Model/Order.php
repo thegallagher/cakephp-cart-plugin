@@ -174,6 +174,7 @@ class Order extends CartAppModel {
 		$this->create();
 		$result = $this->save($order);
 		$orderId = $this->getLastInsertId();
+		$result[$this->alias][$this->primaryKey] = $orderId;
 
 		foreach ($cartData['CartsItem'] as $item) {
 			$item['order_id'] = $orderId;

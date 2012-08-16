@@ -117,10 +117,7 @@ class CartsController extends CartAppController {
  * @return void
  */
 	public function checkout($processor = null, $action = Null) {
-		$processor = $this->__mapProcessorClass($processor);
-
 		$cartData = $this->CartManager->content();
-
 		if (empty($cartData['CartsItem'])) {
 			$this->Session->setFlash(__d('cart', 'Your cart is empty.'));
 			$this->redirect(array('action' => 'view'));
@@ -128,19 +125,18 @@ class CartsController extends CartAppController {
 
 		$this->__anonymousCheckoutIsAllowed();
 
-		try {
-			$Processor = PaymentProcessors::load($processor);
-		} catch (Exception $e) {
-			$this->Session->setFlash($e->getMessage());
-			$this->redirect(array('action' => 'view'));
-		}
+		$Processor = $this->__loadPaymentProcessor($processor);
 
 		$Order = ClassRegistry::init('Cart.Order');
-		$ApiLog = ClassRegistry::init('Cart.PaymentApiTransaction');
 		$newOrder = $Order->createOrder($cartData, $processor);
 
 		if ($newOrder) {
 			$this->CartManager->emptyCart();
+			$ApiLog = ClassRegistry::init('Cart.PaymentApiTransaction');
+			$ApiLog->initialize($processor, $newOrder['Order']['id']);
+
+			$Processor->returnUrl[] = $processor;
+			$Processor->returnUrl[] = $newOrder['Order']['id'];
 			$Processor->checkout($this, $newOrder);
 		}
 
@@ -153,18 +149,8 @@ class CartsController extends CartAppController {
  *
  * @return void
  */
-	public function confirm_order($processor = null, $token = null) {
-		$processor = $this->__mapProcessorClass($processor);
-
-		try {
-			$Processor = PaymentProcessors::load($processor);
-		} catch (MissingPaymentProcessorException $e) {
-			$this->Session->setFlash(__d('cart', 'The payment method does not exist!'));
-			$this->redirect(array('action' => 'view'));
-		} catch (Exception $e) {
-			$this->Session->setFlash($e->getMessage());
-			$this->redirect(array('action' => 'view'));
-		}
+	public function confirm_order($processor = null, $orderId = null) {
+		$Processor = $this->__loadPaymentProcessor($processor);
 
 		die(Debug($this->request));
 		if (!empty($this->request->data)) {
@@ -177,6 +163,28 @@ class CartsController extends CartAppController {
 			//$Processor->confirmOrder($this, $newOrder);
 		}
 
+		$ApiLog = ClassRegistry::init('Cart.PaymentApiTransaction');
+		$ApiLog->finish($processor, $neworder['Order']['id']);
+	}
+
+/**
+ * Loads the processor instance, handles errors and redirects in the case of an error
+ *
+ * @param string $processor
+ * @return PaymentProcessor
+ */
+	protected function __loadPaymentProcessor($processor) {
+		$processor = $this->__mapProcessorClass($processor);
+
+		try {
+			return PaymentProcessors::load($processor);
+		} catch (MissingPaymentProcessorException $e) {
+			$this->Session->setFlash(__d('cart', 'The payment method does not exist!'));
+			$this->redirect(array('action' => 'view'));
+		} catch (Exception $e) {
+			$this->Session->setFlash($e->getMessage());
+			$this->redirect(array('action' => 'view'));
+		}
 	}
 
 /**
@@ -194,8 +202,6 @@ class CartsController extends CartAppController {
  * @return string
  */
 	protected function __mapProcessorClass($processorAlias) {
-		$this->log($processorAlias, 'processor-alias');
-		$this->log($this->request, 'processor-alias');
 		$processorClass = Configure::read('Cart.PaymentMethod.'. $processorAlias . '.processor');
 		if (!empty($processorClass)) {
 			return $processorClass;
@@ -229,6 +235,13 @@ class CartsController extends CartAppController {
  */
 	public function admin_index() {
 		$this->set('carts', $this->paginate());
+	}
+
+/**
+ * 
+ */
+	public function admin_view($cartId = null) {
+		$this->set('cart', $this->Cart->view($cartId));
 	}
 
 /**
