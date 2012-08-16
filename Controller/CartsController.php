@@ -125,18 +125,20 @@ class CartsController extends CartAppController {
 
 		$this->__anonymousCheckoutIsAllowed();
 
-		$Processor = $this->__loadPaymentProcessor($processor);
+		$processorClass = $this->__mapProcessorClass($processor);
+		$Processor = $this->__loadPaymentProcessor($processorClass);
 
 		$Order = ClassRegistry::init('Cart.Order');
 		$newOrder = $Order->createOrder($cartData, $processor);
 
 		if ($newOrder) {
 			$this->CartManager->emptyCart();
-			$ApiLog = ClassRegistry::init('Cart.PaymentApiTransaction');
-			$ApiLog->initialize($processor, $newOrder['Order']['id']);
 
-			$Processor->returnUrl[] = $processor;
-			$Processor->returnUrl[] = $newOrder['Order']['id'];
+			$ApiLog = ClassRegistry::init('Cart.PaymentApiTransaction');
+			$ApiLog->initialize($processorClass, $newOrder['Order']['id']);
+
+			$Processor->cancelUrl[] = CakeSession::read('Payment.token');
+			$Processor->returnUrl[] = CakeSession::read('Payment.token');
 			$Processor->checkout($this, $newOrder);
 		}
 
@@ -149,22 +151,47 @@ class CartsController extends CartAppController {
  *
  * @return void
  */
-	public function confirm_order($processor = null, $orderId = null) {
-		$Processor = $this->__loadPaymentProcessor($processor);
+	public function confirm_order($transactionToken = null) {
+		$this->log(CakeSession::read('Payment.token'), 'order-request');
+		$this->log($this->request, 'order-request');
+		if ($transactionToken != CakeSession::read('Payment.token')) {
+			$this->Session->setFlash(__d('cart', 'Invalid Order'));
+			$this->redirect('/');
+		}
 
-		die(Debug($this->request));
+		$Order = ClassRegistry::init('Cart.Order');
+		$order = $Order->find('first', array(
+			'contain' => array(),
+			'conditions' => array(
+				'Order.id' => CakeSession::read('Payment.orderId'))));
+
+		$Processor = $this->__loadPaymentProcessor($order['Order']['processor']);
+
 		if (!empty($this->request->data)) {
-			debug($this->request->data);
 
 			if (!method_exists($Processor, 'confirmOrder')) {
 				$this->Session->setFlash(__('Unsupported payment processor for this type of checkout!'));
 				$this->redirect(array('action' => 'view'));
 			}
-			//$Processor->confirmOrder($this, $newOrder);
+			$Processor->confirmOrder($this->request, $order);
 		}
 
 		$ApiLog = ClassRegistry::init('Cart.PaymentApiTransaction');
 		$ApiLog->finish($processor, $neworder['Order']['id']);
+	}
+
+/**
+ * @todo
+ */
+	public function finish_order($transactionToken) {
+		
+	}
+
+/**
+ * @todo
+ */
+	public function cancel_order($transactionToken) {
+		
 	}
 
 /**
@@ -174,8 +201,6 @@ class CartsController extends CartAppController {
  * @return PaymentProcessor
  */
 	protected function __loadPaymentProcessor($processor) {
-		$processor = $this->__mapProcessorClass($processor);
-
 		try {
 			return PaymentProcessors::load($processor);
 		} catch (MissingPaymentProcessorException $e) {

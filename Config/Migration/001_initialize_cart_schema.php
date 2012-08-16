@@ -67,7 +67,9 @@ class D287dbf03fef11e1b86c0800200c9a66 extends CakeMigration {
 					'id' => array('type'=>'string', 'null' => false, 'default' => NULL, 'length' => 36, 'key' => 'primary'),
 					'user_id' => array('type'=>'string', 'null' => true, 'default' => NULL, 'length' => 36),
 					'cart_id' => array('type'=>'string', 'null' => true, 'default' => NULL, 'length' => 36),
-					'payment_processor' => array('type'=>'string', 'null' => true, 'default' => NULL, 'length' => 32),
+					'cart_snapshop' => array('type'=>'text', 'null' => true, 'default' => NULL),
+					'token' => array('type'=>'string', 'null' => true, 'default' => NULL, 'length' => 32),
+					'processor' => array('type'=>'string', 'null' => true, 'default' => NULL, 'length' => 32),
 					'status' => array('type'=>'string', 'null' => true, 'default' => NULL, 'length' => 16, 'comment' => 'internal status, up to the app'), // completed, refunded, partial-refund, cancelled, shipped
 					'transaction_status' => array('type'=>'string', 'null' => true, 'default' => NULL, 'length' => 16, 'status of the transaction'),
 					'transaction_fee' => array('type'=>'float', 'null' => true, 'default' => NULL, 'length' => 6,2),
@@ -77,7 +79,10 @@ class D287dbf03fef11e1b86c0800200c9a66 extends CakeMigration {
 					'created' => array('type'=>'datetime', 'null' => true, 'default' => NULL),
 					'modified' => array('type'=>'datetime', 'null' => true, 'default' => NULL),
 					'indexes' => array(
-						'PRIMARY' => array('column' => 'id', 'unique' => 1))
+						'PRIMARY' => array('column' => 'id', 'unique' => 1),
+						'USER_INDEX' => array('column' => 'user_id'),
+						'CART_INDEX' => array('column' => 'cart_id'),
+						'TOKEN_INDEX' => array('column' => 'token'))
 				),
 				'order_items' => array(
 					'id' => array('type'=>'string', 'null' => false, 'default' => NULL, 'length' => 36, 'key' => 'primary'),
