@@ -73,22 +73,6 @@ abstract class BasePaymentProcessor extends Object {
 	public $cancelUrl = array('admin' => false, 'plugin' => 'cart', 'controller' => 'carts', 'action' => 'cancel_order');
 
 /**
- * Constructor
- *
- * @return void
- */
-	public function __construct($options = array()) {
-		$this->response = new CakeResponse();
-		if (!isset($options['cartModel'])) {
-			$options['cartModel'] = 'Cart.Cart';
-		}
-		$this->CartModel = ClassRegistry::init($options['cartModel']);
-		$this->OrderModel = ClassRegistry::init('Cart.Order');
-
-		
-	}
-
-/**
  * Redirect
  *
  * @param string url to redirect to
