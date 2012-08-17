@@ -129,7 +129,7 @@ class CartsController extends CartAppController {
 		$Processor = $this->__loadPaymentProcessor($processorClass);
 
 		$Order = ClassRegistry::init('Cart.Order');
-		$newOrder = $Order->createOrder($cartData, $processor);
+		$newOrder = $Order->createOrder($cartData, $processorClass);
 
 		if ($newOrder) {
 			$this->CartManager->emptyCart();
@@ -141,7 +141,7 @@ class CartsController extends CartAppController {
 
 			$Processor->cancelUrl[] = CakeSession::read('Payment.token');
 			$Processor->returnUrl[] = CakeSession::read('Payment.token');
-			$Processor->checkout($this, $newOrder);
+			$Processor->checkout($newOrder);
 		}
 
 		$this->Session->setFlash(__d('cart', 'There was a problem creating your order.'));
@@ -172,7 +172,7 @@ class CartsController extends CartAppController {
 			$this->redirect(array('action' => 'view'));
 		}
 
-		$Processor->confirmOrder($this->request, $order);
+		debug($Processor->confirmOrder($order));
 
 		//$ApiLog = ClassRegistry::init('Cart.PaymentApiTransaction');
 		//$ApiLog->finish($processor, $neworder['Order']['id']);
