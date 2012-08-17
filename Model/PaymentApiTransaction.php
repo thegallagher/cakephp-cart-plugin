@@ -79,8 +79,6 @@ class PaymentApiTransaction extends CartAppModel {
 		$orderId = CakeSession::read('Payment.orderId');
 
 		if (empty($token) || empty($processorName) || empty($orderId)) {
-			//@todo Throw it really or not or return false?
-			//throw new RuntimeException(__('Missing token or payment processor name'));
 			return false;
 		}
 

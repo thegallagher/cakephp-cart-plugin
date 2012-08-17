@@ -110,6 +110,7 @@ class CartManagerComponent extends Component {
 
 		if (!$this->Session->check($sessionKey)) {
 			if ($userId) {
+				// @todo Do not forget to merge existing itmes with the ones from the database!!!
 				$this->Session->write($sessionKey, $this->CartModel->getActive($userId));
 			} else {
 				$this->Session->write($sessionKey, array(
