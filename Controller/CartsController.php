@@ -51,7 +51,6 @@ class CartsController extends CartAppController {
  */
 	public function view($cartId = null) {
 		if (!empty($this->request->data)) {
-			//debug($this->request->data);
 			$cart = $this->CartManager->content();
 			foreach ($this->request->data['CartsItem'] as $key => $cartItem) {
 				$cartItem = Set::merge($cart['CartsItem'][$key], $cartItem);
@@ -94,9 +93,10 @@ class CartsController extends CartAppController {
  * @param string $processor
  * @return void
  */
-	public function callback($processor = Null, $action = null) {
+	public function callback($processor = null, $action = null) {
 		$this->log($_POST, 'cart-callback');
 		$this->log($_GET, 'cart-callback');
+		$this->log($this->request, 'cart-callback-request');
 
 		// @todo check for valid processor?
 		//$Processor = PaymentProcessors::load($processor, array('request' => $this->request, 'response' => $this->response));
@@ -104,7 +104,7 @@ class CartsController extends CartAppController {
 			$this->cakeError(404);
 		}
 
-		CakeEventManager::dispatch(new CakeEvent('Payment.callback', $this->request));
+		//CakeEventManager::dispatch(new CakeEvent('Payment.callback', $this->request));
 	}
 
 /**
@@ -132,7 +132,7 @@ class CartsController extends CartAppController {
 		$newOrder = $Order->createOrder($cartData, $processorClass);
 
 		if ($newOrder) {
-			$this->CartManager->emptyCart();
+			//$this->CartManager->emptyCart();
 
 			$ApiLog = ClassRegistry::init('Cart.PaymentApiTransaction');
 			$token = $ApiLog->initialize($processorClass, $newOrder['Order']['id']);
@@ -172,7 +172,20 @@ class CartsController extends CartAppController {
 			$this->redirect(array('action' => 'view'));
 		}
 
-		debug($Processor->confirmOrder($order));
+		$this->set('order', $order);
+		$Processor->confirmOrder($order);
+
+		if (!empty($this->request->data)) {
+			if (isset($this->request->data['complete'])) {
+				$result = $Processor->finishOrder($order);
+				if ($result) {
+					$this->redirect(array('action' => 'finish_order'));
+				}
+			} else {
+				// @todo
+			}
+		}
+
 
 		//$ApiLog = ClassRegistry::init('Cart.PaymentApiTransaction');
 		//$ApiLog->finish($processor, $neworder['Order']['id']);

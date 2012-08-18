@@ -15,7 +15,10 @@ class PaymentApiLogger implements CakeLogInterface {
  * @var array
  */
 	public $types = array(
-		'payment');
+		'payment',
+		'payment-debug',
+		'payment-error',
+		'payment-warning');
 
 /**
  * Constructor
@@ -41,9 +44,19 @@ class PaymentApiLogger implements CakeLogInterface {
  * @return void
  */
 	public function write($type, $message) {
-		if (in_array($type, $this->types)) {
-			$this->Model->write($type, $message);
+		if (in_array($type, $this->types) || $type == 'payment-debug' && Configure::read('debug') > 0) {
+			return;
 		}
+
+		$data = array();
+		$trace = debug_backtrace();
+		if (isset($trace[2]) && isset($trace[2]['file']) && isset($trace[2]['line'])) {
+			$data['file'] = $trace[2]['file'],
+			$data['line'] = $trace[2]['line'];
+			$data['trace'] = serialize($trace);
+		}
+
+		$this->Model->write($type, $message, $data);
 	}
 
 }

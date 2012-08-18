@@ -105,13 +105,30 @@ class Order extends CartAppModel {
  * @param array $results
  * @return array
  */
-	public function afterFind($results) {
-		
+	public function afterFind($results, $primary) {
+		$results = $this->unserializeCartSnapshot($results);
 		return $results;
 	}
 
 /**
- * 
+ * Unserializes the data in the cart_snapshot field when it is present
+ *
+ * @param array $resuls
+ * @return array modified results array
+ */
+	public function unserializeCartSnapshot($results) {
+		if (!empty($results)) {
+			foreach ($results as $key => $result) {
+				if (isset($result[$this->alias]['cart_snapshop'])) {
+					$results[$key][$this->alias]['cart_snapshop'] = unserialize($result[$this->alias]['cart_snapshop']);
+				}
+			}
+		}
+		return $results;
+	}
+
+/**
+ * Displays an order
  *
  * @param 
  * @param 
@@ -159,7 +176,7 @@ class Order extends CartAppModel {
 			$this->alias => array(
 				'processor' => $processorClass,
 				'payment_status' => $paymentStatus,
-				'cart_id' => $cartData['Cart']['id'],
+				'cart_id' => empty($cartData['Cart']['id']) ? null : $cartData['Cart']['id'],
 				'user_id' => $cartData['Cart']['user_id'],
 				'cart_snapshop' => $cartData,
 				'total' => $cartData['Cart']['total']));

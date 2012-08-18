@@ -9,6 +9,9 @@
  */
 abstract class BasePaymentLib extends Object {
 
+	public function __construct($request) {
+		$this->_request = $request;
+	}
 /**
  * Log
  *
