@@ -93,18 +93,16 @@ class CartsController extends CartAppController {
  * @param string $processor
  * @return void
  */
-	public function callback($processor = null, $action = null) {
-		$this->log($_POST, 'cart-callback');
-		$this->log($_GET, 'cart-callback');
-		$this->log($this->request, 'cart-callback-request');
+	public function callback($token = null) {
+		$this->log($this->request, 'payment-callback-request');
 
 		// @todo check for valid processor?
 		//$Processor = PaymentProcessors::load($processor, array('request' => $this->request, 'response' => $this->response));
 		if (empty($processor)) {
-			$this->cakeError(404);
+			//$this->cakeError(404);
 		}
 
-		//CakeEventManager::dispatch(new CakeEvent('Payment.callback', $this->request));
+		CakeEventManager::dispatch(new CakeEvent('Payment.callback', $this->request));
 	}
 
 /**
