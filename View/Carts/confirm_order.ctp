@@ -4,7 +4,36 @@
 		echo __('Please review your order and and click below to complete your payment.');
 	?>
 </p>
-<?php //debug($cart); ?>
+
+<table class="table table-striped table-bordered table-condensed">
+	<thead>
+		<tr>
+			<th><?php echo __d('cart', 'Item'); ?></th>
+			<th><?php echo __d('cart', 'Price'); ?></th>
+			<th><?php echo __d('cart', 'Quantity'); ?></th>
+		</tr>
+	</thead>
+	<tbody>
+		<?php foreach($cart['CartsItem'] as $key => $item) : ?>
+			<tr>
+				<td><?php echo h($item['name']); ?></td>
+				<td><?php echo CakeNumber::currency($item['total']); ?></td>
+				<td>
+					<?php
+						echo h($item['quantity']);
+					?>
+				</td>
+			</tr>
+		<?php endforeach; ?>
+	</tbody>
+	<tfooter>
+		<tr>
+			<td><?php echo __d('cart', 'Total'); ?>
+			<td colspan="2"><?php echo CakeNumber::currency($cart['Cart']['total']); ?></td>
+		</tr>
+	</tfooter>
+</table>
+
 
 <h3><?php __('You must click on the "Complete my purchase" button below to complete your purchase'); ?></h3>
 <?php 

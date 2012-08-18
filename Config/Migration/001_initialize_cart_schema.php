@@ -71,7 +71,8 @@ class D287dbf03fef11e1b86c0800200c9a66 extends CakeMigration {
 					'token' => array('type'=>'string', 'null' => true, 'default' => NULL, 'length' => 32),
 					'processor' => array('type'=>'string', 'null' => true, 'default' => NULL, 'length' => 32),
 					'status' => array('type'=>'string', 'null' => true, 'default' => NULL, 'length' => 16, 'comment' => 'internal status, up to the app'), // completed, refunded, partial-refund, cancelled, shipped
-					'transaction_status' => array('type'=>'string', 'null' => true, 'default' => NULL, 'length' => 16, 'status of the transaction'),
+					'payment_reference' => array('type'=>'string', 'null' => true, 'default' => NULL, 'length' => 16, 'status of the transaction'),
+					'payment_status' => array('type'=>'string', 'null' => true, 'default' => NULL, 'length' => 16, 'status of the transaction'),
 					'transaction_fee' => array('type'=>'float', 'null' => true, 'default' => NULL, 'length' => 6,2),
 					'billing_address' => array('type'=>'text', 'null' => true, 'default' => NULL),
 					'shipping_address' => array('type'=>'text', 'null' => true, 'default' => NULL),

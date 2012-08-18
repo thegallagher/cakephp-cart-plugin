@@ -141,6 +141,7 @@ class CartsController extends CartAppController {
 
 			$Processor->cancelUrl[] = CakeSession::read('Payment.token');
 			$Processor->returnUrl[] = CakeSession::read('Payment.token');
+			$Processor->callbackUrl[] = CakeSession::read('Payment.token');
 			$Processor->checkout($newOrder);
 		}
 
@@ -172,30 +173,29 @@ class CartsController extends CartAppController {
 			$this->redirect(array('action' => 'view'));
 		}
 
-		$this->set('order', $order);
+		$this->set('cart', array_merge($order, $order['Order']['cart_snapshop']));
 		$Processor->confirmOrder($order);
 
 		if (!empty($this->request->data)) {
 			if (isset($this->request->data['complete'])) {
 				$result = $Processor->finishOrder($order);
 				if ($result) {
-					$this->redirect(array('action' => 'finish_order'));
+					$Order->save($result, array('validate' => false, 'callbacks' => false));
+					$this->redirect(array('action' => 'finish_order', $transactionToken));
 				}
 			} else {
 				// @todo
 			}
 		}
-
-
-		//$ApiLog = ClassRegistry::init('Cart.PaymentApiTransaction');
-		//$ApiLog->finish($processor, $neworder['Order']['id']);
 	}
 
 /**
  * @todo
  */
-	public function finish_order($transactionToken) {
-		
+	public function finish_order($transactionToken = null) {
+
+		//$ApiLog = ClassRegistry::init('Cart.PaymentApiTransaction');
+		//$ApiLog->finish($processor, $neworder['Order']['id']);
 	}
 
 /**
