@@ -71,7 +71,8 @@ class D287dbf03fef11e1b86c0800200c9a66 extends CakeMigration {
 					'token' => array('type'=>'string', 'null' => true, 'default' => NULL, 'length' => 32),
 					'processor' => array('type'=>'string', 'null' => true, 'default' => NULL, 'length' => 32),
 					'status' => array('type'=>'string', 'null' => true, 'default' => NULL, 'length' => 16, 'comment' => 'internal status, up to the app'), // completed, refunded, partial-refund, cancelled, shipped
-					'transaction_status' => array('type'=>'string', 'null' => true, 'default' => NULL, 'length' => 16, 'status of the transaction'),
+					'payment_reference' => array('type'=>'string', 'null' => true, 'default' => NULL, 'length' => 16, 'status of the transaction'),
+					'payment_status' => array('type'=>'string', 'null' => true, 'default' => NULL, 'length' => 16, 'status of the transaction'),
 					'transaction_fee' => array('type'=>'float', 'null' => true, 'default' => NULL, 'length' => 6,2),
 					'billing_address' => array('type'=>'text', 'null' => true, 'default' => NULL),
 					'shipping_address' => array('type'=>'text', 'null' => true, 'default' => NULL),
@@ -99,7 +100,9 @@ class D287dbf03fef11e1b86c0800200c9a66 extends CakeMigration {
 					'created' => array('type'=>'datetime', 'null' => true, 'default' => NULL),
 					'modified' => array('type'=>'datetime', 'null' => true, 'default' => NULL),
 					'indexes' => array(
-						'PRIMARY' => array('column' => 'id', 'unique' => 1))
+						'PRIMARY' => array('column' => 'id', 'unique' => 1),
+						'FOREIGN_KEY_INDEX' => array('column' => 'foreign_key'),
+						'ORDER_INDEX' => array('column' => 'order_id')),
 				),
 				'cart_rules' => array(
 					'id' => array('type'=>'string', 'null' => false, 'default' => NULL, 'length' => 36, 'key' => 'primary'),
@@ -154,6 +157,9 @@ class D287dbf03fef11e1b86c0800200c9a66 extends CakeMigration {
 					'processor' => array('type'=>'string', 'null' => false, 'default' => NULL),
 					'type' => array('type'=>'string', 'null' => false, 'default' => NULL),
 					'message' => array('type'=>'text', 'null' => false, 'default' => NULL),
+					'file' => array('type'=>'text', 'null' => true, 'default' => NULL),
+					'line' => array('type'=>'integer', 'null' => true, 'default' => NULL, 'length' => 6),
+					'trace' => array('type'=>'text', 'null' => true, 'default' => NULL),
 					'created' => array('type'=>'datetime', 'null' => true, 'default' => NULL),
 					'indexes' => array(
 						'PRIMARY' => array('column' => 'id', 'unique' => 1),

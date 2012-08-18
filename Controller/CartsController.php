@@ -51,7 +51,6 @@ class CartsController extends CartAppController {
  */
 	public function view($cartId = null) {
 		if (!empty($this->request->data)) {
-			//debug($this->request->data);
 			$cart = $this->CartManager->content();
 			foreach ($this->request->data['CartsItem'] as $key => $cartItem) {
 				$cartItem = Set::merge($cart['CartsItem'][$key], $cartItem);
@@ -94,17 +93,16 @@ class CartsController extends CartAppController {
  * @param string $processor
  * @return void
  */
-	public function callback($processor = Null, $action = null) {
-		$this->log($_POST, 'cart-callback');
-		$this->log($_GET, 'cart-callback');
+	public function callback($token = null) {
+		$this->log($this->request, 'payment-callback-request');
 
 		// @todo check for valid processor?
-		//$Processor = PaymentProcessors::load($processor);
+		//$Processor = PaymentProcessors::load($processor, array('request' => $this->request, 'response' => $this->response));
 		if (empty($processor)) {
-			$this->cakeError(404);
+			//$this->cakeError(404);
 		}
 
-		CakeEventManager::dispatch(new CakeEvent('Payment.callack', $this->request));
+		CakeEventManager::dispatch(new CakeEvent('Payment.callback', $this->request));
 	}
 
 /**
@@ -129,10 +127,10 @@ class CartsController extends CartAppController {
 		$Processor = $this->__loadPaymentProcessor($processorClass);
 
 		$Order = ClassRegistry::init('Cart.Order');
-		$newOrder = $Order->createOrder($cartData, $processor);
+		$newOrder = $Order->createOrder($cartData, $processorClass);
 
 		if ($newOrder) {
-			$this->CartManager->emptyCart();
+			//$this->CartManager->emptyCart();
 
 			$ApiLog = ClassRegistry::init('Cart.PaymentApiTransaction');
 			$token = $ApiLog->initialize($processorClass, $newOrder['Order']['id']);
@@ -141,7 +139,8 @@ class CartsController extends CartAppController {
 
 			$Processor->cancelUrl[] = CakeSession::read('Payment.token');
 			$Processor->returnUrl[] = CakeSession::read('Payment.token');
-			$Processor->checkout($this, $newOrder);
+			$Processor->callbackUrl[] = CakeSession::read('Payment.token');
+			$Processor->checkout($newOrder);
 		}
 
 		$this->Session->setFlash(__d('cart', 'There was a problem creating your order.'));
@@ -172,17 +171,29 @@ class CartsController extends CartAppController {
 			$this->redirect(array('action' => 'view'));
 		}
 
-		$Processor->confirmOrder($this->request, $order);
+		$this->set('cart', array_merge($order, $order['Order']['cart_snapshop']));
+		$Processor->confirmOrder($order);
 
-		//$ApiLog = ClassRegistry::init('Cart.PaymentApiTransaction');
-		//$ApiLog->finish($processor, $neworder['Order']['id']);
+		if (!empty($this->request->data)) {
+			if (isset($this->request->data['complete'])) {
+				$result = $Processor->finishOrder($order);
+				if ($result) {
+					$Order->save($result, array('validate' => false, 'callbacks' => false));
+					$this->redirect(array('action' => 'finish_order', $transactionToken));
+				}
+			} else {
+				// @todo
+			}
+		}
 	}
 
 /**
  * @todo
  */
-	public function finish_order($transactionToken) {
-		
+	public function finish_order($transactionToken = null) {
+
+		//$ApiLog = ClassRegistry::init('Cart.PaymentApiTransaction');
+		//$ApiLog->finish($processor, $neworder['Order']['id']);
 	}
 
 /**
@@ -200,7 +211,7 @@ class CartsController extends CartAppController {
  */
 	protected function __loadPaymentProcessor($processor) {
 		try {
-			return PaymentProcessors::load($processor);
+			return PaymentProcessors::load($processor, array('request' => $this->request, 'response' => $this->response));
 		} catch (MissingPaymentProcessorException $e) {
 			$this->Session->setFlash(__d('cart', 'The payment method does not exist!'));
 			$this->redirect(array('action' => 'view'));

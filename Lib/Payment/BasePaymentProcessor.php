@@ -15,6 +15,43 @@ App::uses('CakeSession', 'Model/Datasource');
  */
 abstract class BasePaymentProcessor extends Object {
 /**
+ * CakeRequest object instance
+ * 
+ * @var CakeRequest
+ */
+	protected $_request;
+
+/**
+ * CakeResponse object instance
+ * 
+ * @var CakeResponse
+ */
+	protected $_response;
+
+/**
+ * Constructor
+ *
+ * @return void
+ */
+	public function __construct($options = array()) {
+		if (!empty($options['request'])) {
+			$this->_request = $options['request'];
+		} else {
+			$this->_request = new CakeRequest();
+		}
+		if (!empty($options['response'])) {
+			$this->_response = $options['response'];
+		} else {
+			$this->_response = new CakeResponse();
+		}
+		if (!isset($options['cartModel'])) {
+			$options['cartModel'] = 'Cart.Cart';
+		}
+		$this->CartModel = ClassRegistry::init($options['cartModel']);
+		$this->OrderModel = ClassRegistry::init('Cart.Order');
+	}
+
+/**
  * Callback Url
  * 
  * @var mixed array or string url, parseable by the Router
@@ -34,22 +71,6 @@ abstract class BasePaymentProcessor extends Object {
  * @var mixed array or string url, parseable by the Router
  */
 	public $cancelUrl = array('admin' => false, 'plugin' => 'cart', 'controller' => 'carts', 'action' => 'cancel_order');
-
-/**
- * Constructor
- *
- * @return void
- */
-	public function __construct($options = array()) {
-		$this->response = new CakeResponse();
-		if (!isset($options['cartModel'])) {
-			$options['cartModel'] = 'Cart.Cart';
-		}
-		$this->CartModel = ClassRegistry::init($options['cartModel']);
-		$this->OrderModel = ClassRegistry::init('Cart.Order');
-
-		
-	}
 
 /**
  * Redirect

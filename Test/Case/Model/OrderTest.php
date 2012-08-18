@@ -54,7 +54,7 @@ class OrderTest extends CakeTestCase {
  *
  * @return void
  */
-	public function testCreateOrder() {
+	public function testCreateSimpleOrder() {
 		$cartData = array(
 			'Cart' => array(
 				'cart_id' => 'cart-1',
@@ -75,8 +75,12 @@ class OrderTest extends CakeTestCase {
 					'quantity' => 2,
 					'price' => 10)));
 
-		$result = $this->Order->createOrder($cartData);
+		$result = $this->Order->createOrder($cartData, 'Paypal');
+		$this->assertTrue(is_array($result) && !empty($result));
+	}
 
+	public function testAfterFind() {
+		debug($this->Order->find('first'));
 	}
 
 }
