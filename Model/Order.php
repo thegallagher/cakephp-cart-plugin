@@ -60,6 +60,29 @@ class Order extends CartAppModel {
 			'className' => 'Cart.OrderItem'));
 
 /**
+ * Validation rules
+ *
+ * @var array
+ */
+	public $validate = array(
+		'total' => array(
+			'numeric' => array(
+				'rule' => array('numeric'),
+				'message' => 'This must be a number')),
+		'status' => array(
+			'numeric' => array(
+				'rule' => array('notEmpty'),
+				'message' => 'The order requires a status')),
+		'processor' => array(
+			'numeric' => array(
+				'rule' => array('notEmpty'),
+				'message' => 'The order requires a payment processor')),
+		'cart_snapshot' => array(
+			'notEmpty' => array(
+				'rule' => array('notEmpty'),
+				'message' => 'You must add the cart data to the order')));
+
+/**
  * Filters args for search
  *
  * @var array

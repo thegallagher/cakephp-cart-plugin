@@ -32,7 +32,8 @@ class OrderFixture extends CakeTestFixture {
 		'token' => array('type'=>'string', 'null' => true, 'default' => NULL, 'length' => 32),
 		'processor' => array('type'=>'string', 'null' => true, 'default' => NULL, 'length' => 32),
 		'status' => array('type'=>'string', 'null' => true, 'default' => NULL, 'length' => 16, 'comment' => 'internal status, up to the app'), // completed, refunded, partial-refund, cancelled, shipped
-		'transaction_status' => array('type'=>'string', 'null' => true, 'default' => NULL, 'length' => 16, 'status of the transaction'),
+		'payment_reference' => array('type'=>'string', 'null' => true, 'default' => NULL, 'length' => 16, 'status of the transaction'),
+		'payment_status' => array('type'=>'string', 'null' => true, 'default' => NULL, 'length' => 16, 'status of the transaction'),
 		'transaction_fee' => array('type'=>'float', 'null' => true, 'default' => NULL, 'length' => 6,2),
 		'billing_address' => array('type'=>'text', 'null' => true, 'default' => NULL),
 		'shipping_address' => array('type'=>'text', 'null' => true, 'default' => NULL),
@@ -52,24 +53,27 @@ class OrderFixture extends CakeTestFixture {
  * @var array
  */
 	public $records = array(
-		'id' => 'order-1',
-		'user_id' => 'user-1',
-		'cart_id' => null,
-		'cart_snapshot' => array(
-			'Cart' => array(
-				),
-			'CartsItem' => array(
-				)),
-		'token' => 'token-1',
-		'processor' => 'Paypal',
-		'status' => 'pending',
-		'transaction_status' => 'pending',
-		'transaction_fee' => 0.51,
-		'billing_address' => null,
-		'shipping_address' => null,
-		'total' => 12.00,
-		'created' => '2012-01-01 12:12:12',
-		'modified' => '2012-01-01 12:12:12',
+		array(
+			'id' => 'order-1',
+			'user_id' => 'user-1',
+			'cart_id' => null,
+			'cart_snapshop' => array(
+				'Cart' => array(
+					),
+				'CartsItem' => array(
+					)),
+			'token' => 'token-1',
+			'processor' => 'Paypal',
+			'status' => 'pending',
+			'payment_reference' => '123456',
+			'payment_status' => 'pending',
+			'transaction_fee' => 0.51,
+			'billing_address' => null,
+			'shipping_address' => null,
+			'total' => 12.00,
+			'created' => '2012-01-01 12:12:12',
+			'modified' => '2012-01-01 12:12:12',
+		),
 	);
 
 /**
@@ -80,7 +84,7 @@ class OrderFixture extends CakeTestFixture {
 	public function __construct() {
 		parent::__construct();
 		foreach ($this->records as &$record) {
-			$record['cart_snapshot'] = serialize($record['cart_snapshot']);
+			$record['cart_snapshop'] = serialize($record['cart_snapshop']);
 		}
 	}
 }

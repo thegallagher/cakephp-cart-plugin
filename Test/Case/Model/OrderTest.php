@@ -50,6 +50,27 @@ class OrderTest extends CakeTestCase {
 	}
 
 /**
+ * testView
+ *
+ * @return void
+ */
+	public function testView() {
+		$result = $this->Order->view('order-1', 'user-1');
+		$this->assertTrue(is_array($result) && !empty($result));
+		$this->assertEqual($result['Order']['user_id'], 'user-1');
+		$this->assertEqual($result['Order']['id'], 'order-1');
+	}
+
+/**
+ * testViewNotFoundException
+ *
+ * @expectedException NotFoundException
+ */
+	public function testViewNotFoundException() {
+		$this->Order->view('invalid-order', 'user-1');
+	}
+
+/**
  * testCreateOrder
  *
  * @return void
@@ -60,6 +81,7 @@ class OrderTest extends CakeTestCase {
 				'cart_id' => 'cart-1',
 				'requires_shipping' => false,
 				'user_id' => 'user-1',
+				'processor' => 'Paypal.PaypalExpress',
 				'total' => 20.95),
 			'CartsItem' => array(
 				array(
@@ -80,7 +102,7 @@ class OrderTest extends CakeTestCase {
 	}
 
 	public function testAfterFind() {
-		debug($this->Order->find('first'));
+
 	}
 
 }

@@ -40,6 +40,14 @@ The Cart Manager is a component thought to capture post and get requests to a sp
 
 The Session, Cookie and Database Storage of the Cart Manager is pretty much decoupled.
 
+### Sample Application
+
+There is a sample application that will demonstrate how to use the cart plugin.
+
+	http://github.com/burzum/CartSampleApp
+
+Check it out, clone the application, run migrations, access the app. It already has a sample user and some sample items. Read the instructions of the plugin.
+
 ## Setup
 
 	cd YOUR-APP-FOLDER
