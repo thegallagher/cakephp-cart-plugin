@@ -14,13 +14,14 @@ class OrdersController extends CartAppController {
  */
 	public $components = array(
 		'Search.Prg');
-	
+
 /**
  * Preset fields for the search
  *
  * @var array
  */
 	public $presetVars = array(
+		array('field' => 'invoice_number', 'type' => 'value'),
 		array('field' => 'username', 'type' => 'value'),
 		array('field' => 'email', 'type' => 'value'),
 		array('field' => 'total', 'type' => 'value'),
@@ -46,7 +47,9 @@ class OrdersController extends CartAppController {
 		$userId = $this->Auth->user('id');
 		$this->paginate = array(
 			'conditions' => array(
-				'Order.user_id' => $id));
+				'contain' => array(),
+				'Order.user_id' => $id),
+			'order' => 'Order.created DESC');
 		$this->set('orders', $this->paginate());
 	}
 
@@ -56,7 +59,12 @@ class OrdersController extends CartAppController {
  * @return void
  */
 	public function view($orderId = null) {
-		$this->set('order', $this->Order->view($orderId, $this->Auth->user('id')));
+		try {
+			$this->set('order', $this->Order->view($orderId, $this->Auth->user('id')));
+		} catch (Exception $e) {
+			$this->Session->setFlash($e->getMessage());
+			$this->redirect(array('action' => 'index'));
+		}
 	}
 
 /**
@@ -65,16 +73,25 @@ class OrdersController extends CartAppController {
  * @return void
  */
 	public function admin_index() {
+		$this->paginate = array(
+			'contain' => array(
+				'User'),
+			'order' => 'Order.created DESC');
 		$this->set('orders', $this->paginate());
 	}
 
 /**
- * 
+ * Displays a more detailed information about a single order
  *
  * @return void
  */
 	public function admin_view($orderId = null) {
-		$this->set('order', $this->Order->view($orderId));
+		try {
+			$this->set('order', $this->Order->adminView($orderId));
+		} catch (Exception $e) {
+			$this->Session->setFlash($e->getMessage());
+			$this->redirect(array('action' => 'index'));
+		}
 	}
 
 }

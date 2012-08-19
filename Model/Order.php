@@ -128,13 +128,14 @@ class Order extends CartAppModel {
 	}
 
 /**
- * Displays an order
+ * Returns the data for a user to view an order he made
  *
- * @param 
- * @param 
+ * @param string $orderId Order UUID
+ * @param string $userId User UUId
  * @return array
+ * @throws NotFoundException
  */
-	public function view($orderId, $userId = null) {
+	public function view($orderId = null, $userId = null) {
 		$order = $this->find('first', array(
 			'contain' => array(
 				'OrderItem'),
@@ -143,14 +144,40 @@ class Order extends CartAppModel {
 				$this->alias . '.user_id' => $userId)));
 
 		if (empty($order)) {
-			throw new NotFoundException();
+			throw new NotFoundException(__d('cart', 'The order does not exist.'));
 		}
 		return $order;
 	}
 
 /**
- * createOrder
+ * Returns the data for an order for the admin
  *
+ * @param string $orderId Order UUID
+ * @return array
+ * @throws NotFoundException
+ */
+	public function adminView($orderId = null) {
+		$order = $this->find('first', array(
+			'contain' => array(
+				'User',
+				'OrderItem'),
+			'conditions' => array(
+				$this->alias . '.' . $this->primaryKey => $orderId)));
+
+		if (empty($order)) {
+			throw new NotFoundException(__d('cart', 'The order does not exist.'));
+		}
+		return $order;
+	}
+
+/**
+ * This method will create a new order record and does the validation work for
+ * the different cases that might apply before you can issue a new order
+ *
+ * @param 
+ * @param 
+ * @param 
+ * @return mixed Array with order data on success, false if not
  * @todo finish me
  */
 	public function createOrder($cartData, $processorClass, $paymentStatus = 'pending') {
@@ -215,12 +242,6 @@ class Order extends CartAppModel {
 
 		$result = Set::merge($result, unserialize($result[$this->alias]['cart_snapshop']));
 		return $result;
-	}
-
-	public function fireAfterBuyCallback($cartData) {
-		foreach ($data['CartsItem'] as $item) {
-			CakeEventManager::dispatch(new CakeEvent('Order.afterBuy', $this, array($cartData)));
-		}
 	}
 
 }

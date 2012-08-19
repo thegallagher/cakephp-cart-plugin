@@ -44,6 +44,7 @@ The Session, Cookie and Database Storage of the Cart Manager is pretty much deco
 
 	cd YOUR-APP-FOLDER
 	git submodule add git://github.com/burzum/Cart.git Plugin/Cart
+	git submodule add git://github.com/cakedc/search.git Plugin/Search
 	git submodule update --init
 
 If you do not want to add it as submodule just clone it instead of doing submodule add
