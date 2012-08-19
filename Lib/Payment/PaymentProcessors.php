@@ -1,7 +1,7 @@
 <?php
 App::uses('MissingPaymentProcessorException', 'Cart.Error');
 /**
- * PaymentProcessorCollection
+ * PaymentProcessors
  *
  * This class basically just acts as a loader for payment processors
  *

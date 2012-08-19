@@ -94,12 +94,20 @@ class CartsController extends CartAppController {
  * @return void
  */
 	public function callback($token = null) {
-		$this->log($this->request, 'payment-callback-request');
+		$this->log($this->request, 'payment-callback');
 
-		// @todo check for valid processor?
-		//$Processor = PaymentProcessors::load($processor, array('request' => $this->request, 'response' => $this->response));
-		if (empty($processor)) {
-			//$this->cakeError(404);
+		$Order = ClassRegistry::init('Cart.Order');
+		$order = $Order->find('first', array(
+			'contain' => array(),
+			'conditions' => array(
+					'Order.token' => $token)));
+
+		try {
+			$Processor = $this->__loadPaymentProcessor($order['Order']['processor]);
+			$Processor->parseNotification($order);
+		} catch (Exception $e) {
+			$this->log($e->getMessage(), 'payment-error');
+			$this->log($this->request, 'payment-error');
 		}
 
 		CakeEventManager::dispatch(new CakeEvent('Payment.callback', $this->request));
@@ -191,7 +199,6 @@ class CartsController extends CartAppController {
  * @todo
  */
 	public function finish_order($transactionToken = null) {
-
 		//$ApiLog = ClassRegistry::init('Cart.PaymentApiTransaction');
 		//$ApiLog->finish($processor, $neworder['Order']['id']);
 	}
@@ -211,7 +218,9 @@ class CartsController extends CartAppController {
  */
 	protected function __loadPaymentProcessor($processor) {
 		try {
-			return PaymentProcessors::load($processor, array('request' => $this->request, 'response' => $this->response));
+			return PaymentProcessors::load($processor, array(
+				'request' => $this->request,
+				'response' => $this->response));
 		} catch (MissingPaymentProcessorException $e) {
 			$this->Session->setFlash(__d('cart', 'The payment method does not exist!'));
 			$this->redirect(array('action' => 'view'));
@@ -229,7 +238,7 @@ class CartsController extends CartAppController {
  * on the fly through the admin backend.
  *
  * If no mapped processor classname is found it will return the passed name and
- * the PaymentProcessors::load() method will throw an exception if it cant find
+ * the PaymentProcessors::load() method will throw an exception if it can't find
  * that processor.
  *
  * @param string $processorAlias
