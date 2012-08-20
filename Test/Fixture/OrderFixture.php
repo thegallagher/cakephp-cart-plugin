@@ -1,7 +1,10 @@
 <?php
 /**
- * ItemFixture
+ * OrderFixture
  *
+ * @author Florian Krämer
+ * @copyright 2012 Florian Krämer
+ * @license MIT
  */
 class OrderFixture extends CakeTestFixture {
 
@@ -35,6 +38,7 @@ class OrderFixture extends CakeTestFixture {
 		'payment_reference' => array('type'=>'string', 'null' => true, 'default' => NULL, 'length' => 16, 'status of the transaction'),
 		'payment_status' => array('type'=>'string', 'null' => true, 'default' => NULL, 'length' => 16, 'status of the transaction'),
 		'transaction_fee' => array('type'=>'float', 'null' => true, 'default' => NULL, 'length' => 6,2),
+		'invoice_number' => array('type'=>'string', 'null' => true, 'default' => NULL, 'length' => 64),
 		'billing_address' => array('type'=>'text', 'null' => true, 'default' => NULL),
 		'shipping_address' => array('type'=>'text', 'null' => true, 'default' => NULL),
 		'total' => array('type'=>'float', 'null' => true, 'default' => NULL),
@@ -69,6 +73,7 @@ class OrderFixture extends CakeTestFixture {
 			'payment_status' => 'pending',
 			'transaction_fee' => 0.51,
 			'billing_address' => null,
+			'invoice_number' => '20120101-1',
 			'shipping_address' => null,
 			'total' => 12.00,
 			'created' => '2012-01-01 12:12:12',

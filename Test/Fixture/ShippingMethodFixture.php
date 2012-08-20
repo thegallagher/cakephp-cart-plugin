@@ -1,5 +1,10 @@
 <?php
-/* ShippingMethod Fixture generated on: 2012-07-29 23:07:30 : 1343598870 */
+/* ShippingMethodFixture
+ *
+ * @author Florian Krämer
+ * @copyright 2012 Florian Krämer
+ * @license MIT
+ */
 class ShippingMethodFixture extends CakeTestFixture {
 /**
  * Name

@@ -46,6 +46,7 @@ List of events that are triggered in this plugin
 
 	Cart.applyDiscounts
 	Cart.applyTaxRules
+	Order.created
 
 ### Sample Application
 
@@ -65,6 +66,10 @@ Check it out, clone the application, run migrations, access the app. It already 
 If you do not want to add it as submodule just clone it instead of doing submodule add
 
 	git clone git://github.com/burzum/Cart.git
+
+If you use another user model class in your application other than User you'll need to configure the plugin to use that model:
+
+	Configure::write('Cart.models.User', 'AppUser');
 
 ## Support
 

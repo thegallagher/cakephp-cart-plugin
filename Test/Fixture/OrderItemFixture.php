@@ -1,4 +1,11 @@
 <?php
+/**
+ * OrderItemFixture
+ *
+ * @author Florian Krämer
+ * @copyright 2012 Florian Krämer
+ * @license MIT
+ */
 class OrderItemFixture extends CakeTestFixture {
 /**
  * Name

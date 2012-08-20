@@ -2,6 +2,9 @@
 /**
  * CartRuleConditionFixture
  *
+ * @author Florian Krämer
+ * @copyright 2012 Florian Krämer
+ * @license MIT
  */
 class CartRuleConditionFixture extends CakeTestFixture {
 

@@ -1,7 +1,10 @@
 <?php
 /**
- * DownloadFixture
+ * PaymentApiTransactionFixture
  *
+ * @author Florian Krämer
+ * @copyright 2012 Florian Krämer
+ * @license MIT
  */
 class PaymentApiTransactionFixture extends CakeTestFixture {
 

@@ -46,8 +46,8 @@ class OrdersController extends CartAppController {
 	public function index() {
 		$userId = $this->Auth->user('id');
 		$this->paginate = array(
+			'contain' => array(),
 			'conditions' => array(
-				'contain' => array(),
 				'Order.user_id' => $id),
 			'order' => 'Order.created DESC');
 		$this->set('orders', $this->paginate());
@@ -92,6 +92,13 @@ class OrdersController extends CartAppController {
 			$this->Session->setFlash($e->getMessage());
 			$this->redirect(array('action' => 'index'));
 		}
+	}
+
+/**
+ * 
+ */
+	public function admin_refund($orderId) {
+		
 	}
 
 }

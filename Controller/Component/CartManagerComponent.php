@@ -202,7 +202,7 @@ class CartManagerComponent extends Component {
  */
 	public function afterAddItemRedirect($item) {
 		extract($this->settings);
-		$this->Session->setFlash(__d('cart', 'You added %s to your cart', $item['name']));
+		$this->Session->setFlash(__d('cart', 'You added %d %s to your cart', $item['name'], $item['quantity']));
 		if (is_string($afterAddItemRedirect) || is_array($afterAddItemRedirect)) {
 			$this->Controller->redirect($afterAddItemRedirect);
 		} elseif (is_null($afterAddItemRedirect)) {
@@ -358,6 +358,17 @@ class CartManagerComponent extends Component {
 	public function restoreFromCookie() {
 		$result = $this->Cookie->read($this->settings['cookieName']);
 		$this->Controller->Session->write($this->settings['sessionKey'], $result);
+	}
+
+/**
+ * 
+ */
+	public function mergeSessionItems() {
+		if (!$this->isLoggedIn) {
+			return false;
+		}
+
+		$this->CartModel->mergeItems($this->cartid, $content);
 	}
 
 /**

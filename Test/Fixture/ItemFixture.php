@@ -2,6 +2,9 @@
 /**
  * ItemFixture
  *
+ * @author Florian Krämer
+ * @copyright 2012 Florian Krämer
+ * @license MIT
  */
 class ItemFixture extends CakeTestFixture {
 

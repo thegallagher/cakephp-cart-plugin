@@ -233,7 +233,7 @@ class Cart extends CartAppModel {
  * @todo finish me
  * @return 
  */
-	public function syncWithSessionData($cartId, $cartItems) {
+	public function mergeSessionItems($cartId, $cartItems) {
 		$dbItems = $this->CartsItem->find('all', array(
 			'contain' => array(),
 			'conditions' => array(

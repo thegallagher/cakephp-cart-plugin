@@ -35,7 +35,9 @@ class Order extends CartAppModel {
  */
 	public $belongsTo = array(
 		'Cart' => array(
-			'className' => 'Cart.Cart'));
+			'className' => 'Cart.Cart'),
+		'User' => array(
+			'className' => 'User'));
 
 /**
  * belongsTo associations
@@ -90,16 +92,10 @@ class Order extends CartAppModel {
 	public $filterArgs = array(
 		array('name' => 'username', 'type' => 'like', 'field' => 'User.username'),
 		array('name' => 'email', 'type' => 'like', 'field' => 'User.email'),
+		array('name' => 'invoice_number', 'type' => 'like'),
 		array('name' => 'total', 'type' => 'value'),
 		array('name' => 'created', 'type' => 'like'),
 	);
-
-/**
- * 
- */
-	public function beforeValidate() {
-		return true;
-	}
 
 /**
  * beforeSave callback
@@ -114,11 +110,14 @@ class Order extends CartAppModel {
 	}
 
 /**
- * 
+ * afterSave callback
+ *
+ * @var boolean $created
  */
-	public function afterSave() {
-		if (isset($this->data[$this->alias]['status']) && $this->data[$this->alias]['status'] == 'paid') {
-			CakeEventManager::dispatch(new CakeEvent('Order.paid', $this, array($this->data)));
+	public function afterSave($created) {
+		if ($created) {
+			$this->saveField('invoice_number', $this->invoiceNumber());
+			CakeEventManager::dispatch(new CakeEvent('Order.created', $this, array($this->data)));
 		}
 	}
 
@@ -265,6 +264,20 @@ class Order extends CartAppModel {
 
 		$result = Set::merge($result, unserialize($result[$this->alias]['cart_snapshop']));
 		return $result;
+	}
+
+/**
+ * Generates an invoice number
+ *
+ * @return string
+ */
+	public function invoiceNumber() {
+		$date = date('Y-m-D');
+		$count = $this->find('count', array(
+			'contain' => array(),
+			'conditions' => array(
+				$this->alias . 'created ' => $date .'%')));
+		return $date . '-' . $count + 1;
 	}
 
 }
