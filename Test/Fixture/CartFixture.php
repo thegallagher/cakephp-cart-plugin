@@ -44,7 +44,16 @@ class CartFixture extends CakeTestFixture {
  * @var array
  */
 	public $records = array(
-		
+		array(
+			'id' => 'cart-1',
+			'user_id' => 'user-1',
+			'name' => 'Default Cart',
+			'total' => '1000.00',
+			'active' => 1,
+			'item_count' => 1,
+			'created' => '2012-01-01 12:12:12',
+			'modified' => '2012-01-01 12:12:12'
+		),
 	);
 
 }

@@ -240,19 +240,8 @@ class Cart extends CartAppModel {
 				'CartsItem.cart_id' => $cartId)));
 
 		foreach ($cartItems as $cartKey => $cartItem) {
-			if (empty($dbItems)) {
-				$this->CartsItem->save($cartItem);
-			} else {
-				foreach ($dbItems as $dbItem) {
-					if ($dbItem['foreign_key'] == $cartItem['foreign_key'] && $dbItem['model'] == $cartItem['model']) {
-						$this->CartsItem->save(array_merge($dbItem, $cartItem))
-					}
-				}
-			}
+			$this->addItem($cartId, $cartItem);
 		}
-
-		//$this->
-		//$this->calculateCart($cartData);
 	}
 
 /**

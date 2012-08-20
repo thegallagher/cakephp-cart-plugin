@@ -45,7 +45,15 @@ class CartsItemFixture extends CakeTestFixture {
  * @var array
  */
 	public $records = array(
-		
+		array(
+			'id' => 'carts-item-1',
+			'cart_id' => 'cart-1',
+			'foreign_key' => 'item-1',
+			'model' => 'Item',
+			'quantity' => 1,
+			'name' => 'Eizo Flexscan S2431W',
+			'price' => 720.37,
+		),
 	);
 
 }

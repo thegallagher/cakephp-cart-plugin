@@ -73,6 +73,11 @@ class CartsItem extends CartAppModel {
  * @param array $itemData
  */
 	public function addItem($cartId, $itemData) {
+		$this->set($itemData);
+		if (!$this->validates()) {
+			return false;
+		}
+
 		$item = $this->find('first', array(
 			'contain' => array(),
 			'conditions' => array(

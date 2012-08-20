@@ -101,11 +101,20 @@ class CartTest extends CakeTestCase {
  * @return void
  */
 	public function testSyncWithSessionData() {
-		$cart = array(
+		$cart = $this->Cart->getActive('user-1');
+		$itemCount = count($cart['CartsItem']);
+		$sessionData = array(
+			'Cart' => array(),
 			'CartsItem' => array(
-				array('model' => 12.01, 'foreign_key' => 2),
-				array('model' => 21.10, 'foreign_key' => 1)));
-		$result = $this->Cart->syncWithSessionData('cart-1', $cart);
+				array(
+					'model' => 'Item',
+					'foreign_key' => 'item2',
+					'quantity' => 1,
+					'price' => 12)));
+		$result = $this->Cart->syncWithSessionData('cart-1', $sessionData['CartsItem']);
+
+		$cart = $this->Cart->getActive('user-1');
+		$this->assertEqual(count($cart['CartsItem']), $itemCount + 1);
 	}
 
 }
