@@ -40,6 +40,13 @@ The Cart Manager is a component thought to capture post and get requests to a sp
 
 The Session, Cookie and Database Storage of the Cart Manager is pretty much decoupled.
 
+### List of Events
+
+List of events that are triggered in this plugin
+
+	Cart.applyDiscounts
+	Cart.applyTaxRules
+
 ### Sample Application
 
 There is a sample application that will demonstrate how to use the cart plugin.

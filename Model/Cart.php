@@ -176,12 +176,12 @@ class Cart extends CartAppModel {
  */
 	public function calculateCart($cartData = array()) {
 		if (isset($cartData['CartsItem'])) {
-			$cartData['Cart']['item_count'] = count($cartData['CartsItem']);
+			$cartData[$this->alias]['item_count'] = count($cartData['CartsItem']);
 		} else {
-			return $cartData['Cart']['total'] = 0.00;
+			return $cartData[$this->alias]['total'] = 0.00;
 		}
 
-		$cart['Cart']['requires_shipping'] = $this->requiresShipping($cartData['CartsItem']);
+		$cart[$this->alias]['requires_shipping'] = $this->requiresShipping($cartData['CartsItem']);
 
 		$cartData = $this->applyDiscounts($cartData);
 		$cartData = $this->applyTaxRules($cartData);
@@ -206,15 +206,18 @@ class Cart extends CartAppModel {
 	}
 
 /**
- * 
+ * Calculates the total amount of the cart
+ *
+ * @param array $cartData
+ * @return array
  */
 	public function calculateTotals($cartData) {
-		$cartData['Cart']['total'] = 0.00;
+		$cartData[$this->alias]['total'] = 0.00;
 
 		if (!empty($cartData['CartsItem'])) {
 			foreach ($cartData['CartsItem'] as $key => $item) {
 				$cartData['CartsItem'][$key]['total'] = (int) $item['quantity'] * (float) $item['price'];
-				$cartData['Cart']['total'] += (float) $item['price'];
+				$cartData[$this->alias]['total'] += (float) $item['price'];
 			}
 		}
 
@@ -223,6 +226,9 @@ class Cart extends CartAppModel {
 
 /**
  * Synchronizes the session cart with the db cart items
+ *
+ * This method needs to be called during the login process before the redirect
+ * happens but after the user was authenticated.
  *
  * @todo finish me
  * @return 
@@ -238,13 +244,15 @@ class Cart extends CartAppModel {
 				$this->CartsItem->save($cartItem);
 			} else {
 				foreach ($dbItems as $dbItem) {
-					if ($dbItem['foreign_key'] == $cartItem['foreign_key']
-						&& $dbItem['model'] == $cartItem['model']) {
-						
+					if ($dbItem['foreign_key'] == $cartItem['foreign_key'] && $dbItem['model'] == $cartItem['model']) {
+						$this->CartsItem->save(array_merge($dbItem, $cartItem))
 					}
 				}
 			}
 		}
+
+		//$this->
+		//$this->calculateCart($cartData);
 	}
 
 /**
