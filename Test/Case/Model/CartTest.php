@@ -100,21 +100,40 @@ class CartTest extends CakeTestCase {
  *
  * @return void
  */
-	public function testSyncWithSessionData() {
-		$cart = $this->Cart->getActive('user-1');
-		$itemCount = count($cart['CartsItem']);
+	public function testMergeItems() {
+		$itemsBefore = $this->Cart->CartsItem->find('all', array(
+			'contain' => array(),
+			'conditions' => array(
+				'cart_id' => 'cart-1')));
+
+		$itemCount = count($itemsBefore);
 		$sessionData = array(
 			'Cart' => array(),
 			'CartsItem' => array(
+				// A new item to merge in
+				array(
+					'name' => 'CakePHP',
+					'model' => 'Item',
+					'foreign_key' => 'item-2',
+					'quantity' => 1,
+					'price' => 999.10
+				),
+				// Update an existing items quantity by +1
 				array(
 					'model' => 'Item',
-					'foreign_key' => 'item2',
-					'quantity' => 1,
+					'foreign_key' => 'item-1',
+					'quantity' => 2,
 					'price' => 12)));
-		$result = $this->Cart->syncWithSessionData('cart-1', $sessionData['CartsItem']);
+		$result = $this->Cart->mergeItems('cart-1', $sessionData['CartsItem']);
 
-		$cart = $this->Cart->getActive('user-1');
-		$this->assertEqual(count($cart['CartsItem']), $itemCount + 1);
+		$itemsAfter = $this->Cart->CartsItem->find('all', array(
+			'contain' => array(),
+			'conditions' => array(
+				'cart_id' => 'cart-1')));
+
+		$this->assertEqual(count($itemsAfter), $itemCount + 1);
+		$this->assertEqual($itemsAfter[0]['CartsItem']['name'], 'Eizo Flexscan S2431W');
+		$this->assertEqual($itemsAfter[0]['CartsItem']['quantity'], 2);
 	}
 
 }

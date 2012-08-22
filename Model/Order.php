@@ -272,12 +272,13 @@ class Order extends CartAppModel {
  * @return string
  */
 	public function invoiceNumber() {
-		$date = date('Y-m-D');
+		$date = date('Y-m-d');
 		$count = $this->find('count', array(
-			'contain' => array(),
-			'conditions' => array(
-				$this->alias . 'created ' => $date .'%')));
-		return $date . '-' . $count + 1;
+				'contain' => array(),
+				'conditions' => array(
+						$this->alias . '.created ' => $date .'%')));
+		$increment = $count + 1;
+		return str_replace('-', '', $date) . '-'. $increment;
 	}
 
 }

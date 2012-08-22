@@ -84,10 +84,10 @@ class BuyableBehavior extends ModelBehavior {
 	}
 
 /**
- * Checks if a model
+ * Checks if a model record exists
  *
- * @param 
- * @param 
+ * @param Model $Model
+ * @param array $data
  */
 	public function isBuyable(Model $Model, $data) {
 		$Model->id = $data['CartsItem']['foreign_key'];

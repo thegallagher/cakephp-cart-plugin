@@ -175,6 +175,8 @@ class Cart extends CartAppModel {
  * @todo discounts/coupons
  */
 	public function calculateCart($cartData = array()) {
+		CakeEventManager::dispatch(new CakeEvent('Cart.beforeCalculateCart'), $this, array($cartData));
+
 		if (isset($cartData['CartsItem'])) {
 			$cartData[$this->alias]['item_count'] = count($cartData['CartsItem']);
 		} else {
@@ -186,6 +188,8 @@ class Cart extends CartAppModel {
 		$cartData = $this->applyDiscounts($cartData);
 		$cartData = $this->applyTaxRules($cartData);
 		$cartData = $this->calculateTotals($cartData);
+
+		CakeEventManager::dispatch(new CakeEvent('Cart.afterCalculateCart'), $this, array($cartData));
 		return $cartData;
 	}
 
@@ -225,22 +229,33 @@ class Cart extends CartAppModel {
 	}
 
 /**
- * Synchronizes the session cart with the db cart items
+ * Merges an array of item data with the cart items in the database.
  *
  * This method needs to be called during the login process before the redirect
- * happens but after the user was authenticated.
+ * happens but after the user was authenticated if you want to take the items
+ * from the non-logged in user into the users database cart.
  *
  * @todo finish me
  * @return 
  */
-	public function mergeSessionItems($cartId, $cartItems) {
+	public function mergeItems($cartId, $cartItems) {
 		$dbItems = $this->CartsItem->find('all', array(
 			'contain' => array(),
 			'conditions' => array(
 				'CartsItem.cart_id' => $cartId)));
 
 		foreach ($cartItems as $cartKey => $cartItem) {
-			$this->addItem($cartId, $cartItem);
+			$matched = false;
+			foreach ($dbItems as $dbItem) {
+				if ($dbItem['CartsItem']['model'] == $cartItem['model'] && $dbItem['CartsItem']['foreign_key'] == $cartItem['foreign_key']) {
+					$this->CartsItem->save(array_merge($dbItem['CartsItem'], $cartItem));
+					$matched = true;
+					break;
+				}
+			}
+			if ($matched === false) {
+				$this->addItem($cartId, $cartItem);
+			}
 		}
 	}
 

@@ -268,6 +268,8 @@ class CartManagerComponent extends Component {
 
 		$result = $this->CartSession->addItem($data);
 		$this->calculateCart();
+
+		CakeEventManager::dispatch(new CakeEvent('CartManager.afterAddItem'), $this, array($result));
 		return $result;
 	}
 
@@ -279,11 +281,15 @@ class CartManagerComponent extends Component {
  */
 	public function removeItem($data = null) {
 		extract($this->settings);
+
 		if ($this->isLoggedIn) {
 			$this->CartModel->removeItem($this->cartId, $data);
 		}
+
 		$result = $this->CartSession->removeItem($data);
 		$this->calculateCart();
+
+		CakeEventManager::dispatch(new CakeEvent('CartManager.afterRemoveItem'), $this, array($result));
 		return $result;
 	}
 
@@ -297,6 +303,11 @@ class CartManagerComponent extends Component {
 		if ($this->isLoggedIn) {
 			$this->CartModel->emptyCart($this->cartId);
 		}
+
+		if ($this->settings['useCookie'] == true) {
+			$this->Cookie->delete(($this->settings['cookieName']);
+		}
+
 		$result = $this->CartSession->emptyCart();
 
 		$this->initalizeCart();
@@ -325,16 +336,30 @@ class CartManagerComponent extends Component {
 	}
 
 /**
- * @todo finish me
+ * Checks if the cart requires shipping
+ *
+ * @return boolean
+ */
+	public function requiresShipping() {
+		return (bool) $this->Session->read($sessionKey . '.Cart.requires_shipping');
+	}
+
+/**
+ * (Re-)calculates a cart, this will run over all items, coupons and taxes
+ * 
+ * @todo refactor saveAll?
+ * @return array the cart data
  */
 	public function calculateCart() {
 		$sessionKey = $this->settings['sessionKey'];
 		$cartData = $this->CartModel->calculateCart($this->Session->read($sessionKey));
+
 		if ($this->isLoggedIn) {
-			//@todo save cart data here to db or in the model?
-			//$this->CartModel->saveAll($cartData);
+			$this->CartModel->saveAll($cartData);
 		}
+
 		$this->Session->write($sessionKey, $cartData);
+		return $cartData;
 	}
 
 /**
@@ -361,14 +386,19 @@ class CartManagerComponent extends Component {
 	}
 
 /**
- * 
+ * //@todo
  */
-	public function mergeSessionItems() {
-		if (!$this->isLoggedIn) {
-			return false;
+	public function updateCart($items) {
+		foreach ($items as $item) {
+			// fire beforeAddToCart
 		}
 
-		$this->CartModel->mergeItems($this->cartid, $content);
+		$this->CartModel->mergeItems($this->cartid, $items);
+
+		if ($this->isLoggedIn) {
+			$this->CartModel->mergeItems($this->cartId, $items);
+		}
+
 	}
 
 /**

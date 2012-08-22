@@ -8,14 +8,16 @@ App::uses('CartAppModel', 'Cart.Model');
  */
 class PaymentMethod extends CartAppModel {
 /**
- * 
+ * Returns a list of payment methods a customer can pay with
+ *
+ * @return array
  */
-	public function getActiveMethods() {
+	public function getPublicAvailable() {
 		return $this->find('all', array(
 			'contain' => array(),
 			'conditions' => array(
 				$this->alias . '.active' => 1),
-			'order' => $this->alias . '.position ASC'));
+			'order' => $this->alias . '.name DESC'));
 	}
 
 /**

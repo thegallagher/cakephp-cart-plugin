@@ -53,6 +53,8 @@ class CartsItemFixture extends CakeTestFixture {
 			'quantity' => 1,
 			'name' => 'Eizo Flexscan S2431W',
 			'price' => 720.37,
+			'created' => '2012-01-01 12:30:00',
+			'modified' => '2012-01-01 12:30:00',
 		),
 	);
 
