@@ -170,7 +170,6 @@ class Cart extends CartAppModel {
 /**
  * Calculates the totals of a cart
  *
- * @toto total sum
  * @todo taxes
  * @todo discounts/coupons
  */
@@ -189,7 +188,7 @@ class Cart extends CartAppModel {
 		$cartData = $this->applyTaxRules($cartData);
 		$cartData = $this->calculateTotals($cartData);
 
-		CakeEventManager::dispatch(new CakeEvent('Cart.afterCalculateCart'), $this, array($cartData));
+		CakeEventManager::dispatch(new CakeEvent('Cart.afterCalculateCart', $this, array($cartData)));
 		return $cartData;
 	}
 
@@ -197,7 +196,7 @@ class Cart extends CartAppModel {
  *
  */
 	public function applyTaxRules($cartData) {
-		CakeEventManager::dispatch(new CakeEvent('Cart.applyTaxRules', $cartData));
+		CakeEventManager::dispatch(new CakeEvent('Cart.applyTaxRules', $this, array($cartData)));
 		return $cartData;
 	}
 
@@ -205,7 +204,7 @@ class Cart extends CartAppModel {
  * 
  */
 	public function applyDiscounts($cartData) {
-		CakeEventManager::dispatch(new CakeEvent('Cart.applyDiscounts', $cartData));
+		CakeEventManager::dispatch(new CakeEvent('Cart.applyDiscounts', $this, array($cartData)));
 		return $cartData;
 	}
 

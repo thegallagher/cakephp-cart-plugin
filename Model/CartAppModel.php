@@ -26,7 +26,7 @@ class CartAppModel extends AppModel {
  */
 	public function __construct($id = false, $table = null, $ds = null) {
 		parent::__construct($id, $table, $ds);
-		$this->__configureAssociations();
+		$this->_configureAssociations();
 	}
 
 /**
@@ -38,7 +38,7 @@ class CartAppModel extends AppModel {
  *
  * @return void
  */
-	protected function __configureAssociations() {
+	protected function _configureAssociations() {
 		$models = Configure::read('Cart.models');
 		if (!empty($models)) {
 			$types = array('belongsTo', 'hasMany', 'hasOne', 'hasAndBelongsToMany');

@@ -116,7 +116,10 @@ class Order extends CartAppModel {
  */
 	public function afterSave($created) {
 		if ($created) {
-			$this->saveField('invoice_number', $this->invoiceNumber());
+			$invoiceNumber = $this->invoiceNumber();
+			$this->saveField('invoice_number', $invoiceNumber);
+			$this->data[$this->alias]['invoice_number'] = $invoiceNumber;
+			$this->data[$this->alias][$this->primaryKey] => $this->getLastInsertId();
 			CakeEventManager::dispatch(new CakeEvent('Order.created', $this, array($this->data)));
 		}
 	}
@@ -205,7 +208,11 @@ class Order extends CartAppModel {
 	public function createOrder($cartData, $processorClass, $paymentStatus = 'pending') {
 		$data[$this->alias]['cart_snapshot'] = serialize($cartData);
 
+		CakeEventManager::dispatch(new CakeEvent('Order.beforeCreateOrder', $this, array($data)));
+
 		// Shipping and Billing Address validation if the cart requires shipping
+		// by default true, it will get just validated and by this maybe set
+		// to invalid, when the cart requires shipping
 		$validBillingAddress = true;
 		$validShippingAddress = true;
 
@@ -259,7 +266,7 @@ class Order extends CartAppModel {
 
 		if ($result) {
 			$result[$this->alias][$this->primaryKey] = $this->getLastInsertId();
-			CakeEventManager::dispatch(new CakeEvent('Order.newOrder', $this, array($data)));
+			CakeEventManager::dispatch(new CakeEvent('Order.created', $this, array($data)));
 		}
 
 		$result = Set::merge($result, unserialize($result[$this->alias]['cart_snapshop']));

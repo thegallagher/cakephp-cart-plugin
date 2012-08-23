@@ -51,17 +51,15 @@ class CartsController extends CartAppController {
  */
 	public function view($cartId = null) {
 		if (!empty($this->request->data)) {
-			$cart = $this->CartManager->content();
-			foreach ($this->request->data['CartsItem'] as $key => $cartItem) {
-				$cartItem = Set::merge($cart['CartsItem'][$key], $cartItem);
-				$this->CartManager->addItem($cartItem);
-			}
+			$this->CartManager->updateItems($this->request->data['CartsItem']);
 		}
 
 		$cart = $this->CartManager->content();
 
 		$this->request->data = $cart;
 		$this->set('cart', $cart);
+		$this->set('requiresShipping', $this->CartManager->requiresShipping());
+
 		$this->set('paymentMethods', ClassRegistry::init('Cart.PaymentMethod')->getPaymentMethods());
 	}
 
@@ -103,7 +101,7 @@ class CartsController extends CartAppController {
 					'Order.token' => $token)));
 
 		try {
-			$Processor = $this->__loadPaymentProcessor($order['Order']['processor]);
+			$Processor = $this->_loadPaymentProcessor($order['Order']['processor']);
 			$Processor->parseNotification($order);
 		} catch (Exception $e) {
 			$this->log($e->getMessage(), 'payment-error');
@@ -129,10 +127,10 @@ class CartsController extends CartAppController {
 			$this->redirect(array('action' => 'view'));
 		}
 
-		$this->__anonymousCheckoutIsAllowed();
+		$this->_anonymousCheckoutIsAllowed();
 
-		$processorClass = $this->__mapProcessorClass($processor);
-		$Processor = $this->__loadPaymentProcessor($processorClass);
+		$processorClass = $this->_mapProcessorClass($processor);
+		$Processor = $this->_loadPaymentProcessor($processorClass);
 
 		$Order = ClassRegistry::init('Cart.Order');
 		$newOrder = $Order->createOrder($cartData, $processorClass);
@@ -172,7 +170,7 @@ class CartsController extends CartAppController {
 			'conditions' => array(
 				'Order.id' => CakeSession::read('Payment.orderId'))));
 
-		$Processor = $this->__loadPaymentProcessor($order['Order']['processor']);
+		$Processor = $this->_loadPaymentProcessor($order['Order']['processor']);
 
 		if (!method_exists($Processor, 'confirmOrder')) {
 			$this->Session->setFlash(__d('cart', 'Unsupported payment processor for this type of checkout!'));
@@ -216,7 +214,7 @@ class CartsController extends CartAppController {
  * @param string $processor
  * @return PaymentProcessor
  */
-	protected function __loadPaymentProcessor($processor) {
+	protected function _loadPaymentProcessor($processor) {
 		try {
 			return PaymentProcessors::load($processor, array(
 				'request' => $this->request,
@@ -244,7 +242,7 @@ class CartsController extends CartAppController {
  * @param string $processorAlias
  * @return string
  */
-	protected function __mapProcessorClass($processorAlias) {
+	protected function _mapProcessorClass($processorAlias) {
 		$processorClass = Configure::read('Cart.PaymentMethod.'. $processorAlias . '.processor');
 		if (!empty($processorClass)) {
 			return $processorClass;
@@ -257,12 +255,12 @@ class CartsController extends CartAppController {
 	}
 
 /**
- * __allowAnonymousCheckout
+ * Checks if the user can do the checkout while not being logged in or not
  *
  * @param boolean $redirect
  * @return boolean
  */
-	protected function __anonymousCheckoutIsAllowed($redirect = true) {
+	protected function _anonymousCheckoutIsAllowed($redirect = true) {
 		if (Configure::read('Cart.anonymousCheckout') === false && is_null($this->Auth->user())) {#
 			$this->Session->setFlash(__d('cart', 'Sorry, but you have to login to check this cart out.'));
 			if ($redirect) {
@@ -274,24 +272,29 @@ class CartsController extends CartAppController {
 	}
 
 /**
- * 
+ * Admin listing of carts
+ *
+ * @return void
  */
 	public function admin_index() {
 		$this->set('carts', $this->paginate());
 	}
 
 /**
- * 
+ * View the content of any cart
+ *
+ * @param string $cartId Cart UUId
+ * @return void
  */
 	public function admin_view($cartId = null) {
 		$this->set('cart', $this->Cart->view($cartId));
 	}
 
 /**
- *
+ * 
  */
 	public function admin_delete($cartId = null) {
-		$this->Cart->delete($cartId);
+		//$this->Cart->delete($cartId);
 	}
 
 }

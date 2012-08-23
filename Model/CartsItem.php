@@ -22,7 +22,8 @@ class CartsItem extends CartAppModel {
  */
 	public $belongsTo = array(
 		'Cart' => array(
-			'className' => 'Cart.Cart'));
+			'className' => 'Cart.Cart',
+			'counterCache' => 'item_count'));
 
 /**
  * Validation parameters
@@ -73,9 +74,8 @@ class CartsItem extends CartAppModel {
  * @param array $itemData
  */
 	public function addItem($cartId, $itemData) {
-		$this->set($itemData);
-		if (!$this->validates()) {
-			return false;
+		if (isset($itemData['CartsItem'])) {
+			$itemData = $itemData['CartsItem'];
 		}
 
 		$item = $this->find('first', array(
@@ -92,7 +92,7 @@ class CartsItem extends CartAppModel {
 		} else {
 			$item[$this->alias] = Set::merge($item['CartsItem'], $itemData);
 		}
-	
+
 		return $this->save($item);
 	}
 

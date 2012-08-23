@@ -1,3 +1,4 @@
+<h2><?php echo __d('cart', 'Carts'); ?></h2>
 <?php if (!empty($carts)) : ?>
 	<table>
 		<tr>
@@ -12,5 +13,5 @@
 		<?php endforeach; ?>
 	</table>
 <?php else : ?>
-
+	<p><?php echo __d('cart', 'No carts found.'); ?></p>
 <?php endif; ?>
