@@ -219,8 +219,9 @@ class Cart extends CartAppModel {
 
 		if (!empty($cartData['CartsItem'])) {
 			foreach ($cartData['CartsItem'] as $key => $item) {
+
 				$cartData['CartsItem'][$key]['total'] = (int) $item['quantity'] * (float) $item['price'];
-				$cartData[$this->alias]['total'] += (float) $item['price'];
+				$cartData[$this->alias]['total'] += (float) $cartData['CartsItem'][$key]['total'];
 			}
 		}
 

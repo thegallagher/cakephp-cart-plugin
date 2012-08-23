@@ -33,6 +33,13 @@ class CartManagerComponent extends Component {
 		'Cart.CartSession');
 
 /**
+ * Id of the active database cart
+ *
+ * @var string Cart UUID
+ */
+	protected $_cartId = null;
+
+/**
  * Default settings
  * - model 
  * - buyAction the controller action to use or check for
@@ -83,7 +90,7 @@ class CartManagerComponent extends Component {
 
 		$this->sessionKey = $this->settings['sessionKey'];
 
-		$this->__setLoggedInStatus();
+		$this->_setLoggedInStatus();
 		$this->initalizeCart();
 	}
 
@@ -92,7 +99,7 @@ class CartManagerComponent extends Component {
  *
  * @return void
  */
-	protected function __setLoggedInStatus() {
+	protected function _setLoggedInStatus() {
 		if (is_a($this->Controller->Auth, 'AuthComponent') && $this->Controller->Auth->user()) {
 			$this->isLoggedIn = true;
 		}
@@ -101,6 +108,7 @@ class CartManagerComponent extends Component {
 /**
  * Initializes the cart data from session or database depending on if user is logged in or not and if the cart is present or not
  *
+ * @todo Do not forget to merge existing itmes with the ones from the database when the user logs in!
  * @return void
  */
 	public function initalizeCart() {
@@ -110,7 +118,6 @@ class CartManagerComponent extends Component {
 
 		if (!$this->Session->check($sessionKey)) {
 			if ($userId) {
-				// @todo Do not forget to merge existing itmes with the ones from the database!!!
 				$this->Session->write($sessionKey, $this->CartModel->getActive($userId));
 			} else {
 				$this->Session->write($sessionKey, array(
@@ -122,7 +129,7 @@ class CartManagerComponent extends Component {
 				$this->Session->write($sessionKey, $this->CartModel->getActive($userId));
 			}
 		}
-		$this->cartId = $this->Session->read($sessionKey . '.Cart.id');
+		$this->_cartId = $this->Session->read($sessionKey . '.Cart.id');
 	}
 
 /**
@@ -156,35 +163,33 @@ class CartManagerComponent extends Component {
 			return false;
 		}
 
-		$data = $this->_additionalData($data);
-
-		if ($this->Controller->{$model}->isBuyable($data)) {
-			$item = $this->addItem($data);
-			if ($item) {
-				if ($this->Controller->request->is('ajax')) {
-					$this->Controller->set('item', $item);
-					$this->Controller->set('_serialize', array('item'));
-				} else {
-					$this->afterAddItemRedirect($item);
-				}
+		$item = $this->addItem($data);
+		if ($item) {
+			if ($this->Controller->request->is('ajax')) {
+				$this->Controller->set('item', $item);
+				$this->Controller->set('_serialize', array('item'));
+			} else {
+				$this->afterAddItemRedirect($item);
 			}
 		}
+
 
 		return false;
 	}
 
 /**
- * Adds additional data here to avoid code duplication in getBuy() and postBuy()
+ * Adds additional data here that depends more or less on the controller and we
+ * want to be present in the before
  *
  * @param array $data
  * @return array
  */
 	protected function _additionalData($data) {
 		$data['CartsItem']['user_id'] = $this->Auth->user('id');
-		$data['CartsItem']['cart_id'] = $this->Session->read('Cart.Cart.id');
+		$data['CartsItem']['cart_id'] = $this->_cartId;
 
 		if (!isset($data['CartsItem']['model'])) {
-			$data['CartsItem']['model'] = get_class($this->Controller->{$model});
+			$data['CartsItem']['model'] = $this->settings['model'];
 		}
 
 		if (empty($data['CartsItem']['quantity'])) {
@@ -253,13 +258,29 @@ class CartManagerComponent extends Component {
  * @param array $data
  * @return boolean
  */
-	public function addItem($data) {
+	public function addItem($data, $recalculate = true) {
 		extract($this->settings);
 
-		$data = $this->Controller->{$model}->beforeAddToCart($data);
+		$data = $this->_additionalData($data);
 
+		CakeEventManager::dispatch(new CakeEvent('CartManager.beforeAddItem'), $this, array($data));
+
+		$Model = ClassRegistry::init($data['CartsItem']['model']);
+
+		$Model->isBuyable($data);
+		$data = $Model->beforeAddToCart($data);
+/*
+		if (method_exists($Model, 'isBuyable') || in_array('Buyable', $Model->Behaviors->enabled())) {
+			$data = $Model->beforeAddToCart($data);
+			if ($data === false) {
+				return false;
+			}
+		} else {
+			return false;
+		}
+*/
 		if ($this->isLoggedIn) {
-			$data = $this->CartModel->addItem($this->cartId, $data);
+			$data = $this->CartModel->addItem($this->_cartId, $data);
 			if ($data === false) {
 				return false;
 			}
@@ -267,7 +288,9 @@ class CartManagerComponent extends Component {
 		}
 
 		$result = $this->CartSession->addItem($data);
-		$this->calculateCart();
+		if ($recalculate) {
+			$this->calculateCart();
+		}
 
 		CakeEventManager::dispatch(new CakeEvent('CartManager.afterAddItem'), $this, array($result));
 		return $result;
@@ -282,8 +305,10 @@ class CartManagerComponent extends Component {
 	public function removeItem($data = null) {
 		extract($this->settings);
 
+		CakeEventManager::dispatch(new CakeEvent('CartManager.beforeRemoveItem'), $this, array($result));
+
 		if ($this->isLoggedIn) {
-			$this->CartModel->removeItem($this->cartId, $data);
+			$this->CartModel->removeItem($this->_cartId, $data);
 		}
 
 		$result = $this->CartSession->removeItem($data);
@@ -301,11 +326,11 @@ class CartManagerComponent extends Component {
  */
 	public function emptyCart() {
 		if ($this->isLoggedIn) {
-			$this->CartModel->emptyCart($this->cartId);
+			$this->CartModel->emptyCart($this->_cartId);
 		}
 
 		if ($this->settings['useCookie'] == true) {
-			$this->Cookie->delete(($this->settings['cookieName']);
+			$this->Cookie->delete($this->settings['cookieName']);
 		}
 
 		$result = $this->CartSession->emptyCart();
@@ -341,7 +366,7 @@ class CartManagerComponent extends Component {
  * @return boolean
  */
 	public function requiresShipping() {
-		return (bool) $this->Session->read($sessionKey . '.Cart.requires_shipping');
+		return (bool) $this->Session->read($this->settings['sessionKey'] . '.Cart.requires_shipping');
 	}
 
 /**
@@ -355,7 +380,7 @@ class CartManagerComponent extends Component {
 		$cartData = $this->CartModel->calculateCart($this->Session->read($sessionKey));
 
 		if ($this->isLoggedIn) {
-			$this->CartModel->saveAll($cartData);
+			//$this->CartModel->saveAll($cartData);
 		}
 
 		$this->Session->write($sessionKey, $cartData);
@@ -388,17 +413,15 @@ class CartManagerComponent extends Component {
 /**
  * //@todo
  */
-	public function updateCart($items) {
-		foreach ($items as $item) {
-			// fire beforeAddToCart
+	public function updateItems($items) {
+		try {
+			foreach ($items as $item) {
+				$this->addItem(array('CartsItem' => $item), false);
+			}
+			$this->calculateCart();
+		} catch (Exception $e) {
+			throw $e;
 		}
-
-		$this->CartModel->mergeItems($this->cartid, $items);
-
-		if ($this->isLoggedIn) {
-			$this->CartModel->mergeItems($this->cartId, $items);
-		}
-
 	}
 
 /**
