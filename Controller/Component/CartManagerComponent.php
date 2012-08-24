@@ -150,7 +150,7 @@ class CartManagerComponent extends Component {
  * @return mixed False if the catpure failed array with item data on success
  */
 	public function captureBuy() {
-		extract($this->settings);
+
 		if ($this->Controller->request->is('get')) {
 			$data = $this->getBuy();
 		}
@@ -207,7 +207,7 @@ class CartManagerComponent extends Component {
  */
 	public function afterAddItemRedirect($item) {
 		extract($this->settings);
-		$this->Session->setFlash(__d('cart', 'You added %d %s to your cart', $item['name'], $item['quantity']));
+		$this->Session->setFlash(__d('cart', 'You added %s %s to your cart', $item['quantity'], $item['name']));
 		if (is_string($afterAddItemRedirect) || is_array($afterAddItemRedirect)) {
 			$this->Controller->redirect($afterAddItemRedirect);
 		} elseif (is_null($afterAddItemRedirect)) {
@@ -225,7 +225,7 @@ class CartManagerComponent extends Component {
 			$data = array(
 				'CartsItem' => array(
 					'foreign_key' => $this->Controller->request->params['named']['item'],
-					'model' => get_class($this->Controller->{$model})));
+					'model' => $this->Controller->modelClass));
 
 			if (isset($this->Controller->request->params['named']['model'])) {
 				$data['CartsItem']['model'] = $this->Controller->request->params['named']['model'];
@@ -266,19 +266,23 @@ class CartManagerComponent extends Component {
 		CakeEventManager::dispatch(new CakeEvent('CartManager.beforeAddItem'), $this, array($data));
 
 		$Model = ClassRegistry::init($data['CartsItem']['model']);
+		$behaviorMethods = array_keys($Model->Behaviors->methods());
 
-		$Model->isBuyable($data);
-		$data = $Model->beforeAddToCart($data);
-/*
-		if (method_exists($Model, 'isBuyable') || in_array('Buyable', $Model->Behaviors->enabled())) {
-			$data = $Model->beforeAddToCart($data);
-			if ($data === false) {
-				return false;
-			}
-		} else {
+		if ((!method_exists($Model, 'isBuyable') || !method_exists($Model, 'beforeAddToCart')) && 
+			!in_array('isBuyable', $behaviorMethods) || !in_array('beforeAddToCart', $behaviorMethods)) {
+			throw new InternalErrorException(__('The model %s is not implementing isBuyable() or beforeAddToCart() or is not using the BuyableBehavior!', get_class($Model)));
+		}
+
+		if (!$Model->isBuyable($data)) {
+			// throw exception?
 			return false;
 		}
-*/
+
+		$data = $Model->beforeAddToCart($data);
+		if ($data === false || !is_array($data)) {
+			return false;
+		}
+
 		if ($this->isLoggedIn) {
 			$data = $this->CartModel->addItem($this->_cartId, $data);
 			if ($data === false) {
@@ -293,6 +297,7 @@ class CartManagerComponent extends Component {
 		}
 
 		CakeEventManager::dispatch(new CakeEvent('CartManager.afterAddItem'), $this, array($result));
+
 		return $result;
 	}
 
