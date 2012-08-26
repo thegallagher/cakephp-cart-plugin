@@ -36,8 +36,7 @@ class CartManagerComponentTest extends CakeTestCase {
  * @return void
  */
 	public function startTest() {
-		$request = new CakeRequest(null, false);
-		$this->Controller = new CartTestItemsController($request, $this->getMock('CakeResponse'));
+		$this->Controller = new CartTestItemsController($this->getMock('CakeRequest'), $this->getMock('CakeResponse'));
 
 		$this->collection = new ComponentCollection();
 		$this->collection->init($this->Controller);
@@ -45,8 +44,12 @@ class CartManagerComponentTest extends CakeTestCase {
 		$AuthMock = $this->getMock('AuthComponent', array(), array($this->collection));
 		$this->Controller->Auth = $AuthMock;
 
+		$SessionMock = $this->getMock('SessionComponent', array(), array($this->collection));
+		$this->Controller->Session = $AuthMock;
+
 		$this->CartManager = new CartManagerComponent($this->collection);
 		$this->CartManager->Auth = $AuthMock;
+		$this->CartManager->Session = $SessionMock;
 	}
 
 /**
@@ -82,40 +85,6 @@ class CartManagerComponentTest extends CakeTestCase {
 
 		$this->CartManager = $this->getMock('CartManagerComponent', array('captureBuy'), array($this->collection));
 		$this->CartManager->initialize($this->Controller, array());
-/*
-		$this->CartManager->expectAt(0, 'captureBuy', array());
-		$this->CartManager->setReturnValueAt(0, 'captureBuy', true);
-
-		$this->Controller->action = 'buy';
-		$this->CartManager->startup($this->Controller);
-*/
-	}
-
-/**
- * testAddItem
- *
- * @return void
- */
-	public function testAddItem() {
-		//$this->CartManager->addItem();
-	}
-
-/**
- * testPostBuy
- *
- * @return void
- */
-	public function testPostBuy() {
-		$this->Controller->request->data = array('test');
-		$this->CartManager->initialize($this->Controller, array());
-		$this->assertFalse($this->CartManager->postBuy());
-
-		$this->Controller->response->expects($this->any())
-			->method('is')
-			->with('post')
-			->will($this->returnValue(true));
-
-		debug($this->CartManager->postBuy());
 	}
 
 /**
@@ -124,8 +93,92 @@ class CartManagerComponentTest extends CakeTestCase {
  * @return void
  */
 	public function testGetBuy() {
-		$this->CartManager->initialize($this->Controller, array());
-		$this->assertFalse($this->CartManager->getBuy());
+		$this->CartManager->Controller = $this->Controller;
+		$this->Controller->request->params['named'] = array(
+			'item' => 'item-1',
+			'model' => 'Item',
+			'quantity' => 1);
+
+		$this->CartManager->Controller->request->expects($this->any())
+			->method('is')
+			->with('get')
+			->will($this->returnValue(true));
+
+		$result = $this->CartManager->getBuy();
+
+		$this->assertEqual($result, array(
+			'CartsItem' => array(
+				'model' => 'Item',
+				'quantity' => 1,
+				'foreign_key' => 'item-1')));
 	}
 
+/**
+ * testPostBuy
+ *
+ * @return void
+ */
+	public function testPostBuy() {
+		$this->CartManager->Controller = $this->Controller;
+		$this->Controller->request->data = array(
+			'CartsItem' => array(
+				'model' => 'Item',
+				'quantity' => 1,
+				'foreign_key' => 'item-1'));
+
+		$this->CartManager->Controller->request->expects($this->any())
+			->method('is')
+			->with('post')
+			->will($this->returnValue(true));
+
+		$result = $this->CartManager->postBuy();
+		$this->assertEqual($result, array(
+			'CartsItem' => array(
+				'model' => 'Item',
+				'quantity' => 1,
+				'foreign_key' => 'item-1')));
+	}
+
+/**
+ * testRequiresShipping
+ *
+ * @return void
+ */
+	public function testRequiresShipping() {
+		$this->CartManager->settings['sessionKey'] = 'Cart';
+
+		$this->CartManager->Session->expects($this->any())
+			->method('read')
+			->with('Cart.Cart.requires_shipping')
+			->will($this->returnValue(true));
+
+		$result = $this->CartManager->requiresShipping();
+		$this->assertTrue($result);
+
+
+		$this->CartManager->Session->expects($this->any())
+			->method('read')
+			->with('Cart.Cart.requires_shipping')
+			->will($this->returnValue(false));
+
+		$result = $this->CartManager->requiresShipping();
+		$this->assertFalse($result);
+	}
+
+/**
+ * testAfterAddItemRedirect
+ * 
+ * @return void
+ */
+	public function testAfterAddItemRedirect() {
+		$this->CartManager->Controller =  $this->getMock('CartTestItemsController', array('redirect'));
+		$this->CartManager->settings['afterAddItemRedirect'] = '/bought';
+
+		$this->CartManager->Controller->expects($this->any())
+			->method('redirect')
+			->with('/bought')
+			->will($this->returnValue(true));
+
+		$this->CartManager->afterAddItemRedirect(array('name' => 'CakePHP', 'quantity' => '1'));
+	}
 }

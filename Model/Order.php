@@ -196,23 +196,18 @@ class Order extends CartAppModel {
 	}
 
 /**
- * This method will create a new order record and does the validation work for
- * the different cases that might apply before you can issue a new order
+ * Validate Order
+ *
+ * Shipping and Billing Address validation if the cart requires shipping
+ * by default true, it will get just validated and by this maybe set
+ * to invalid, when the cart requires shipping
  *
  * @param 
  * @param 
  * @param 
- * @return mixed Array with order data on success, false if not
- * @todo finish me
+ * @return mixed
  */
-	public function createOrder($cartData, $processorClass, $paymentStatus = 'pending') {
-		$data[$this->alias]['cart_snapshot'] = serialize($cartData);
-
-		CakeEventManager::dispatch(new CakeEvent('Order.beforeCreateOrder', $this, array($data)));
-
-		// Shipping and Billing Address validation if the cart requires shipping
-		// by default true, it will get just validated and by this maybe set
-		// to invalid, when the cart requires shipping
+	public function validateOrder($cartData, $processorClass, $paymentStatus) {
 		$validBillingAddress = true;
 		$validShippingAddress = true;
 
@@ -241,6 +236,27 @@ class Order extends CartAppModel {
 		$validOrder = $this->validates();
 
 		if (!$validOrder || !$validBillingAddress || !$validShippingAddress) {
+			return false;
+		}
+	}
+
+/**
+ * This method will create a new order record and does the validation work for
+ * the different cases that might apply before you can issue a new order
+ *
+ * @param 
+ * @param 
+ * @param 
+ * @return mixed Array with order data on success, false if not
+ * @todo finish me
+ */
+	public function createOrder($cartData, $processorClass, $paymentStatus = 'pending') {
+		$data[$this->alias]['cart_snapshot'] = serialize($cartData);
+
+		CakeEventManager::dispatch(new CakeEvent('Order.beforeCreateOrder', $this, array($data)));
+
+		$order = $this->validateOrder($cartData, $processorClass, $paymentStatus);
+		if ($order === false) {
 			return false;
 		}
 

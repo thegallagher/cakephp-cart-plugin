@@ -40,6 +40,13 @@ class CartManagerComponent extends Component {
 	protected $_cartId = null;
 
 /**
+ * User status if logged in or not
+ *
+ * @var boolean
+ */
+	public $_isLoggedIn = false;
+
+/**
  * Default settings
  * - model 
  * - buyAction the controller action to use or check for
@@ -69,13 +76,6 @@ class CartManagerComponent extends Component {
 		'postBuy' => true);
 
 /**
- * User status if logged in or not
- *
- * @var boolean
- */
-	public $loggedIn = false;
-
-/**
  * Default settings
  *
  * @var array
@@ -101,7 +101,7 @@ class CartManagerComponent extends Component {
  */
 	protected function _setLoggedInStatus() {
 		if (is_a($this->Controller->Auth, 'AuthComponent') && $this->Controller->Auth->user()) {
-			$this->isLoggedIn = true;
+			$this->_isLoggedIn = true;
 		}
 	}
 
@@ -149,7 +149,7 @@ class CartManagerComponent extends Component {
  *
  * @return mixed False if the catpure failed array with item data on success
  */
-	public function captureBuy() {
+	public function captureBuy($returnItem = false) {
 
 		if ($this->Controller->request->is('get')) {
 			$data = $this->getBuy();
@@ -165,12 +165,15 @@ class CartManagerComponent extends Component {
 
 		$item = $this->addItem($data);
 		if ($item) {
-			if ($this->Controller->request->is('ajax')) {
-				$this->Controller->set('item', $item);
-				$this->Controller->set('_serialize', array('item'));
-			} else {
-				$this->afterAddItemRedirect($item);
+			if ($returnItem == false) {
+				if ($this->Controller->request->is('ajax') || $this->Controller->request->is('json') || $this->Controller->request->is('xml')) {
+					$this->Controller->set('item', $item);
+					$this->Controller->set('_serialize', array('item'));
+				} else {
+					$this->afterAddItemRedirect($item);
+				}
 			}
+			return $item;
 		}
 
 
@@ -210,7 +213,7 @@ class CartManagerComponent extends Component {
 		$this->Session->setFlash(__d('cart', 'You added %s %s to your cart', $item['quantity'], $item['name']));
 		if (is_string($afterAddItemRedirect) || is_array($afterAddItemRedirect)) {
 			$this->Controller->redirect($afterAddItemRedirect);
-		} elseif (is_null($afterAddItemRedirect)) {
+		} elseif (is_true($afterAddItemRedirect)) {
 			$this->Controller->redirect($this->Controller->referer());
 		}
 	}
@@ -283,7 +286,7 @@ class CartManagerComponent extends Component {
 			return false;
 		}
 
-		if ($this->isLoggedIn) {
+		if ($this->_isLoggedIn) {
 			$data = $this->CartModel->addItem($this->_cartId, $data);
 			if ($data === false) {
 				return false;
@@ -312,7 +315,7 @@ class CartManagerComponent extends Component {
 
 		CakeEventManager::dispatch(new CakeEvent('CartManager.beforeRemoveItem'), $this, array($result));
 
-		if ($this->isLoggedIn) {
+		if ($this->_isLoggedIn) {
 			$this->CartModel->removeItem($this->_cartId, $data);
 		}
 
@@ -330,7 +333,7 @@ class CartManagerComponent extends Component {
  * @return void
  */
 	public function emptyCart() {
-		if ($this->isLoggedIn) {
+		if ($this->_isLoggedIn) {
 			$this->CartModel->emptyCart($this->_cartId);
 		}
 
@@ -384,7 +387,7 @@ class CartManagerComponent extends Component {
 		$sessionKey = $this->settings['sessionKey'];
 		$cartData = $this->CartModel->calculateCart($this->Session->read($sessionKey));
 
-		if ($this->isLoggedIn) {
+		if ($this->_isLoggedIn) {
 			//$this->CartModel->saveAll($cartData);
 		}
 
