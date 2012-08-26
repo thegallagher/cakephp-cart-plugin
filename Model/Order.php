@@ -119,7 +119,7 @@ class Order extends CartAppModel {
 			$invoiceNumber = $this->invoiceNumber();
 			$this->saveField('invoice_number', $invoiceNumber);
 			$this->data[$this->alias]['invoice_number'] = $invoiceNumber;
-			$this->data[$this->alias][$this->primaryKey] => $this->getLastInsertId();
+			$this->data[$this->alias][$this->primaryKey] = $this->getLastInsertId();
 			CakeEventManager::dispatch(new CakeEvent('Order.created', $this, array($this->data)));
 		}
 	}
@@ -207,30 +207,21 @@ class Order extends CartAppModel {
  * @param 
  * @return mixed
  */
-	public function validateOrder($cartData, $processorClass, $paymentStatus) {
+	public function validateOrder($order) {
 		$validBillingAddress = true;
 		$validShippingAddress = true;
 
-		if (isset($cartData['Cart']['requires_shipping']) && $cartData['Cart']['requires_shipping'] == 1) {
+		if (isset($order['Cart']['requires_shipping']) && $order['Cart']['requires_shipping'] == 1) {
 			$this->ShippingAddress->set($data);
 			$validShippingAddress = $this->ShippingAddress->validates();
 
-			if (isset($cartData['BillingAddress']['same_as_shipping']) && $cartData['BillingAddress']['same_as_shipping'] == 1) {
-				$cartData['BillingAddress'] = $cartData['ShippingAddress'];
+			if (isset($order['BillingAddress']['same_as_shipping']) && $order['BillingAddress']['same_as_shipping'] == 1) {
+				$order['BillingAddress'] = $order['ShippingAddress'];
 			} else {
-				$this->BillingAddress->set($cartData);
+				$this->BillingAddress->set($order);
 				$validBillingAddress = $this->BillingAddress->validates();
 			}
 		}
-
-		$order = array(
-			$this->alias => array(
-				'processor' => $processorClass,
-				'payment_status' => $paymentStatus,
-				'cart_id' => empty($cartData['Cart']['id']) ? null : $cartData['Cart']['id'],
-				'user_id' => $cartData['Cart']['user_id'],
-				'cart_snapshop' => $cartData,
-				'total' => $cartData['Cart']['total']));
 
 		$this->set($order);
 		$validOrder = $this->validates();
@@ -238,6 +229,8 @@ class Order extends CartAppModel {
 		if (!$validOrder || !$validBillingAddress || !$validShippingAddress) {
 			return false;
 		}
+
+		return $order;
 	}
 
 /**
@@ -251,11 +244,20 @@ class Order extends CartAppModel {
  * @todo finish me
  */
 	public function createOrder($cartData, $processorClass, $paymentStatus = 'pending') {
-		$data[$this->alias]['cart_snapshot'] = serialize($cartData);
+		$order = array(
+			$this->alias => array(
+				'processor' => $processorClass,
+				'payment_status' => $paymentStatus,
+				'cart_id' => empty($cartData['Cart']['id']) ? null : $cartData['Cart']['id'],
+				'user_id' => empty($cartData['Cart']['user_id']) ? null : $cartData['Cart']['user_id'],
+				'cart_snapshop' => serialize($cartData),
+				'total' => $cartData['Cart']['total']));
 
-		CakeEventManager::dispatch(new CakeEvent('Order.beforeCreateOrder', $this, array($data)));
+		$order = Set::merge($cartData, $order);
 
-		$order = $this->validateOrder($cartData, $processorClass, $paymentStatus);
+		CakeEventManager::dispatch(new CakeEvent('Order.beforeCreateOrder', $this, array($order)));
+
+		$order = $this->validateOrder($order);
 		if ($order === false) {
 			return false;
 		}
@@ -265,24 +267,24 @@ class Order extends CartAppModel {
 		$orderId = $this->getLastInsertId();
 		$result[$this->alias][$this->primaryKey] = $orderId;
 
-		foreach ($cartData['CartsItem'] as $item) {
+		foreach ($order['CartsItem'] as $item) {
 			$item['order_id'] = $orderId;
 			$this->OrderItem->create();
 			$this->OrderItem->save($item);
 		}
 
-		if (isset($cartData['Cart']['requires_shipping']) && $cartData['Cart']['requires_shipping'] == 1) {
-			$cartData['BillingAddress']['order_id'] = $orderId;
-			$cartData['ShippingAddress']['order_id'] = $orderId;
+		if (isset($order['Cart']['requires_shipping']) && $order['Cart']['requires_shipping'] == 1) {
+			$order['BillingAddress']['order_id'] = $orderId;
+			$order['ShippingAddress']['order_id'] = $orderId;
 			$this->BillingAddress->create();
-			$this->BillingAddress->save($cartData);
+			$this->BillingAddress->save($order);
 			$this->ShippingAddress->create();
-			$this->ShippingAddress->save($cartData);
+			$this->ShippingAddress->save($order);
 		}
 
 		if ($result) {
 			$result[$this->alias][$this->primaryKey] = $this->getLastInsertId();
-			CakeEventManager::dispatch(new CakeEvent('Order.created', $this, array($data)));
+			CakeEventManager::dispatch(new CakeEvent('Order.created', $this, array($result)));
 		}
 
 		$result = Set::merge($result, unserialize($result[$this->alias]['cart_snapshop']));

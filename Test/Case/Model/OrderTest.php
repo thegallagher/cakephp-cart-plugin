@@ -78,7 +78,7 @@ class OrderTest extends CakeTestCase {
 	public function testCreateSimpleOrder() {
 		$cartData = array(
 			'Cart' => array(
-				'cart_id' => 'cart-1',
+				'id' => 'cart-1',
 				'requires_shipping' => false,
 				'user_id' => 'user-1',
 				'processor' => 'Paypal.PaypalExpress',
@@ -101,8 +101,39 @@ class OrderTest extends CakeTestCase {
 		$this->assertTrue(is_array($result) && !empty($result));
 	}
 
-	public function testAfterFind() {
+/**
+ * testCreateOrder
+ *
+ * @return void
+ */
+	public function testValidateOrder() {
+		$cartData = array(
+			'Cart' => array(
+				'id' => 'cart-1',
+				'requires_shipping' => false,
+				'user_id' => 'user-1',
+				'processor' => 'Paypal.PaypalExpress',
+				'total' => 20.95),
+			'CartsItem' => array(
+				array(
+					'name' => 'CakePHP',
+					'foreign_key' => 'item-1',
+					'model' => 'Item',
+					'quantity' => 1,
+					'price' => 10),
+				array(
+					'name' => 'Developer',
+					'foreign_key' => 'item-2',
+					'model' => 'Item',
+					'quantity' => 2,
+					'price' => 10)));
 
+		$cartData['Order'] = array(
+			'user_id' => 'user-1',
+			'cart_snapshot' => serialize($cartData));
+
+		$result = $this->Order->validateOrder($cartData);
+		$this->assertTrue(is_array($result));
 	}
 
 }
