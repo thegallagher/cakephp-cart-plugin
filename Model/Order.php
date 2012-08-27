@@ -203,8 +203,6 @@ class Order extends CartAppModel {
  * to invalid, when the cart requires shipping
  *
  * @param 
- * @param 
- * @param 
  * @return mixed
  */
 	public function validateOrder($order) {

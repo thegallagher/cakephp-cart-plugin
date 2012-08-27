@@ -132,6 +132,17 @@ class OrderTest extends CakeTestCase {
 			'user_id' => 'user-1',
 			'cart_snapshot' => serialize($cartData));
 
+		$cartData['BillingAddress'] = array(
+			'same_as_shipping' => 1);
+
+		$cartData['ShippingAddress'] = array(
+			'first_name' => 'Cake',
+			'last_name' => 'PHP',
+			'street' => 'Cookie Street',
+			'city' => 'Cake Town',
+			'zip' => '12345',
+			'country' => 'DEU');
+
 		$result = $this->Order->validateOrder($cartData);
 		$this->assertTrue(is_array($result));
 	}

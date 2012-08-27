@@ -71,7 +71,8 @@ class CartManagerComponent extends Component {
 		'sessionKey' => 'Cart',
 		'useCookie' => false,
 		'cookieName' => 'Cart',
-		'afterAddItemRedirect' => null,
+		'afterAddItemRedirect' => true,
+		'afterAddItemFailedRedirect' => true,
 		'getBuy' => true,
 		'postBuy' => true);
 
@@ -91,7 +92,7 @@ class CartManagerComponent extends Component {
 		$this->sessionKey = $this->settings['sessionKey'];
 
 		$this->_setLoggedInStatus();
-		$this->initalizeCart();
+		$this->_initalizeCart();
 	}
 
 /**
@@ -111,7 +112,7 @@ class CartManagerComponent extends Component {
  * @todo Do not forget to merge existing itmes with the ones from the database when the user logs in!
  * @return void
  */
-	public function initalizeCart() {
+	protected function _initalizeCart() {
 		extract($this->settings);
 		$userId = $this->Auth->user('id');
 		$this->CartModel = ClassRegistry::init($cartModel);
@@ -150,6 +151,7 @@ class CartManagerComponent extends Component {
  * @return mixed False if the catpure failed array with item data on success
  */
 	public function captureBuy($returnItem = false) {
+		extract($this->settings);
 
 		if ($this->Controller->request->is('get')) {
 			$data = $this->getBuy();
@@ -160,6 +162,10 @@ class CartManagerComponent extends Component {
 		}
 
 		if (!$data) {
+			if ($afterAddItemFailedRedirect === true) {
+				$this->Session->setFlash(__d('cart', 'Failed to buy the item'));
+				$this->Controller->redirect($this->Controller->referer());
+			}
 			return false;
 		}
 
@@ -176,6 +182,10 @@ class CartManagerComponent extends Component {
 			return $item;
 		}
 
+		if ($afterAddItemFailedRedirect === true) {
+			$this->Session->setFlash(__d('cart', 'Failed to buy the item'));
+			$this->Controller->redirect($this->Controller->referer());
+		}
 
 		return false;
 	}
@@ -213,7 +223,7 @@ class CartManagerComponent extends Component {
 		$this->Session->setFlash(__d('cart', 'You added %s %s to your cart', $item['quantity'], $item['name']));
 		if (is_string($afterAddItemRedirect) || is_array($afterAddItemRedirect)) {
 			$this->Controller->redirect($afterAddItemRedirect);
-		} elseif (is_true($afterAddItemRedirect)) {
+		} elseif ($afterAddItemRedirect === true) {
 			$this->Controller->redirect($this->Controller->referer());
 		}
 	}
