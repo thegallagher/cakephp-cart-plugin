@@ -2,13 +2,15 @@
 <?php if (!empty($paymentMethods)) : ?>
 	<ul class="payment-methods">
 		<?php foreach ($paymentMethods as $paymentMethod) : ?>
+		<?php //debug($paymentMethod); ?>
 		<li>
 			<?php
-				if (empty($paymentMethod['logo'])) {
-					echo $this->Html->link($paymentMethod['name'], $paymentMethod['checkoutUrl']);
+				if (empty($paymentMethod['PaymentMethod']['logo'])) {
+					//echo $this->Html->link($paymentMethod['PaymentMethod']['name'], $paymentMethod['PaymentMethod']['checkoutUrl']);
+					echo $this->Html->link($paymentMethod['PaymentMethod']['name'], array('action' => 'checkout', $paymentMethod['PaymentMethod']['class']));
 				} else {
-					$image = $this->Html->image($paymentMethod['logo'], array('alt' => $paymentMethod['name']));
-					echo $this->Html->link($image, $paymentMethod['checkoutUrl'], array('escape' => false));
+					$image = $this->Html->image($paymentMethod['PaymentMethod']['logo'], array('alt' => $paymentMethod['PaymentMethod']['name']));
+					//echo $this->Html->link($image, $paymentMethod['PaymentMethod']['checkoutUrl'], array('escape' => false));
 				}
 			?>
 		</li>

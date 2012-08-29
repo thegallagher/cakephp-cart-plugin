@@ -24,7 +24,16 @@ class PaymentMethod extends CartAppModel {
  * 
  */
 	public function getPaymentMethods() {
-		return Configure::read('Cart.PaymentMethod');
+		$methods = Configure::read('Cart.PaymentMethod');
+		$validMethods = array();
+		if (!empty($methods)) {
+			foreach($methods as $method) {
+				if ($method['active'] == 1) {
+					$validMethods[] = array($this->alias => $method);
+				}
+			}
+		}
+		return $validMethods;
 	}
 
 /**
