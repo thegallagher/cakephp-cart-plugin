@@ -3,7 +3,8 @@
 	<table>
 		<thead>
 			<tr>
-				<th><?php echo $this->Paginator->sort('order_number'); ?></th>
+				<th><?php echo $this->Paginator->sort('invoice_number'); ?></th>
+				<th><?php echo $this->Paginator->sort('total'); ?></th>
 				<th><?php echo $this->Paginator->sort('created'); ?></th>
 				<th>-</th>
 			</tr>
@@ -11,8 +12,9 @@
 		<tbody>
 			<?php foreach ($orders as $order) : ?>
 				<tr>
-					<td><?php echo $order['Order']['order_number']; ?></td>
-					<td><?php echo $order['Order']['created']; ?></td>
+					<td><?php echo h($order['Order']['invoice_number']); ?></td>
+					<td><?php echo $this->Number->currency($order['Order']['total'], $order['Order']['currency']); ?></td>
+					<td><?php echo h($order['Order']['created']); ?></td>
 					<td><?php echo $this->Html->link(__d('cart', 'view'), array('action' => 'view', $order['Order']['id'])); ?></td>
 				</tr>
 			<?php endforeach; ?>

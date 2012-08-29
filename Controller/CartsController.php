@@ -277,6 +277,9 @@ class CartsController extends CartAppController {
  * @return void
  */
 	public function admin_index() {
+		$this->paginate = array(
+			'contain' => array('User'));
+
 		$this->set('carts', $this->paginate());
 	}
 

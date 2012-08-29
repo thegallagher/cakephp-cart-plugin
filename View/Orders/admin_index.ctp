@@ -31,8 +31,8 @@
 								'action' => 'view', $order['Order']['id']));
 						?>
 					</td>
-					<td><?php echo $order['Order']['total']; ?></td>
-					<td><?php echo $order['Order']['order_number']; ?></td>
+					<td><?php echo $this->Number->currency($order['Order']['total'], $order['Order']['currency']); ?></td>
+					<td><?php echo $order['Order']['invoice_number']; ?></td>
 					<td><?php echo $order['Order']['created']; ?></td>
 					<td><?php echo $this->Html->link(__d('cart', 'view'), array('action' => 'view', $order['Order']['id'])); ?></td>
 				</tr>

@@ -65,8 +65,6 @@ class CartHelper extends AppHelper {
 		$string .= $this->Form->hidden('Cart.' . $this->iterator . '.foreign_key', array(
 			'value' => $id));
 
-		
-
 		if (isset($options['div']) && $options['div'] !== false) {
 			if (is_array($options['div'])) {
 				$this->Html->div($string, $options['div']);
@@ -75,6 +73,11 @@ class CartHelper extends AppHelper {
 					'class' => 'cart-item-form'));
 			}
 		}
+	}
+
+	public function hidden($name, $value, $options) {
+		$options = array_merge($options, array('value' => $value));
+		$this->Form->hidden($name, $options);
 	}
 
 /**

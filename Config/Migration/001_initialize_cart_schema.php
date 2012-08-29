@@ -81,6 +81,7 @@ class D287dbf03fef11e1b86c0800200c9a66 extends CakeMigration {
 					'billing_address' => array('type'=>'text', 'null' => true, 'default' => NULL),
 					'shipping_address' => array('type'=>'text', 'null' => true, 'default' => NULL),
 					'total' => array('type'=>'float', 'null' => true, 'default' => NULL),
+					'currency' => array('type' => 'integer', 'null' => true, 'default' => NULL),
 					'created' => array('type'=>'datetime', 'null' => true, 'default' => NULL),
 					'modified' => array('type'=>'datetime', 'null' => true, 'default' => NULL),
 					'indexes' => array(

@@ -12,6 +12,16 @@ App::uses('CakeEventManager', 'Event');
  * @property CartsItem CartsItem
  */
 class Cart extends CartAppModel {
+
+/**
+ * belongsTo associations
+ *
+ * @var array
+ */
+	public $belongsTo = array(
+		'User' => array(
+			'className' => 'User'));
+
 /**
  * hasMany associations
  *
