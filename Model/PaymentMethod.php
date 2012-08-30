@@ -28,7 +28,7 @@ class PaymentMethod extends CartAppModel {
 		$validMethods = array();
 		if (!empty($methods)) {
 			foreach($methods as $method) {
-				if ($method['active'] == 1) {
+				if (isset($method['active']) && $method['active'] == 1) {
 					$validMethods[] = array($this->alias => $method);
 				}
 			}

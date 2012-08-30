@@ -103,7 +103,7 @@ class Order extends CartAppModel {
  * @return boolean
  */
 	public function beforeSave() {
-		if (!empty($this->data[$this->alias]['cart_snapshop'])) {
+		if (!empty($this->data[$this->alias]['cart_snapshop']) && is_array($this->data[$this->alias]['cart_snapshop'])) {
 			$this->data[$this->alias]['cart_snapshop'] = serialize($this->data[$this->alias]['cart_snapshop']);
 		}
 		return true;
@@ -248,7 +248,7 @@ class Order extends CartAppModel {
 				'payment_status' => $paymentStatus,
 				'cart_id' => empty($cartData['Cart']['id']) ? null : $cartData['Cart']['id'],
 				'user_id' => empty($cartData['Cart']['user_id']) ? null : $cartData['Cart']['user_id'],
-				'cart_snapshop' => serialize($cartData),
+				'cart_snapshop' => $cartData,
 				'total' => $cartData['Cart']['total']));
 
 		$order = Set::merge($cartData, $order);
