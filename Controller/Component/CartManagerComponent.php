@@ -81,8 +81,8 @@ class CartManagerComponent extends Component {
  *
  * @var array
  */
-	public function initialize(Controller $Controller, $settings = array()) {
-		$this->settings = array_merge($this->_defaultSettings, $settings);
+	public function initialize(Controller $Controller) {
+		$this->settings = array_merge($this->_defaultSettings, $this->settings);
 		$this->Controller = $Controller;
 
 		if (empty($this->settings['model'])) {
