@@ -49,7 +49,9 @@ class BuyableBehavior extends ModelBehavior {
 		if (empty($this->settings[$Model->alias]['nameField'])) {
 			$this->settings[$Model->alias]['nameField'] = $Model->displayField;
 		}
-
+		
+		$this->settings[$Model->alias] = array_merge($this->settings[$Model->alias], $settings);
+		
 		$this->bindCartModel($Model);
 	}
 
