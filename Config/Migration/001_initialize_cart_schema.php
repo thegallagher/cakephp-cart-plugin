@@ -123,7 +123,7 @@ class D287dbf03fef11e1b86c0800200c9a66 extends CakeMigration {
 					'id' => array('type'=>'string', 'null' => false, 'default' => NULL, 'length' => 36, 'key' => 'primary'),
 					'cart_rule_id' => array('type'=>'string', 'null' => true, 'default' => NULL, 'length' => 36),
 					'position' => array('type'=>'integer', 'null' => false, 'default' => '', 'length' => 2),
-					'applies_to' => array('type'=>'stromg', 'null' => true, 'default' => NULL, 'comment' => 'cart, items'),
+					'applies_to' => array('type'=>'string', 'null' => true, 'default' => NULL, 'comment' => 'cart, items'),
 					'conditions' => array('type'=>'text', 'null' => true, 'default' => NULL),
 					'created' => array('type'=>'datetime', 'null' => true, 'default' => NULL),
 					'modified' => array('type'=>'datetime', 'null' => true, 'default' => NULL),
