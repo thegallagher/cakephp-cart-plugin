@@ -51,7 +51,7 @@ class PaymentApiLogger implements CakeLogInterface {
 		$data = array();
 		$trace = debug_backtrace();
 		if (isset($trace[2]) && isset($trace[2]['file']) && isset($trace[2]['line'])) {
-			$data['file'] = $trace[2]['file'],
+			$data['file'] = $trace[2]['file'];
 			$data['line'] = $trace[2]['line'];
 			$data['trace'] = serialize($trace);
 		}
