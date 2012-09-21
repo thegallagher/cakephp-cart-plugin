@@ -47,7 +47,7 @@ class OrderAddressFixture extends CakeTestFixture {
 				'PRIMARY' => array('column' => 'id', 'unique' => 1),
 				'USER_INDEX' => array('column' => 'user_id'),
 				'ORDER_INDEX' => array('column' => 'order_id'))
-	);
+	));
 
 /**
  * Records
