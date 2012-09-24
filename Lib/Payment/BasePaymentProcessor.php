@@ -84,19 +84,19 @@ abstract class BasePaymentProcessor extends Object {
 		}
 
 		if (!empty($status) && is_string($status)) {
-			$codes = array_flip($this->response->httpCodes());
+			$codes = array_flip($this->_response->httpCodes());
 			if (isset($codes[$status])) {
 				$status = $codes[$status];
 			}
 		}
 
-		$this->response->header('Location', $url);
+		$this->_response->header('Location', Router::url($url));
 
 		if (!empty($status) && ($status >= 300 && $status < 400)) {
-			$this->response->statusCode($status);
+			$this->_response->statusCode($status);
 		}
 
-		$this->response->send();
+		$this->_response->send();
 		exit;
 	}
 
