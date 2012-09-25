@@ -184,7 +184,7 @@ class Cart extends CartAppModel {
  * @todo discounts/coupons
  */
 	public function calculateCart($cartData = array()) {
-		CakeEventManager::dispatch(new CakeEvent('Cart.beforeCalculateCart'), $this, array($cartData));
+		CakeEventManager::dispatch(new CakeEvent('Cart.beforeCalculateCart', $this, array($cartData)));
 
 		if (isset($cartData['CartsItem'])) {
 			$cartData[$this->alias]['item_count'] = count($cartData['CartsItem']);
