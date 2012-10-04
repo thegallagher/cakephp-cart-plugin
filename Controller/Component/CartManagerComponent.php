@@ -7,13 +7,13 @@ App::uses('CakeEvent', 'Event');
  *
  * This component cares just and only about the cart contents. It will add
  * and remove items from the active cart but nothing more.
- * 
+ *
  * The component will make sure that the cart content in the sessio and database
  * is always the same and gets merged when a user is not logged in and then logs in.
  *
  * It also can store the cart for non logged in users semi-persistant in a cookie.
  *
- * Checking a cart out and dealing with other stuff is not the purpose of this 
+ * Checking a cart out and dealing with other stuff is not the purpose of this
  * component.
  *
  * @author Florian Krämer
@@ -48,12 +48,12 @@ class CartManagerComponent extends Component {
 
 /**
  * Default settings
- * - model 
+ * - model
  * - buyAction the controller action to use or check for
- * - cartModel 
- * - sessionKey 
- * - useCookie 
- * - cookieName 
+ * - cartModel
+ * - sessionKey
+ * - useCookie
+ * - cookieName
  * - afterAddItemRedirect
  *   - false to disable it
  *   - null to use the referer
@@ -281,7 +281,7 @@ class CartManagerComponent extends Component {
 		$Model = ClassRegistry::init($data['CartsItem']['model']);
 		$behaviorMethods = array_keys($Model->Behaviors->methods());
 
-		if ((!method_exists($Model, 'isBuyable') || !method_exists($Model, 'beforeAddToCart')) && 
+		if ((!method_exists($Model, 'isBuyable') || !method_exists($Model, 'beforeAddToCart')) &&
 			!in_array('isBuyable', $behaviorMethods) || !in_array('beforeAddToCart', $behaviorMethods)) {
 			throw new InternalErrorException(__('The model %s is not implementing isBuyable() or beforeAddToCart() or is not using the BuyableBehavior!', get_class($Model)));
 		}
@@ -323,7 +323,7 @@ class CartManagerComponent extends Component {
 	public function removeItem($data = null) {
 		extract($this->settings);
 
-		CakeEventManager::dispatch(new CakeEvent('CartManager.beforeRemoveItem', $this, array($result)));
+		CakeEventManager::dispatch(new CakeEvent('CartManager.beforeRemoveItem', $this, array($data)));
 
 		if ($this->_isLoggedIn) {
 			$this->CartModel->removeItem($this->_cartId, $data);
@@ -389,7 +389,7 @@ class CartManagerComponent extends Component {
 
 /**
  * (Re-)calculates a cart, this will run over all items, coupons and taxes
- * 
+ *
  * @todo refactor saveAll?
  * @return array the cart data
  */
@@ -418,7 +418,7 @@ class CartManagerComponent extends Component {
 
 /**
  * Used to restore a cart from a cookie
- * 
+ *
  * Use this in the case the user was not logged in and left the page for a longer time
  *
  * @return boolean true on success
