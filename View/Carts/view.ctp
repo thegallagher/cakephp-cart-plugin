@@ -19,7 +19,7 @@
 						<td>
 							<?php
 								echo $this->Html->link('remove', array('action' => 'remove_item', 'id' => $item['foreign_key'],'model' => $item['model']));
-								if ($item['quantity_limit'] != 1) { 
+								if ($item['quantity_limit'] != 1) {
 									echo $this->Form->input('CartsItem.' . $key . '.quantity', array(
 										'div' => false,
 										'label' => false,
@@ -33,12 +33,12 @@
 					</tr>
 				<?php endforeach; ?>
 			</tbody>
-			<tfooter>
+			<tfoot>
 				<tr>
 					<td><?php echo __d('cart', 'Total'); ?>
 					<td colspan="2"><?php echo CakeNumber::currency($cart['Cart']['total']); ?></td>
 				</tr>
-			</tfooter>
+			</tfoot>
 		</table>
 	<?php echo $this->Form->submit(__d('cart', 'Update cart')); ?>
 	<?php echo $this->Form->end();?>
