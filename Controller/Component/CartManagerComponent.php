@@ -351,7 +351,7 @@ class CartManagerComponent extends Component {
 
 		$result = $this->CartSession->emptyCart();
 
-		$this->initalizeCart();
+		$this->_initalizeCart();
 		return $result;
 	}
 
@@ -427,14 +427,19 @@ class CartManagerComponent extends Component {
 	}
 
 /**
- * //@todo
+ * Adds multiple items to the cart, the session and database if a user is logged in
+ *
+ * @param array $data array of items
+ * @return boolean
  */
 	public function updateItems($items) {
 		try {
+			$results = array();
 			foreach ($items as $item) {
-				$this->addItem(array('CartsItem' => $item), false);
+				$results[] = $this->addItem(array('CartsItem' => $item), false);
 			}
 			$this->calculateCart();
+			return !in_array(false, $results, true);
 		} catch (Exception $e) {
 			throw $e;
 		}
