@@ -279,10 +279,8 @@ class CartManagerComponent extends Component {
 		CakeEventManager::dispatch(new CakeEvent('CartManager.beforeAddItem', $this, array($data)));
 
 		$Model = ClassRegistry::init($data['CartsItem']['model']);
-		$behaviorMethods = array_keys($Model->Behaviors->methods());
 
-		if ((!method_exists($Model, 'isBuyable') || !method_exists($Model, 'beforeAddToCart')) &&
-			!in_array('isBuyable', $behaviorMethods) || !in_array('beforeAddToCart', $behaviorMethods)) {
+		if (!$Model->hasMethod('isBuyable') || !$Model->hasMethod('beforeAddToCart')) {
 			throw new InternalErrorException(__('The model %s is not implementing isBuyable() or beforeAddToCart() or is not using the BuyableBehavior!', get_class($Model)));
 		}
 
