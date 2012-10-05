@@ -48,12 +48,16 @@ class CartSessionComponent extends Component {
 
 		$arrayKey = $this->_findItem($item['foreign_key'], $item['model']);
 		if ($arrayKey === false) {
-			$cart = $this->Session->read($this->sessionKey . '.CartsItem');
+			$cart = $this->read('CartsItem');
 			$cart[] = $item;
-			$this->Session->write($this->sessionKey . '.CartsItem', $cart);
+			$this->write('CartsItem', $cart);
 			return $item;
 		} else {
-			$this->Session->write($this->sessionKey . '.CartsItem.' . $arrayKey, $item);
+			if (!empty($item['increment'])) {
+				$item['quantity'] += $this->read('CartsItem.' . $arrayKey . '.quantity');
+				unset($item['increment']);
+			}
+			$this->write('CartsItem.' . $arrayKey, $item);
 			return $item;
 		}
 		return false;
@@ -74,7 +78,7 @@ class CartSessionComponent extends Component {
 		if ($arrayKey === false) {
 			return false;
 		}
-		return $this->Session->delete($this->sessionKey . '.CartsItem.' . $arrayKey);
+		return $this->delete('CartsItem.' . $arrayKey);
 	}
 
 /**
@@ -97,13 +101,13 @@ class CartSessionComponent extends Component {
 	}
 
 /**
- * Public method to find if an item already exists in the cart
+ * Public method to find item key
  *
  * @param mixed $id integer or string uuid
  * @param string $model Model name
  * @return mixed False or key of the array entry in the cart session
  */
-	public function contains($id, $model) {
+	public function getItemKey($id, $model) {
 		return $this->_findItem($id, $model);
 	}
 
@@ -114,15 +118,18 @@ class CartSessionComponent extends Component {
  * @return mixed
  */
 	public function read($key = '') {
-		return $this->Session->read($this->sessionKey);
+		if (!empty($key)) {
+			$key = '.' . $key;
+		}
+		return $this->Session->read($this->sessionKey . $key);
 	}
 
 /**
  * Write to the cart session
  *
- * @param 
- * @param 
- * @return 
+ * @param
+ * @param
+ * @return
  */
 	public function write($key = '', $data = null) {
 		if (!empty($key)) {
@@ -132,11 +139,24 @@ class CartSessionComponent extends Component {
 	}
 
 /**
+ * Deletes from the cart session
+ *
+ * @param string
+ * @return mixed
+ */
+	public function delete($key = '') {
+		if (!empty($key)) {
+			$key = '.' . $key;
+		}
+		return $this->Session->delete($this->sessionKey . $key);
+	}
+
+/**
  * Drops the cart data from the session
  *
  * @return boolean
  */
 	public function emptyCart() {
-		return $this->Session->delete($this->sessionKey);
+		return $this->delete();
 	}
 }

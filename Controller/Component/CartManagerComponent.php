@@ -54,12 +54,18 @@ class CartManagerComponent extends Component {
  * - sessionKey
  * - useCookie
  * - cookieName
- * - afterAddItemRedirect
+ * - afterBuyRedirect
  *   - false to disable it
  *   - null to use the referer
  *   - string or array to set a redirect url
  * - getBuy boolean enable/disable capture of buy data via get
  * - postBuy boolean enable/disable capture of buy data via post
+ * - update mixed true/false/'get'/'post'
+ *   Allow to update the item in cart: true/false for both get and post, or only allow for method
+ * - incremental mixed true/false/'get'/'post'
+ *   Allow to increment/decrement the item in cart: true/false for both get and post, or only allow for method
+ * - remove mixed true/false/'get'/'post'
+ *   Allow to remove the item from the cart: true/false for both get and post, or only allow for method
  *
  * @var array
  */
@@ -71,10 +77,14 @@ class CartManagerComponent extends Component {
 		'sessionKey' => 'Cart',
 		'useCookie' => false,
 		'cookieName' => 'Cart',
-		'afterAddItemRedirect' => true,
-		'afterAddItemFailedRedirect' => true,
+		'afterBuyRedirect' => true,
+		'afterBuyFailedRedirect' => true,
 		'getBuy' => true,
-		'postBuy' => true);
+		'postBuy' => true,
+		'update' => true,
+		'incremental' => true,
+		'remove' => true
+	);
 
 /**
  * Default settings
@@ -160,33 +170,107 @@ class CartManagerComponent extends Component {
 		if ($this->Controller->request->is('post')) {
 			$data = $this->postBuy();
 		}
+		$type = $this->getType($data);
+		if (!$this->typeAllowed($type)) {
+			throw new InternalErrorException(__('Type %s is not allowed', $type));
+		}
 
 		if (!$data) {
-			if ($afterAddItemFailedRedirect === true) {
+			if ($afterBuyFailedRedirect === true) {
 				$this->Session->setFlash(__d('cart', 'Failed to buy the item'));
 				$this->Controller->redirect($this->Controller->referer());
 			}
 			return false;
 		}
 
-		$item = $this->addItem($data);
-		if ($item) {
-			if ($returnItem == false) {
-				if ($this->Controller->request->is('ajax') || $this->Controller->request->is('json') || $this->Controller->request->is('xml')) {
-					$this->Controller->set('item', $item);
-					$this->Controller->set('_serialize', array('item'));
-				} else {
-					$this->afterAddItemRedirect($item);
-				}
-			}
+		$item = $this->updateItem($data);
+		if ($returnItem === true) {
 			return $item;
 		}
 
-		if ($afterAddItemFailedRedirect === true) {
+		if ($item !== false) {
+			if ($this->Controller->request->is('ajax') || $this->Controller->request->is('json') || $this->Controller->request->is('xml')) {
+				$this->Controller->set('item', $item);
+				$this->Controller->set('_serialize', array('item'));
+			} else {
+				$this->afterBuyRedirect($item);
+			}
+		}
+
+		if ($afterBuyFailedRedirect === true) {
 			$this->Session->setFlash(__d('cart', 'Failed to buy the item'));
 			$this->Controller->redirect($this->Controller->referer());
 		}
 
+		return false;
+	}
+
+/**
+ * Checks if the increment/decrement/update type is allowed.
+ *
+ * @param string|array $data array or type string
+ * @return boolean The type is allowed or not
+ */
+	public function typeAllowed($type) {
+		if (is_array($type)) {
+			$type = $this->getType($type);
+		}
+		if (in_array($type, array('update', 'remove'))) {
+			$key = $type;
+		} elseif (in_array($type, array('increment', 'decrement'))) {
+			$key = 'incremental';
+		}
+
+		if (!isset($key)) {
+			return false;
+		}
+		return (
+			$this->settings[$key] === true ||
+			strtoupper($this->settings[$key]) === $this->Controller->request->method()
+		);
+	}
+
+/**
+ * Returns 'type' from data, if not present defaults to 'update'
+ *
+ * @param array $data
+ * @return string type for the buy action
+ */
+	public function getType($data) {
+		if (!empty($data['CartsItem']['increment'])) {
+			return 'increment';
+		} elseif (!empty($data['CartsItem']['decrement'])) {
+			return 'decrement';
+		} elseif (!empty($data['CartsItem']['remove'])) {
+			return 'remove';
+		}
+		return 'update';
+	}
+
+/**
+ *
+ * @param array $data
+ */
+	public function updateItem($data, $recalculate = true) {
+		$type = $this->getType($data);
+		$data = $this->_additionalData($data, $type);
+		if ($type == 'update' || !$this->contains($data['CartsItem']['foreign_key'], $data['CartsItem']['model'])) {
+			return $this->addItem($data, $recalculate);
+		}
+
+		$item = $this->getItem($data['CartsItem']['foreign_key'], $data['CartsItem']['model']);
+		if ($type == 'increment') {
+			$data['CartsItem']['quantity'] += $item['quantity'];
+			return $this->addItem($data, $recalculate);
+		} elseif ($type == 'decrement') {
+			$data['CartsItem']['quantity'] = $item['quantity'] - $data['CartsItem']['quantity'];
+			if ($data['CartsItem']['quantity'] > 0) {
+				return $this->addItem($data, $recalculate);
+			}
+			return $this->removeItem($data);
+		} elseif ($type == 'remove') {
+			return $this->removeItem($data);
+		}
 		return false;
 	}
 
@@ -197,12 +281,16 @@ class CartManagerComponent extends Component {
  * @param array $data
  * @return array
  */
-	protected function _additionalData($data) {
+	protected function _additionalData($data, $type = 'update') {
 		$data['CartsItem']['user_id'] = $this->Auth->user('id');
 		$data['CartsItem']['cart_id'] = $this->_cartId;
 
 		if (!isset($data['CartsItem']['model'])) {
 			$data['CartsItem']['model'] = $this->settings['model'];
+		}
+		if (!empty($data['CartsItem'][$type]) && empty($data['CartsItem']['quantity'])) {
+			$data['CartsItem']['quantity'] = (int)$data['CartsItem'][$type];
+			unset($data['CartsItem'][$type]);
 		}
 
 		if (empty($data['CartsItem']['quantity'])) {
@@ -213,28 +301,32 @@ class CartManagerComponent extends Component {
 	}
 
 /**
- * afterAddItemRedirect
+ * afterBuyRedirect
  *
  * @param array $item
  * @return vodi
  */
-	public function afterAddItemRedirect($item) {
+	public function afterBuyRedirect($item) {
 		extract($this->settings);
-		$this->Session->setFlash(__d('cart', 'You added %s %s to your cart', $item['quantity'], $item['name']));
-		if (is_string($afterAddItemRedirect) || is_array($afterAddItemRedirect)) {
-			$this->Controller->redirect($afterAddItemRedirect);
-		} elseif ($afterAddItemRedirect === true) {
+		if ($item === true) {
+			$this->Session->setFlash(__d('cart', 'Item was succesfully removed from your cart'));
+		} else {
+			$this->Session->setFlash(__d('cart', 'You now have %s %s in your cart', $item['quantity'], $item['name']));
+		}
+		if (is_string($afterBuyRedirect) || is_array($afterBuyRedirect)) {
+			$this->Controller->redirect($afterBuyRedirect);
+		} elseif ($afterBuyRedirect === true) {
 			$this->Controller->redirect($this->Controller->referer());
 		}
 	}
 
 /**
- * Handles the buy process of an item via a http get request and url parameters
+ * Gets item data via a http get request and url parameters
  *
  * @return mixed false or array
  */
 	public function getBuy() {
-		if ($this->Controller->request->is('get') && isset($this->Controller->request->params['named']['item'])) {
+		if ($this->Controller->request->is('get') && $this->settings['getBuy'] && isset($this->Controller->request->params['named']['item'])) {
 			$data = array(
 				'CartsItem' => array(
 					'foreign_key' => $this->Controller->request->params['named']['item'],
@@ -247,6 +339,12 @@ class CartManagerComponent extends Component {
 			if (isset($this->Controller->request->params['named']['quantity'])) {
 				$data['CartsItem']['quantity'] = $this->Controller->request->params['named']['quantity'];
 			}
+			foreach (array('update', 'increment', 'decrement', 'remove') as $type) {
+				if (isset($this->Controller->request->params['named'][$type])) {
+					$data['CartsItem'][$type] = $this->Controller->request->params['named'][$type];
+					break;
+				}
+			}
 
 			return $data;
 		}
@@ -254,12 +352,12 @@ class CartManagerComponent extends Component {
 	}
 
 /**
- * Handels the buy process of an item via http post request
+ * Gets the item data via http post request
  *
  * @return mixed false or array
  */
 	public function postBuy() {
-		if ($this->Controller->request->is('post')) {
+		if ($this->Controller->request->is('post') && $this->settings['postBuy']) {
 			return $this->Controller->request->data;
 		}
 		return false;
@@ -272,8 +370,6 @@ class CartManagerComponent extends Component {
  * @return boolean
  */
 	public function addItem($data, $recalculate = true) {
-		extract($this->settings);
-
 		$data = $this->_additionalData($data);
 
 		CakeEventManager::dispatch(new CakeEvent('CartManager.beforeAddItem', $this, array($data)));
@@ -324,10 +420,10 @@ class CartManagerComponent extends Component {
 		CakeEventManager::dispatch(new CakeEvent('CartManager.beforeRemoveItem', $this, array($data)));
 
 		if ($this->_isLoggedIn) {
-			$this->CartModel->removeItem($this->_cartId, $data);
+			$this->CartModel->removeItem($this->_cartId, $data['CartsItem']);
 		}
 
-		$result = $this->CartSession->removeItem($data);
+		$result = $this->CartSession->removeItem($data['CartsItem']);
 		$this->calculateCart();
 
 		CakeEventManager::dispatch(new CakeEvent('CartManager.afterRemoveItem', $this, array($result)));
@@ -362,7 +458,7 @@ class CartManagerComponent extends Component {
  */
 	public function content() {
 		$this->calculateCart();
-		return $this->Session->read($this->settings['sessionKey']);
+		return $this->CartSession->read();
 	}
 
 /**
@@ -370,10 +466,34 @@ class CartManagerComponent extends Component {
  *
  * @param mixed $id integer or string uuid
  * @param string $model Model name
- * @return mixed False or key of the array entry in the cart session
+ * @return boolean
  */
 	public function contains($id, $model) {
-		return $this->CartSession->contains($id, $model);
+		return $this->getItemKey($id, $model) !== false;
+	}
+
+/**
+ * Find the item key
+ *
+ * @param mixed $id integer or string uuid
+ * @param string $model Model name
+ * @return mixed False or key of the array entry in the cart session
+ */
+	public function getItemKey($id, $model) {
+		return $this->CartSession->getItemKey($id, $model);
+	}
+
+	public function getItem($id, $model, $field = '') {
+		$key = $this->getItemKey($id, $model);
+		if (!$key) {
+			return false;
+		}
+
+		if (!empty($field)) {
+			$field = '.' . $field;
+		}
+
+		return $this->CartSession->read('CartsItem.' . $key . $field);
 	}
 
 /**
@@ -430,13 +550,15 @@ class CartManagerComponent extends Component {
  * Adds multiple items to the cart, the session and database if a user is logged in
  *
  * @param array $data array of items
+ * @param string Buy type, 'update' will replace quantity if present in cart, 'increment' will add to existing quantity
  * @return boolean
  */
-	public function updateItems($items) {
+	public function updateItems($items, $type = 'update') {
 		try {
 			$results = array();
 			foreach ($items as $item) {
-				$results[] = $this->addItem(array('CartsItem' => $item), false);
+				$item[$type] = true;
+				$results[] = $this->updateItem(array('CartsItem' => $item), false);
 			}
 			$this->calculateCart();
 			return !in_array(false, $results, true);

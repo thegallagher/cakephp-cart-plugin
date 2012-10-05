@@ -64,7 +64,7 @@ class CartsItem extends CartAppModel {
 	}
 
 	public function afterSave($created) {
-		
+
 	}
 
 /**
@@ -129,7 +129,7 @@ class CartsItem extends CartAppModel {
 				'foreign_key' => $data[$this->alias]['foreign_key'])));
 
 		if (empty($result)) {
-			
+
 		}
 
 		$data = array($this->alias => array($data[$this->alias]));
