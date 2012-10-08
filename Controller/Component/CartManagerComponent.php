@@ -254,8 +254,15 @@ class CartManagerComponent extends Component {
 	public function updateItem($data, $recalculate = true) {
 		$type = $this->getType($data);
 		$data = $this->_additionalData($data, $type);
-		if ($type == 'update' || !$this->contains($data['CartsItem']['foreign_key'], $data['CartsItem']['model'])) {
+		if ($type == 'update') {
 			return $this->addItem($data, $recalculate);
+		}
+
+		$contains = $this->contains($data['CartsItem']['foreign_key'], $data['CartsItem']['model']);
+		if (!$contains && $type === 'increment') {
+			return $this->addItem($data, $recalculate);
+		} elseif (!$contains) {
+			return false;
 		}
 
 		$item = $this->getItem($data['CartsItem']['foreign_key'], $data['CartsItem']['model']);
@@ -290,10 +297,10 @@ class CartManagerComponent extends Component {
 		}
 		if (!empty($data['CartsItem'][$type]) && empty($data['CartsItem']['quantity'])) {
 			$data['CartsItem']['quantity'] = (int)$data['CartsItem'][$type];
-			unset($data['CartsItem'][$type]);
 		}
+		unset($data['CartsItem'][$type]);
 
-		if (empty($data['CartsItem']['quantity'])) {
+		if (!isset($data['CartsItem']['quantity'])) {
 			$data['CartsItem']['quantity'] = 1;
 		}
 
@@ -371,6 +378,9 @@ class CartManagerComponent extends Component {
  */
 	public function addItem($data, $recalculate = true) {
 		$data = $this->_additionalData($data);
+		if ($data['CartsItem']['quantity'] == 0) {
+			return $this->removeItem($data);
+		}
 
 		CakeEventManager::dispatch(new CakeEvent('CartManager.beforeAddItem', $this, array($data)));
 
@@ -485,7 +495,7 @@ class CartManagerComponent extends Component {
 
 	public function getItem($id, $model, $field = '') {
 		$key = $this->getItemKey($id, $model);
-		if (!$key) {
+		if ($key === false) {
 			return false;
 		}
 
