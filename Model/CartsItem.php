@@ -54,8 +54,9 @@ class CartsItem extends CartAppModel {
 	);
 
 /**
- * validateItem
+ * Validates an item record set
  *
+ * @param array $data
  * @return void
  */
 	public function validateItem($data) {
@@ -63,19 +64,20 @@ class CartsItem extends CartAppModel {
 		return $this->validates();
 	}
 
-	public function afterSave($created) {
-
-	}
-
 /**
  * Adds and updates an item if it already exists in the cart
  *
  * @param string $cartId
  * @param array $itemData
+ * @return mixed
  */
 	public function addItem($cartId, $itemData) {
 		if (isset($itemData['CartsItem'])) {
 			$itemData = $itemData['CartsItem'];
+		}
+
+		if (!isset($itemData['foreign_key']) || !isset($itemData['model'])) {
+			throw new InvalidArgumentException(__d('cart', 'foreign_key or model is missing from the item data!'));
 		}
 
 		$item = $this->find('first', array(
@@ -103,6 +105,10 @@ class CartsItem extends CartAppModel {
  * @parma $itemData
  */
 	public function removeItem($cartId, $itemData) {
+		if (!isset($itemData['foreign_key']) || !isset($itemData['model'])) {
+			throw new InvalidArgumentException(__d('cart', 'foreign_key or model is missing from the item data!'));
+		}
+
 		$item = $this->find('first', array(
 			'contain' => array(),
 			'conditions' => array(

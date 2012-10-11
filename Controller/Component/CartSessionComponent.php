@@ -43,7 +43,7 @@ class CartSessionComponent extends Component {
  */
 	public function addItem($item) {
 		if (!isset($item['foreign_key']) || !isset($item['model'])) {
-			return false;
+			throw new InvalidArgumentException(__d('cart', 'foreign_key or model is missing from the item data!'));
 		}
 
 		$arrayKey = $this->_findItem($item['foreign_key'], $item['model']);
@@ -71,7 +71,7 @@ class CartSessionComponent extends Component {
  */
 	public function removeItem($item) {
 		if (!isset($item['foreign_key']) || !isset($item['model'])) {
-			return false;
+			throw new InvalidArgumentException(__d('cart', 'foreign_key or model is missing from the item data!'));
 		}
 
 		$arrayKey = $this->_findItem($item['foreign_key'], $item['model']);
