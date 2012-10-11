@@ -8,8 +8,6 @@ The cart plugin is a stand alone cart only plugin, no payment processors are inc
 
 The shopping cart part of this plugin is finished but needs to be polished. There callbacks for many things in place that give you customization possibilities.
 
-I'm looking for help to complete this plugin. If you're interested please send me a message on github and fork it.
-
 ## Requirements
 
  * CakePHP 2.x
@@ -24,10 +22,6 @@ Features done:
 
  * CartManager - handles the cart, adding and removing items from it
  * Allow/deny anonymous checkouts
-
-Work in progress:
-
- * The checkout process is functional but is a topic of change until I'm happy with it. Actually I've got checkout with Paypal working.
 
 Planed features:
 
@@ -79,4 +73,13 @@ If you use another user model class in your application other than User you'll n
 
 ## Support
 
-This plugin is still in early development, feel free to help fixing and contributing to it, there is no form of bug or feature support yet.
+For support and feature request, please visit the FileStorage issue page
+
+https://github.com/burzum/Cart/issues
+
+## License
+
+Copyright 2012, Florian Krämer
+
+Licensed under The MIT License
+Redistributions of files must retain the above copyright notice.

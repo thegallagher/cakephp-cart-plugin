@@ -14,7 +14,7 @@ class CartHelper extends AppHelper {
 	public $helpers = array('Html', 'Form', 'Session');
 
 /**
- * 
+ *
  */
 	public $iterator = 0;
 
@@ -46,11 +46,29 @@ class CartHelper extends AppHelper {
  * Checks if an item exists in the cart session
  *
  * @param string $id
- * @param string $model 
+ * @param string $model
  */
 	public function inCart($id, $model = '') {
-		$item = $item['foreign_key'] . '-' . $item['model'];
+		$item = $id . '-' . $model;
 		return in_array($item, $this->_itemsInCart);
+	}
+
+/**
+ * Checks if an item exists in the cart session
+ *
+ * @param string $id
+ * @param string $model
+ */
+	public function quantity($id, $model = '') {
+		if($this->inCart($id, $model)) {
+			$items = $this->Session->read('Cart.CartsItem');
+			foreach ($items as $key => $item) {
+				if ($item['foreign_key'] == $id && $item['model'] == $model) {
+					return $item['quantity'];
+				}
+			}
+		}
+		return 0;
 	}
 
 	public function input($id, $model, $options = array()) {
@@ -81,7 +99,7 @@ class CartHelper extends AppHelper {
 	}
 
 /**
- * 
+ *
  */
 	public function multiInput($id, $model = '') {
 		$string = $this->Form->input('Cart.' . $this->iterator . '.quantity', array(
@@ -98,7 +116,7 @@ class CartHelper extends AppHelper {
 	}
 
 /**
- * 
+ *
  */
 	public function link($title, $url = array(), $options = array()) {
 		$urlDefaults = array(
@@ -117,7 +135,7 @@ class CartHelper extends AppHelper {
 	}
 
 /**
- * 
+ *
  */
 	public function reset() {
 		$this->iterator = 0;
