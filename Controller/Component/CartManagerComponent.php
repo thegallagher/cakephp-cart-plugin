@@ -8,7 +8,7 @@ App::uses('CakeEvent', 'Event');
  * This component cares just and only about the cart contents. It will add
  * and remove items from the active cart but nothing more.
  *
- * The component will make sure that the cart content in the sessio and database
+ * The component will make sure that the cart content in the session and database
  * is always the same and gets merged when a user is not logged in and then logs in.
  *
  * It also can store the cart for non logged in users semi-persistant in a cookie.
@@ -54,7 +54,7 @@ class CartManagerComponent extends Component {
  * - sessionKey
  * - useCookie
  * - cookieName
- * - afterBuyRedirect
+ * - afterAddItemRedirect
  *   - false to disable it
  *   - null to use the referer
  *   - string or array to set a redirect url
@@ -77,8 +77,8 @@ class CartManagerComponent extends Component {
 		'sessionKey' => 'Cart',
 		'useCookie' => false,
 		'cookieName' => 'Cart',
-		'afterBuyRedirect' => true,
-		'afterBuyFailedRedirect' => true,
+		'afterAddItemRedirect' => true,
+		'afterAddItemFailedRedirect' => true,
 		'getBuy' => true,
 		'postBuy' => true,
 		'update' => true,
@@ -176,7 +176,7 @@ class CartManagerComponent extends Component {
 		}
 
 		if (!$data) {
-			if ($afterBuyFailedRedirect === true) {
+			if ($afterAddItemFailedRedirect === true) {
 				$this->Session->setFlash(__d('cart', 'Failed to buy the item'));
 				$this->Controller->redirect($this->Controller->referer());
 			}
@@ -193,11 +193,11 @@ class CartManagerComponent extends Component {
 				$this->Controller->set('item', $item);
 				$this->Controller->set('_serialize', array('item'));
 			} else {
-				$this->afterBuyRedirect($item);
+				$this->afterAddItemRedirect($item);
 			}
 		}
 
-		if ($afterBuyFailedRedirect === true) {
+		if ($afterAddItemFailedRedirect === true) {
 			$this->Session->setFlash(__d('cart', 'Failed to buy the item'));
 			$this->Controller->redirect($this->Controller->referer());
 		}
@@ -224,6 +224,7 @@ class CartManagerComponent extends Component {
 		if (!isset($key)) {
 			return false;
 		}
+
 		return (
 			$this->settings[$key] === true ||
 			strtoupper($this->settings[$key]) === $this->Controller->request->method()
@@ -308,21 +309,21 @@ class CartManagerComponent extends Component {
 	}
 
 /**
- * afterBuyRedirect
+ * afterAddItemRedirect
  *
  * @param array $item
  * @return vodi
  */
-	public function afterBuyRedirect($item) {
+	public function afterAddItemRedirect($item) {
 		extract($this->settings);
 		if ($item === true) {
 			$this->Session->setFlash(__d('cart', 'Item was succesfully removed from your cart'));
 		} else {
 			$this->Session->setFlash(__d('cart', 'You now have %s %s in your cart', $item['quantity'], $item['name']));
 		}
-		if (is_string($afterBuyRedirect) || is_array($afterBuyRedirect)) {
-			$this->Controller->redirect($afterBuyRedirect);
-		} elseif ($afterBuyRedirect === true) {
+		if (is_string($afterAddItemRedirect) || is_array($afterAddItemRedirect)) {
+			$this->Controller->redirect($afterAddItemRedirect);
+		} elseif ($afterAddItemRedirect === true) {
 			$this->Controller->redirect($this->Controller->referer());
 		}
 	}
