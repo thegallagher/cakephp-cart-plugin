@@ -56,6 +56,7 @@ class OrdersController extends CartAppController {
 /**
  * Displays a more detailed information about a single order for a user
  *
+ * @param string $orderId Order UUID
  * @return void
  */
 	public function view($orderId = null) {

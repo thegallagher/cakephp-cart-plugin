@@ -8,6 +8,7 @@ App::uses('CartAppModel', 'Cart.Model');
  * @license MIT
  */
 class Order extends CartAppModel {
+
 /**
  * Behaviors
  *
@@ -100,9 +101,10 @@ class Order extends CartAppModel {
 /**
  * beforeSave callback
  *
+ * @param array $options
  * @return boolean
  */
-	public function beforeSave() {
+	public function beforeSave($options = array()) {
 		if (!empty($this->data[$this->alias]['cart_snapshop']) && is_array($this->data[$this->alias]['cart_snapshop'])) {
 			$this->data[$this->alias]['cart_snapshop'] = serialize($this->data[$this->alias]['cart_snapshop']);
 		}
@@ -116,10 +118,13 @@ class Order extends CartAppModel {
  */
 	public function afterSave($created) {
 		if ($created) {
-			$invoiceNumber = $this->invoiceNumber();
-			$this->saveField('invoice_number', $invoiceNumber);
+			$invoiceNumber = $this->invoiceNumber($this->data);
 			$this->data[$this->alias]['invoice_number'] = $invoiceNumber;
 			$this->data[$this->alias][$this->primaryKey] = $this->getLastInsertId();
+			$result = $this->save($this->data, array(
+				'validate' => false,
+				'callbacks' => false));
+			$this->data = $result;
 			CakeEventManager::dispatch(new CakeEvent('Order.created', $this, array($this->data)));
 		}
 	}
@@ -128,6 +133,7 @@ class Order extends CartAppModel {
  * afterFind callback
  *
  * @param array $results
+ * @param bool $primary
  * @return array
  */
 	public function afterFind($results, $primary) {
@@ -138,7 +144,8 @@ class Order extends CartAppModel {
 /**
  * Unserializes the data in the cart_snapshot field when it is present
  *
- * @param array $resuls
+ * @param $results
+ * @internal param array $resuls
  * @return array modified results array
  */
 	public function unserializeCartSnapshot($results) {
@@ -210,7 +217,7 @@ class Order extends CartAppModel {
 		$validShippingAddress = true;
 
 		if (isset($order['Cart']['requires_shipping']) && $order['Cart']['requires_shipping'] == 1) {
-			$this->ShippingAddress->set($data);
+			$this->ShippingAddress->set($order);
 			$validShippingAddress = $this->ShippingAddress->validates();
 
 			if (isset($order['BillingAddress']['same_as_shipping']) && $order['BillingAddress']['same_as_shipping'] == 1) {
@@ -235,9 +242,12 @@ class Order extends CartAppModel {
  * This method will create a new order record and does the validation work for
  * the different cases that might apply before you can issue a new order
  *
- * @param 
- * @param 
- * @param 
+ * @param $cartData
+ * @param $processorClass
+ * @param string $paymentStatus
+ * @internal param $
+ * @internal param $
+ * @internal param $
  * @return mixed Array with order data on success, false if not
  * @todo finish me
  */
@@ -260,8 +270,10 @@ class Order extends CartAppModel {
 			return false;
 		}
 
+		$this->data = null;
 		$this->create();
 		$result = $this->save($order);
+
 		$orderId = $this->getLastInsertId();
 		$result[$this->alias][$this->primaryKey] = $orderId;
 
@@ -292,14 +304,21 @@ class Order extends CartAppModel {
 /**
  * Generates an invoice number
  *
+ * @param array $data Order data
  * @return string
  */
-	public function invoiceNumber() {
+	public function invoiceNumber($data) {
+		$Event = new CakeEvent('Order.createInvoiceNumber', $this, array($data));
+		CakeEventManager::dispatch($Event);
+		if ($Event->isStopped()) {
+			return $Event->data['result'];
+		}
+
 		$date = date('Y-m-d');
 		$count = $this->find('count', array(
-				'contain' => array(),
-				'conditions' => array(
-						$this->alias . '.created ' => $date .'%')));
+			'contain' => array(),
+			'conditions' => array(
+				$this->alias . '.created ' => $date .'%')));
 		$increment = $count + 1;
 		return str_replace('-', '', $date) . '-'. $increment;
 	}

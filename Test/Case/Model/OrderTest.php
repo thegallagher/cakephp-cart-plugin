@@ -8,6 +8,7 @@ App::uses('Order', 'Cart.Model');
  * @license MIT
  */
 class OrderTest extends CakeTestCase {
+
 /**
  * Fixtures
  *

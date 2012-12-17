@@ -27,6 +27,10 @@ class CartsController extends CartAppController {
 	public function beforeFilter() {
 		parent::beforeFilter();
 		$this->Auth->allow('index', 'view', 'remove_item', 'checkout', 'callback');
+
+		if ($this->request->params['action'] == 'callback') {
+			$this->Components->disable('Security');
+		}
 	}
 
 /**
@@ -98,7 +102,11 @@ class CartsController extends CartAppController {
 		$order = $Order->find('first', array(
 			'contain' => array(),
 			'conditions' => array(
-					'Order.token' => $token)));
+				'Order.token' => $token)));
+
+		if (empty($order)) {
+			// @todo exception?
+		}
 
 		try {
 			$Processor = $this->_loadPaymentProcessor($order['Order']['processor']);
@@ -117,7 +125,8 @@ class CartsController extends CartAppController {
  * - checks if the cart is not empty
  * - checks if the payment processor is valid
  *
- * @param 
+ * @param string
+ * @param string
  * @return void
  */
 	public function checkout($processor = null, $action = Null) {
@@ -143,10 +152,11 @@ class CartsController extends CartAppController {
 			$newOrder['Order']['token'] = $token;
 			$Order->saveField('token', $token);
 
-			$Processor->cancelUrl[] = CakeSession::read('Payment.token');
-			$Processor->returnUrl[] = CakeSession::read('Payment.token');
-			$Processor->callbackUrl[] = CakeSession::read('Payment.token');
-			$Processor->checkout($newOrder);
+			$Processor->cancelUrl[] = $token;
+			$Processor->returnUrl[] = $token;
+			$Processor->callbackUrl[] = $token;
+			$Processor->finishUrl[] = $token;
+			$Processor->pay($newOrder);
 		}
 
 		$this->Session->setFlash(__d('cart', 'There was a problem creating your order.'));
@@ -156,6 +166,7 @@ class CartsController extends CartAppController {
 /**
  * Last step for so called express checkout processors
  *
+ * @param string $transactionToken
  * @return void
  */
 	public function confirm_order($transactionToken = null) {
@@ -197,8 +208,10 @@ class CartsController extends CartAppController {
  * @todo
  */
 	public function finish_order($transactionToken = null) {
-		//$ApiLog = ClassRegistry::init('Cart.PaymentApiTransaction');
-		//$ApiLog->finish($processor, $neworder['Order']['id']);
+		$Order = ClassRegistry::init('Cart.Order');
+		$this->set('order', $Order->find('first', array(
+			'conditions' => array(
+				'token' => $transactionToken))));
 	}
 
 /**

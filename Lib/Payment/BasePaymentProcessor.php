@@ -31,7 +31,8 @@ abstract class BasePaymentProcessor extends Object {
 /**
  * Constructor
  *
- * @return void
+ * @param array $options
+ * @return \BasePaymentProcessor
  */
 	public function __construct($options = array()) {
 		if (!empty($options['request'])) {
@@ -39,16 +40,23 @@ abstract class BasePaymentProcessor extends Object {
 		} else {
 			$this->_request = new CakeRequest();
 		}
+
 		if (!empty($options['response'])) {
 			$this->_response = $options['response'];
 		} else {
 			$this->_response = new CakeResponse();
 		}
+
 		if (!isset($options['cartModel'])) {
 			$options['cartModel'] = 'Cart.Cart';
 		}
+
+		if (!isset($options['orderModel'])) {
+			$options['orderModel'] = 'Cart.Order';
+		}
+
 		$this->CartModel = ClassRegistry::init($options['cartModel']);
-		$this->OrderModel = ClassRegistry::init('Cart.Order');
+		$this->OrderModel = ClassRegistry::init($options['orderModel']);
 	}
 
 /**
@@ -71,6 +79,13 @@ abstract class BasePaymentProcessor extends Object {
  * @var mixed array or string url, parseable by the Router
  */
 	public $cancelUrl = array('admin' => false, 'plugin' => 'cart', 'controller' => 'carts', 'action' => 'cancel_order');
+
+/**
+ * Finishing page url to display a thank you page or something like that
+ *
+ * @var mixed array or string url, parseable by the Router
+ */
+	public $finishUrl = array('admin' => false, 'plugin' => 'cart', 'controller' => 'carts', 'action' => 'finish_order');
 
 /**
  * Redirect
@@ -114,17 +129,31 @@ abstract class BasePaymentProcessor extends Object {
 		return;
 	}
 
+	public function refund() {
+		return;
+	}
+
 /**
  * Log
  *
  * @param string $message
  * @param string $type
+ * @return bool|void
  */
 	public function log($message, $type = null) {
 		if (empty($type)) {
-			$type = Inflector::underscore(__CLASS__);
+			$type = 'payments_' . Inflector::underscore(__CLASS__);
 		}
 		parent::log($message, $type);
+	}
+
+/**
+ * Check of the processor supports subscriptions
+ *
+ * @return boolean
+ */
+	public function supportsSubscriptions() {
+		return in_array('RecurringPaymentsInterface', class_implements($this));
 	}
 
 }

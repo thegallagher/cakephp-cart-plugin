@@ -12,11 +12,13 @@ abstract class BasePaymentLib extends Object {
 	public function __construct($request) {
 		$this->_request = $request;
 	}
+
 /**
  * Log
  *
  * @param string $message
  * @param string $type
+ * @return bool|void
  */
 	public function log($message, $type = null) {
 		if (empty($type)) {
