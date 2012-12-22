@@ -68,6 +68,10 @@ class OrdersController extends CartAppController {
 		}
 	}
 
+	public function cancel($orderId) {
+
+	}
+
 /**
  * Lists all orders for an admin
  *
@@ -99,7 +103,14 @@ class OrdersController extends CartAppController {
  * 
  */
 	public function admin_refund($orderId) {
-		
+		$order = $this->Order->find('first', array(
+			'conditions' => array(
+				'Order.id' => $orderId)));
+
+		if ($this->request->is('post')) {
+			$this->Order->refund($orderId);
+		}
+
 	}
 
 }

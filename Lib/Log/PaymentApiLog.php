@@ -7,8 +7,17 @@ App::uses('CakeLogInterface', 'Log');
  * @copyright 2012 Florian Krämer
  * @license MIT
  * @link http://book.cakephp.org/2.0/en/core-libraries/logging.html#creating-and-configuring-log-streams
+ * @property Model $Model
  */
 class PaymentApiLogger implements CakeLogInterface {
+
+/**
+ * Model instance
+ *
+ * @var Model
+ */
+	public $Model = null;
+
 /**
  * Log types to log to the payment api log
  *
@@ -24,16 +33,22 @@ class PaymentApiLogger implements CakeLogInterface {
  * Constructor
  *
  * @param array $options
+ * @throws InternalErrorException
  */
 	public function __construct($options = array()) {
 		if (!isset($options['model'])) {
-			$options['model'] = 'Cart.PaymentApiLog';
+			$options['model'] = 'Payments.PaymentApiLog';
 		}
+
 		if (!isset($options['types'])) {
 			$this->types = array_merge($this->types, $options['types']);
 		}
 
 		$this->Model = ClassRegistry::init($options['model']);
+		if (method_exists($this->Model, 'write')) {
+			throw new InternalErrorException(__('The model %s does not implement a required method write($type, $message, $data)!'));
+		}
+
 	}
 
 /**
@@ -44,7 +59,7 @@ class PaymentApiLogger implements CakeLogInterface {
  * @return void
  */
 	public function write($type, $message) {
-		if (in_array($type, $this->types) || $type == 'payment-debug' && Configure::read('debug') > 0) {
+		if (!in_array($type, $this->types) || $type == 'payment-debug' && Configure::read('debug') > 0) {
 			return;
 		}
 
@@ -56,7 +71,7 @@ class PaymentApiLogger implements CakeLogInterface {
 			$data['trace'] = serialize($trace);
 		}
 
-		$this->Model->write($type, $message, $data);
+		$this->Model->writeLog($type, $message, $data);
 	}
 
 }

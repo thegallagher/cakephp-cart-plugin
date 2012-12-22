@@ -11,10 +11,10 @@ The shopping cart part of this plugin is finished but needs to be polished. Ther
 ## Requirements
 
  * CakePHP 2.x
+ * Payments Plugin https://github.com/burzum/Payments
+ * Search Plugin https://github.com/cakedc/search
 
-Optional for some report / search features in the admin backend:
-
- * CakeDC Search Plugin for CakePHP https://github.com/cakedc/search
+The cart is using the Payments plugin, or more accurate, payment processors built on top of it.
 
 ## Parts of the Plugin explained 
 

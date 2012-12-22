@@ -2,7 +2,7 @@
 App::uses('CartAppController', 'Cart.Controller');
 App::uses('CakeEventManager', 'Event');
 App::uses('CakeEvent', 'Event');
-App::uses('PaymentProcessors', 'Cart.Payment');
+App::uses('PaymentProcessors', 'Payments.Lib/Payment');
 /**
  * Carts Controller
  *
@@ -116,7 +116,13 @@ class CartsController extends CartAppController {
 			$this->log($this->request, 'payment-error');
 		}
 
-		CakeEventManager::dispatch(new CakeEvent('Payment.callback', $this->request));
+		$Event = new CakeEvent('Payment.callback', $this->request);
+		CakeEventManager::dispatch($Event);
+		if ($Event->isStopped()) {
+
+		}
+
+		$this->_stop();
 	}
 
 /**
@@ -149,14 +155,29 @@ class CartsController extends CartAppController {
 
 			$ApiLog = ClassRegistry::init('Cart.PaymentApiTransaction');
 			$token = $ApiLog->initialize($processorClass, $newOrder['Order']['id']);
+
+			$cancelUrl = Configure::read('Cart.paymentUrls.cancelUrl');
+			$cancelUrl[] = $token;
+			$Processor->cancelUrl = Router::url($cancelUrl, true);
+
+			$returnUrl = Configure::read('Cart.paymentUrls.returnUrl');
+			$returnUrl[] = $token;
+			$Processor->returnUrl = Router::url($returnUrl, true);
+
+			$callbackUrl = Configure::read('Cart.paymentUrls.callbackUrl');
+			$callbackUrl[] = $token;
+			$Processor->callbackUrl = Router::url($callbackUrl, true);
+
+			$finishUrl = Configure::read('Cart.paymentUrls.finishUrl');
+			$finishUrl[] = $token;
+			$Processor->finishUrl = Router::url($finishUrl, true);
+
 			$newOrder['Order']['token'] = $token;
 			$Order->saveField('token', $token);
 
-			$Processor->cancelUrl[] = $token;
-			$Processor->returnUrl[] = $token;
-			$Processor->callbackUrl[] = $token;
-			$Processor->finishUrl[] = $token;
-			$Processor->pay($newOrder);
+			$Processor->set('payment_reason', $newOrder['Order']['id']);
+			$Processor->set('payment_reason2', $token);
+			$Processor->pay($newOrder['Order']['total']);
 		}
 
 		$this->Session->setFlash(__d('cart', 'There was a problem creating your order.'));
@@ -215,13 +236,6 @@ class CartsController extends CartAppController {
 	}
 
 /**
- * @todo
- */
-	public function cancel_order($transactionToken) {
-		
-	}
-
-/**
  * Loads the processor instance, handles errors and redirects in the case of an error
  *
  * @param string $processor
@@ -230,8 +244,8 @@ class CartsController extends CartAppController {
 	protected function _loadPaymentProcessor($processor) {
 		try {
 			return PaymentProcessors::load($processor, array(
-				'request' => $this->request,
-				'response' => $this->response));
+				'CakeRequest' => $this->request,
+				'CakeResponse' => $this->response));
 		} catch (MissingPaymentProcessorException $e) {
 			$this->Session->setFlash(__d('cart', 'The payment method does not exist!'));
 			$this->redirect(array('action' => 'view'));
