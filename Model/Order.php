@@ -48,10 +48,12 @@ class Order extends CartAppModel {
 	public $hasOne = array(
 		'BillingAddress' => array(
 			'className' => 'Cart.OrderAddress',
-			'conditions' => array('type' => 'billing')),
+			'conditions' => array(
+				'BillingAddress.type' => 'billing')),
 		'ShippingAddress' => array(
 			'className' => 'Cart.OrderAddress',
-			'conditions' => array('type' => 'shipping')));
+			'conditions' => array(
+				'ShippingAddress.type' => 'shipping')));
 
 /**
  * hasMany associations
@@ -73,11 +75,15 @@ class Order extends CartAppModel {
 				'rule' => array('numeric'),
 				'message' => 'This must be a number')),
 		'status' => array(
-			'numeric' => array(
+			'notEmpty' => array(
 				'rule' => array('notEmpty'),
 				'message' => 'The order requires a status')),
+		'currency' => array(
+			'notEmpty' => array(
+				'rule' => array('notEmpty'),
+				'message' => 'You must select a currency')),
 		'processor' => array(
-			'numeric' => array(
+			'notEmpty' => array(
 				'rule' => array('notEmpty'),
 				'message' => 'The order requires a payment processor')),
 		'cart_snapshot' => array(
@@ -108,6 +114,7 @@ class Order extends CartAppModel {
 		if (!empty($this->data[$this->alias]['cart_snapshop']) && is_array($this->data[$this->alias]['cart_snapshop'])) {
 			$this->data[$this->alias]['cart_snapshop'] = serialize($this->data[$this->alias]['cart_snapshop']);
 		}
+
 		return true;
 	}
 
@@ -118,12 +125,18 @@ class Order extends CartAppModel {
  */
 	public function afterSave($created) {
 		if ($created) {
-			$invoiceNumber = $this->invoiceNumber($this->data);
-			$this->data[$this->alias]['invoice_number'] = $invoiceNumber;
+			if (empty($this->data[$this->alias]['currency'])) {
+				$this->data[$this->alias]['currency'] = Configure::read('Cart.defaultCurrency');
+			}
+
+			$this->data[$this->alias]['order_number'] = $this->orderNumber($this->data);
+			$this->data[$this->alias]['invoice_number'] = $this->invoiceNumber($this->data);;
 			$this->data[$this->alias][$this->primaryKey] = $this->getLastInsertId();
+
 			$result = $this->save($this->data, array(
 				'validate' => false,
 				'callbacks' => false));
+
 			$this->data = $result;
 			CakeEventManager::dispatch(new CakeEvent('Order.created', $this, array($this->data)));
 		}
@@ -192,7 +205,8 @@ class Order extends CartAppModel {
 		$order = $this->find('first', array(
 			'contain' => array(
 				'User',
-				'OrderItem'),
+				//'OrderItem'
+			),
 			'conditions' => array(
 				$this->alias . '.' . $this->primaryKey => $orderId)));
 
@@ -305,22 +319,39 @@ class Order extends CartAppModel {
  * Generates an invoice number
  *
  * @param array $data Order data
+ * @param $date
  * @return string
  */
-	public function invoiceNumber($data) {
+	public function invoiceNumber($data = array(), $date = null) {
 		$Event = new CakeEvent('Order.createInvoiceNumber', $this, array($data));
 		CakeEventManager::dispatch($Event);
 		if ($Event->isStopped()) {
 			return $Event->data['result'];
 		}
 
-		$date = date('Y-m-d');
+		if (empty($date)) {
+			$date = date('Y-m-d');
+		}
+
 		$count = $this->find('count', array(
 			'contain' => array(),
 			'conditions' => array(
-				$this->alias . '.created ' => $date .'%')));
-		$increment = $count + 1;
+				$this->alias . '.created LIKE' => substr($date, 0, -2) .'%')));
+
+		if ($count == 1) {
+			$increment = $count;
+		} else {
+			$increment = $count + 1;
+		}
+
 		return str_replace('-', '', $date) . '-'. $increment;
+	}
+
+/**
+ * Order number
+ */
+	public function orderNumber($data = array()) {
+		return $this->find('count');
 	}
 
 }

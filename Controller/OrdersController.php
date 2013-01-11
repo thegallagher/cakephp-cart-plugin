@@ -7,6 +7,7 @@ App::uses('CartAppController', 'Cart.Controller');
  * @copyright 2012 Florian Krämer
  */
 class OrdersController extends CartAppController {
+
 /**
  * Components
  *
@@ -93,6 +94,12 @@ class OrdersController extends CartAppController {
 	public function admin_view($orderId = null) {
 		try {
 			$this->set('order', $this->Order->adminView($orderId));
+			/*
+			$this->Paginator->settings['OrderItem'] = array(
+				'conditions' => array(
+					'OrderItem' => $orderId	));
+			*/
+			$this->set('orderItems', $this->Paginator->paginate($this->Order->OrderItem));
 		} catch (Exception $e) {
 			$this->Session->setFlash($e->getMessage());
 			$this->redirect(array('action' => 'index'));

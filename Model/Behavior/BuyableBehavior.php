@@ -38,8 +38,10 @@ class BuyableBehavior extends ModelBehavior {
 /**
  * Setup
  *
- * @param AppModel $model
+ * @param Model $Model
  * @param array $settings
+ * @return void
+ * @internal param AppModel $model
  */
 	public function setup(Model $Model, $settings = array()) {
 		if (!isset($this->settings[$Model->alias])) {
@@ -49,16 +51,18 @@ class BuyableBehavior extends ModelBehavior {
 		if (empty($this->settings[$Model->alias]['nameField'])) {
 			$this->settings[$Model->alias]['nameField'] = $Model->displayField;
 		}
-		
+
 		$this->settings[$Model->alias] = array_merge($this->settings[$Model->alias], $settings);
-		
+
 		$this->bindCartModel($Model);
 	}
 
 /**
  * Default method for additionalItemData model callback
- * No additional data are returned
  *
+ * No additional data is returned
+ *
+ * @param Model $Model
  * @return mixed Data to be serialized as additional data for the current item, null otherwise
  * @access public
  */
@@ -69,6 +73,7 @@ class BuyableBehavior extends ModelBehavior {
 /**
  * Binds the cart association if no HABTM assoc named 'Cart' already exists.
  *
+ * @param Model $Model
  * @return void
  */
 	public function bindCartModel(Model $Model) {
@@ -90,6 +95,7 @@ class BuyableBehavior extends ModelBehavior {
  *
  * @param Model $Model
  * @param array $data
+ * @return bool
  */
 	public function isBuyable(Model $Model, $data) {
 		$Model->id = $data['CartsItem']['foreign_key'];
@@ -99,8 +105,9 @@ class BuyableBehavior extends ModelBehavior {
 /**
  * Model $Model, $data
  *
- * @param 
- * @param 
+ * @param Model $Model
+ * @param array $cartsItem
+ * @return array
  */
 	public function beforeAddToCart(Model $Model, $cartsItem) {
 		$record = $Model->find('first', array(
@@ -114,14 +121,24 @@ class BuyableBehavior extends ModelBehavior {
 /**
  * Creates a cart compatible item data array from the data coming from beforeAddToCart
  *
- * @param 
- * @param 
+ * @param Model $Model
+ * @param array $record
+ * @param array $cartsItem
+ * @return array
+ * @throws RuntimeException
  */
 	public function composeItemData(Model $Model, $record, $cartsItem) {
 		extract($this->settings[$Model->alias]);
 
+		if (is_string($maxQuantity)) {
+			if (!isset($record[$Model->alias][$maxQuantity])) {
+				throw new RuntimeException(__d('cart', 'Invalid model field %s for maxQuantity!', $maxQuantity));
+			}
+			$maxQuantity = $record[$Model->alias][$maxQuantity];
+		}
+
 		$result = array(
-			'quantity_limit' => false,
+			'quantity_limit' => $maxQuantity,
 			'is_virtual' => $allVirtual,
 			'model' => get_class($Model),
 			'foreign_key' => $record[$Model->alias][$Model->primaryKey],

@@ -16,6 +16,7 @@ class OrderItem extends CartAppModel {
  */
 	public $belongsTo = array(
 		'Order' => array(
-			'className' => 'Cart.Order'));
+			'className' => 'Cart.Order',
+			'counterCache' => true));
 
 }

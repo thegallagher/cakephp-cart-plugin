@@ -8,12 +8,15 @@ App::uses('AppController', 'Controller');
  * @license MIT
  */
 class CartAppController extends AppController {
+
 /**
  * Components
  *
  * @var array
  */
 	public $components = array(
+		'Security',
 		'Session',
 		'Auth');
+
 }

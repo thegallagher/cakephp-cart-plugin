@@ -206,7 +206,8 @@ class Cart extends CartAppModel {
  *
  */
 	public function applyTaxRules($cartData) {
-		CakeEventManager::dispatch(new CakeEvent('Cart.applyTaxRules', $this, array($cartData)));
+		$Event = new CakeEvent('Cart.applyTaxRules', $this, array($cartData));
+		CakeEventManager::dispatch($Event);
 		return $cartData;
 	}
 
@@ -214,7 +215,8 @@ class Cart extends CartAppModel {
  * 
  */
 	public function applyDiscounts($cartData) {
-		CakeEventManager::dispatch(new CakeEvent('Cart.applyDiscounts', $this, array($cartData)));
+		$Event = new CakeEvent('Cart.applyDiscounts', $this, array($cartData));
+		CakeEventManager::dispatch($Event);
 		return $cartData;
 	}
 
@@ -226,12 +228,14 @@ class Cart extends CartAppModel {
  */
 	public function calculateTotals($cartData) {
 		$cartData[$this->alias]['total'] = 0.00;
+		$cartData[$this->alias]['total_price'] = 0.00;
 
 		if (!empty($cartData['CartsItem'])) {
 			foreach ($cartData['CartsItem'] as $key => $item) {
 
-				$cartData['CartsItem'][$key]['total'] = (int) $item['quantity'] * (float) $item['price'];
+				$cartData['CartsItem'][$key]['total'] = (float) $item['quantity'] * (float) $item['price'];
 				$cartData[$this->alias]['total'] += (float) $cartData['CartsItem'][$key]['total'];
+				$cartData[$this->alias]['total_price'] += (float) $cartData['CartsItem'][$key]['total'];
 			}
 		}
 

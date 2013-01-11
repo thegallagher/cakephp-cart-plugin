@@ -9,6 +9,7 @@ App::uses('Component', 'Controller');
  * @copyright 2012 Florian Krämer
  */
 class CartSessionComponent extends Component {
+
 /**
  * Components
  *
@@ -27,8 +28,9 @@ class CartSessionComponent extends Component {
 /**
  * Initializes the component
  *
- * @param Controller $controller
+ * @param Controller $Controller
  * @param array $settings
+ * @internal param \Controller $controller
  * @return void
  */
 	public function initialize(Controller $Controller, $settings = array()) {
@@ -66,7 +68,9 @@ class CartSessionComponent extends Component {
 /**
  * Removes an item from the cart session
  *
- * @param array
+ * @param $item
+ * @throws InvalidArgumentException
+ * @internal param $array
  * @return boolean
  */
 	public function removeItem($item) {

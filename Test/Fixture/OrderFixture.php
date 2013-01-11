@@ -43,6 +43,8 @@ class OrderFixture extends CakeTestFixture {
 		'shipping_address' => array('type'=>'text', 'null' => true, 'default' => NULL),
 		'total' => array('type'=>'float', 'null' => true, 'default' => NULL),
 		'currency' => array('type' => 'integer', 'null' => true, 'default' => NULL),
+		'order_item_count' => array('type' => 'integer', 'null' => false, 'default' => '0', 'length' => 8),
+		'order_number' => array('type'=>'string', 'null' => true, 'default' => NULL, 'length' => 64),
 		'created' => array('type'=>'datetime', 'null' => true, 'default' => NULL),
 		'modified' => array('type'=>'datetime', 'null' => true, 'default' => NULL),
 		'indexes' => array(
@@ -78,6 +80,8 @@ class OrderFixture extends CakeTestFixture {
 			'shipping_address' => null,
 			'total' => 12.00,
 			'currency' => 'EUR',
+			'order_item_count' => 0,
+			'order_number' => 1,
 			'created' => '2012-01-01 12:12:12',
 			'modified' => '2012-01-01 12:12:12',
 		),

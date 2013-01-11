@@ -25,8 +25,8 @@ class CartAppModel extends AppModel {
  * @access public
  */
 	public function __construct($id = false, $table = null, $ds = null) {
-		parent::__construct($id, $table, $ds);
 		$this->_configureAssociations();
+		parent::__construct($id, $table, $ds);
 	}
 
 /**

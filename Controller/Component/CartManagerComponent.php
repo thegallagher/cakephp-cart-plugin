@@ -383,7 +383,8 @@ class CartManagerComponent extends Component {
 			return $this->removeItem($data);
 		}
 
-		CakeEventManager::dispatch(new CakeEvent('CartManager.beforeAddItem', $this, array($data)));
+		$Event = new CakeEvent('CartManager.beforeAddItem', $this, array($data));
+		CakeEventManager::dispatch($Event);;
 
 		$Model = ClassRegistry::init($data['CartsItem']['model']);
 
@@ -414,7 +415,8 @@ class CartManagerComponent extends Component {
 			$this->calculateCart();
 		}
 
-		CakeEventManager::dispatch(new CakeEvent('CartManager.afterAddItem', $this, array($result)));
+		$Event = new CakeEvent('CartManager.afterAddItem', $this, array($result));
+		CakeEventManager::dispatch($Event);
 
 		return $result;
 	}
@@ -428,16 +430,19 @@ class CartManagerComponent extends Component {
 	public function removeItem($data = null) {
 		extract($this->settings);
 
-		CakeEventManager::dispatch(new CakeEvent('CartManager.beforeRemoveItem', $this, array($data)));
+		$Event = new CakeEvent('CartManager.beforeRemoveItem', $this, array($data));
+		CakeEventManager::dispatch($Event);
 
 		if ($this->_isLoggedIn) {
 			$this->CartModel->removeItem($this->_cartId, $data['CartsItem']);
 		}
-
+debug($data);
 		$result = $this->CartSession->removeItem($data['CartsItem']);
 		$this->calculateCart();
 
-		CakeEventManager::dispatch(new CakeEvent('CartManager.afterRemoveItem', $this, array($result)));
+		$Event = new CakeEvent('CartManager.afterRemoveItem', $this, array($result));
+		CakeEventManager::dispatch($Event);
+
 		return $result;
 	}
 

@@ -10,6 +10,7 @@ App::uses('PaymentProcessors', 'Payments.Lib/Payment');
  * @copyright 2012 Florian Krämer
  */
 class CartsController extends CartAppController {
+
 /**
  * Components
  *
@@ -26,7 +27,7 @@ class CartsController extends CartAppController {
  */
 	public function beforeFilter() {
 		parent::beforeFilter();
-		$this->Auth->allow('index', 'view', 'remove_item', 'checkout', 'callback');
+		$this->Auth->allow('index', 'view', 'remove_item', 'checkout', 'callback', 'finish_order');
 
 		if ($this->request->params['action'] == 'callback') {
 			$this->Components->disable('Security');
@@ -77,8 +78,9 @@ class CartsController extends CartAppController {
 		}
 
 		$result = $this->CartManager->removeItem(array(
-			'foreign_key' => $this->request->named['id'],
-			'model' => $this->request->named['model']));
+			'CartsItem' => array(
+				'foreign_key' => $this->request->named['id'],
+				'model' => $this->request->named['model'])));
 
 		if ($result) {
 			$this->Session->setFlash(__d('cart', 'Item removed'));
@@ -92,7 +94,9 @@ class CartsController extends CartAppController {
 /**
  * Default callback entry point for API callbacks for payment processors
  *
- * @param string $processor
+ * @param null $token
+ * @throws NotFoundException
+ * @internal param string $processor
  * @return void
  */
 	public function callback($token = null) {
@@ -105,22 +109,34 @@ class CartsController extends CartAppController {
 				'Order.token' => $token)));
 
 		if (empty($order)) {
-			// @todo exception?
+			throw new NotFoundException(__d('cart', 'Invalid payment token %s!', $token));
 		}
 
 		try {
 			$Processor = $this->_loadPaymentProcessor($order['Order']['processor']);
-			$Processor->parseNotification($order);
+			$status = $Processor->notificationCallback($order);
+			$transactionId = $Processor->getTransactionId();
+
+			if (empty($order['Order']['payment_reference']) && !empty($transactionId)) {
+				$order['Order']['payment_reference'] = $transactionId;
+			}
+
+			$result = $Order->save(
+				array(
+					'Order' => array(
+						'id' => $order['Order']['id'],
+						'payment_status' => $status,
+						'payment_reference' => $order['Order']['payment_reference'])),
+				array(
+					'validate' => false,
+					'callbacks' => false));
 		} catch (Exception $e) {
 			$this->log($e->getMessage(), 'payment-error');
 			$this->log($this->request, 'payment-error');
 		}
 
 		$Event = new CakeEvent('Payment.callback', $this->request);
-		CakeEventManager::dispatch($Event);
-		if ($Event->isStopped()) {
-
-		}
+		CakeEventManager::dispatch($Event, $this, array($result));
 
 		$this->_stop();
 	}
@@ -135,7 +151,7 @@ class CartsController extends CartAppController {
  * @param string
  * @return void
  */
-	public function checkout($processor = null, $action = Null) {
+	public function checkout($processor = null) {
 		$cartData = $this->CartManager->content();
 		if (empty($cartData['CartsItem'])) {
 			$this->Session->setFlash(__d('cart', 'Your cart is empty.'));
@@ -151,8 +167,6 @@ class CartsController extends CartAppController {
 		$newOrder = $Order->createOrder($cartData, $processorClass);
 
 		if ($newOrder) {
-			//$this->CartManager->emptyCart();
-
 			$ApiLog = ClassRegistry::init('Cart.PaymentApiTransaction');
 			$token = $ApiLog->initialize($processorClass, $newOrder['Order']['id']);
 
@@ -177,7 +191,20 @@ class CartsController extends CartAppController {
 
 			$Processor->set('payment_reason', $newOrder['Order']['id']);
 			$Processor->set('payment_reason2', $token);
-			$Processor->pay($newOrder['Order']['total']);
+
+			$status = $Processor->pay($newOrder['Order']['total']);
+
+			$Order->save(
+				array(
+					'Order' => array(
+						'id' => $newOrder['Order']['id'],
+						'payment_status' => $status,
+						'payment_reference' => $Processor->getTransactionId())),
+				array(
+					'validate' => false,
+					'callbacks' => false));
+
+			//$this->CartManager->emptyCart();
 		}
 
 		$this->Session->setFlash(__d('cart', 'There was a problem creating your order.'));
@@ -243,9 +270,28 @@ class CartsController extends CartAppController {
  */
 	protected function _loadPaymentProcessor($processor) {
 		try {
-			return PaymentProcessors::load($processor, array(
+			list($plugin, $class) = pluginSplit($processor, true);
+
+			if (substr($class, -9) != 'Processor') {
+				$class = $class . 'Processor';
+			}
+
+			$sandboxMode = false;
+			$config = Configure::read($class);
+			if (isset($config['sandboxMode']) && isset($config['sandbox'])) {
+				$config = $config['sandbox'];
+				$sandboxMode = true;
+			} elseif (isset($config['live'])) {
+				$config = $config['live'];
+			}
+
+			$Processor = PaymentProcessors::load($processor, $config, array(
 				'CakeRequest' => $this->request,
 				'CakeResponse' => $this->response));
+			$Processor->sandboxMode($sandboxMode);
+
+			return $Processor;
+
 		} catch (MissingPaymentProcessorException $e) {
 			$this->Session->setFlash(__d('cart', 'The payment method does not exist!'));
 			$this->redirect(array('action' => 'view'));

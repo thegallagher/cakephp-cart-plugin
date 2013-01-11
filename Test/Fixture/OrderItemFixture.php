@@ -33,12 +33,12 @@ class OrderItemFixture extends CakeTestFixture {
 		'status' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 16, 'collate' => 'utf8_general_ci', 'comment' => 'internal status, up to the app', 'charset' => 'utf8'),
 		'shipped' => array('type' => 'boolean', 'null' => true, 'default' => '0', 'comment' => 'Virtual as a download or a service'),
 		'shipping_date' => array('type' => 'datetime', 'null' => true, 'default' => null),
+		'total' => array('type' => 'float', 'null' => false, 'default' => 0.00, 'length' => 10,2),
 		'created' => array('type' => 'datetime', 'null' => true, 'default' => null),
 		'modified' => array('type' => 'datetime', 'null' => true, 'default' => null),
 		'indexes' => array(
 			'PRIMARY' => array('column' => 'id', 'unique' => 1)
 		),
-		'tableParameters' => array('charset' => 'utf8', 'collate' => 'utf8_general_ci', 'engine' => 'InnoDB')
 	);
 
 /**

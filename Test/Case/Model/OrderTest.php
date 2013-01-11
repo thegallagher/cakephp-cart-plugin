@@ -20,6 +20,8 @@ class OrderTest extends CakeTestCase {
 		'plugin.Cart.Order',
 		'plugin.Cart.OrderItem',
 		'plugin.Cart.CartsItem',
+		'plugin.Cart.OrderAddress',
+		'plugin.Cart.User',
 	);
 
 /**
@@ -146,6 +148,73 @@ class OrderTest extends CakeTestCase {
 
 		$result = $this->Order->validateOrder($cartData);
 		$this->assertTrue(is_array($result));
+	}
+
+/**
+ * testOrderNumber
+ *
+ * @return void
+ */
+	public function testOrderNumber() {
+		$this->Order->deleteAll(array());
+		$count = $this->Order->find('count');
+
+		$this->Order->save(array(
+			'Order' => array(
+				'create' => '2066-12-12 12:12:12')),
+			array(
+				'validate' => false,
+				'callbacks' => true));
+
+		$result = $this->Order->orderNumber(array());
+		$this->assertEqual($count + 1, $result);
+
+		$this->Order->save(array(
+			'Order' => array(
+				'create' => '2066-12-12 12:12:15')),
+			array(
+				'validate' => false,
+				'callbacks' => true));
+
+		$result = $this->Order->orderNumber(array());
+		$this->assertEqual($count + 2, $result);
+	}
+
+/**
+ * testInvoiceNUmber
+ *
+ * @return void
+ */
+	public function testInvoiceNUmber() {
+		$this->Order->save(array(
+			'Order' => array(
+				'create' => '2066-12-12 12:12:12')),
+			array(
+				'validate' => false,
+				'callbacks' => true));
+
+		$result = $this->Order->invoiceNumber(array(), '2066-12-12');
+		$this->assertEqual('20661212-1', $result);
+
+		$this->Order->save(array(
+			'Order' => array(
+				'create' => '2066-12-12 12:12:15')),
+			array(
+				'validate' => false,
+				'callbacks' => true));
+
+		$result = $this->Order->invoiceNumber(array(), '2066-12-12');
+		$this->assertEqual('20661212-2', $result);
+
+		$this->Order->save(array(
+			'Order' => array(
+				'create' => '2066-12-12 12:12:15')),
+			array(
+				'validate' => false,
+				'callbacks' => true));
+
+		$result = $this->Order->invoiceNumber(array(), '2066-12-12');
+		$this->assertEqual('20661212-3', $result);
 	}
 
 }

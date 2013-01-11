@@ -13,9 +13,12 @@ App::uses('CartAppController', 'Cart.Controller');
  * @author Florian Krämer
  * @copyright 2012 Florian Krämer
  */
-class PaymentMethodsController extends CartsAppController {
+class PaymentMethodsController extends CartAppController {
+
 /**
- * 
+ * beforeFilter callback
+ *
+ * @return void
  */
 	public function beforeFilter() {
 		parent::beforeFilter();
@@ -27,12 +30,17 @@ class PaymentMethodsController extends CartsAppController {
 /**
  * Displays a list of payment methods
  *
+ * @return void
  */
 	public function index() {
-		$this->find('all', $this->PaymentMethod->getPublicAvailable());
+		//debug($this->PaymentMethod->getPaymentMethods());
+		//debug($this->PaymentMethod->getPublicAvailable());
+		$this->set('paymentMethods', $this->PaymentMethod->getPaymentMethods());
 	}
 
 /**
+ * List payment methods
+ *
  * @return void
  */
 	public function admin_index() {
@@ -43,7 +51,9 @@ class PaymentMethodsController extends CartsAppController {
  * 
  */
 	public function admin_edit($id = null) {
-		
+		if ($this->request->is('post')) {
+			$this->PaymentMethod->edit($this->request->data);
+		}
 	}
 
 }
