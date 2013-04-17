@@ -2,6 +2,7 @@
 App::uses('Controller', 'Controller');
 App::uses('CartManagerComponent', 'Cart.Controller/Component');
 App::uses('AuthComponent', 'Controller/Component');
+
 /**
  * CartTestItemsController
  *
@@ -10,6 +11,7 @@ class CartTestItemsController extends Controller {
 	public $uses = array('Item');
 	public $modelClass = 'Item';
 }
+
 /**
  * Cart Manager Component Test
  * 
@@ -18,6 +20,7 @@ class CartTestItemsController extends Controller {
  * @license MIT
  */
 class CartManagerComponentTest extends CakeTestCase {
+
 /**
  * Fixtures
  *
@@ -35,7 +38,7 @@ class CartManagerComponentTest extends CakeTestCase {
  *
  * @return void
  */
-	public function startTest() {
+	public function setUp() {
 		$this->Controller = new CartTestItemsController($this->getMock('CakeRequest'), $this->getMock('CakeResponse'));
 
 		$this->collection = new ComponentCollection();
@@ -57,7 +60,7 @@ class CartManagerComponentTest extends CakeTestCase {
  *
  * @return void
  */
-	public function endTest() {
+	public function tearDown() {
 		ClassRegistry::flush();
 		unset($this->CartManager);
 	}
@@ -93,6 +96,7 @@ class CartManagerComponentTest extends CakeTestCase {
  * @return void
  */
 	public function testGetBuy() {
+		$this->CartManager->settings['getBuy'] = true;
 		$this->CartManager->Controller = $this->Controller;
 		$this->Controller->request->params['named'] = array(
 			'item' => 'item-1',
@@ -119,6 +123,7 @@ class CartManagerComponentTest extends CakeTestCase {
  * @return void
  */
 	public function testPostBuy() {
+		$this->CartManager->settings['postBuy'] = true;
 		$this->CartManager->Controller = $this->Controller;
 		$this->Controller->request->data = array(
 			'CartsItem' => array(
@@ -147,7 +152,7 @@ class CartManagerComponentTest extends CakeTestCase {
 	public function testRequiresShipping() {
 		$this->CartManager->settings['sessionKey'] = 'Cart';
 
-		$this->CartManager->Session->expects($this->any())
+		$this->CartManager->Session->expects($this->at(0))
 			->method('read')
 			->with('Cart.Cart.requires_shipping')
 			->will($this->returnValue(true));
@@ -155,8 +160,7 @@ class CartManagerComponentTest extends CakeTestCase {
 		$result = $this->CartManager->requiresShipping();
 		$this->assertTrue($result);
 
-
-		$this->CartManager->Session->expects($this->any())
+		$this->CartManager->Session->expects($this->at(0))
 			->method('read')
 			->with('Cart.Cart.requires_shipping')
 			->will($this->returnValue(false));

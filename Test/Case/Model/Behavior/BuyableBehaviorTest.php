@@ -43,7 +43,7 @@ class BuyableBehaviorTest extends CakeTestCase {
  *
  * @return void
  */
-	public function startTest() {
+	public function setUp() {
 		$this->Model = ClassRegistry::init('CartTestItemModel');
 		$this->Model->alias = 'Item';
 	}
@@ -53,7 +53,7 @@ class BuyableBehaviorTest extends CakeTestCase {
  *
  * @return void
  */
-	public function endTest() {
+	public function tearDown() {
 		ClassRegistry::flush();
 		unset($this->Model);
 	}

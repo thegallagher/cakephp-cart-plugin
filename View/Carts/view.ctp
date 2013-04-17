@@ -37,10 +37,13 @@
 						</td>
 						<td>
 							<?php
-								echo $this->Html->link(__d('cart', 'remove'), array(
-									'action' => 'remove_item',
-									'id' => $item['foreign_key'],
-									'model' => $item['model']));
+								echo $this->Html->link(__d('cart', 'remove'),
+									array(
+										'action' => 'remove_item',
+										'id' => $item['foreign_key'],
+										'model' => $item['model']),
+									array(
+										'class' => ''));
 							?>
 						</td>
 					</tr>
@@ -53,8 +56,11 @@
 				</tr>
 			</tfoot>
 		</table>
-	<?php echo $this->Form->submit(__d('cart', 'Update cart')); ?>
-	<?php echo $this->Form->end();?>
+	<?php
+		echo $this->Form->submit(__d('cart', 'Update cart'), array(
+			'class' => 'btn btn-primary'));
+		echo $this->Form->end();
+	?>
 	<?php echo $this->element('Cart.payment_methods'); ?>
 
 <?php else : ?>

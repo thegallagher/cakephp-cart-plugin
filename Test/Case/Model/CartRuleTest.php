@@ -17,8 +17,7 @@ class CartRuleTest extends CakeTestCase {
  *
  * @return void
  */
-	public function startTest($method) {
-        parent::startTest($method);
+	public function setUp() {
 		$this->CartRule = ClassRegistry::init('Cart.CartRule');
 	}
 

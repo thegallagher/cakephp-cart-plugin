@@ -60,7 +60,6 @@ class CartSessionComponentTest extends CakeTestCase {
  *
  * @return void
  */
-
 	public function testWrite() {
 		$Cart = new CartSessionComponent($this->ComponentCollection);
 		$Cart->addItem(array(
@@ -92,16 +91,7 @@ class CartSessionComponentTest extends CakeTestCase {
 			'foreign_key' => '2',
 			'foo' => 'bar'));
 
-
 		$result = $Cart->read();
-		debug($result['CartsItem']);
-
-
-		$Cart->removeItem('test', 'test');
-
-		$result = $Cart->read();
-		debug($result);
-
 	}
 
 }

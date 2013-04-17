@@ -29,7 +29,7 @@ class PaymentApiTransactionTest extends CakeTestCase {
  *
  * @return void
  */
-	public function startTest() {
+	public function setUp() {
 		$this->Model = ClassRegistry::init('Cart.PaymentApiTransaction');
 	}
 
@@ -38,7 +38,7 @@ class PaymentApiTransactionTest extends CakeTestCase {
  *
  * @return void
  */
-	public function endTest() {
+	public function tearDown() {
 		ClassRegistry::flush();
 		unset($this->Model);
 	}

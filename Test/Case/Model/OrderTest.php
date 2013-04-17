@@ -29,7 +29,7 @@ class OrderTest extends CakeTestCase {
  *
  * @return void
  */
-	public function startTest() {
+	public function setUp() {
 		$this->Order = ClassRegistry::init('Cart.Order');
 	}
 

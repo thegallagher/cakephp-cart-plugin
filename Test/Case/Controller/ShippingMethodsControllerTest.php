@@ -22,8 +22,8 @@ class ShippingMethodsControllerTestCase extends AppControllerTestCase {
  * @return void
  * @access public
  */
-	public function startTest($method) {
-		parent::startTest($method);
+	public function setUp() {
+		parent::startUp();
 		$this->ShippingMethods = $this->generate(
 			'ShippingMethods', array(
 			  'methods' => array(
@@ -46,8 +46,8 @@ class ShippingMethodsControllerTestCase extends AppControllerTestCase {
  * @return void
  * @access public
  */
-	public function endTest($method) {
-		parent::endTest($method);
+	public function tearDown() {
+		parent::tearDown();
 		unset($this->ShippingMethods);
 		ClassRegistry::flush();
 	}

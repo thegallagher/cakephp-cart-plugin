@@ -28,7 +28,7 @@ class CartTest extends CakeTestCase {
  *
  * @return void
  */
-	public function startTest() {
+	public function setUp() {
 		$this->Cart = ClassRegistry::init('Cart.Cart');
 	}
 
@@ -37,7 +37,7 @@ class CartTest extends CakeTestCase {
  *
  * @return void
  */
-	public function endTest() {
+	public function tearDown() {
 		ClassRegistry::flush();
 		unset($this->Model);
 	}

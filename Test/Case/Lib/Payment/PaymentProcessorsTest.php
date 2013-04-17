@@ -10,7 +10,7 @@ class PaymentProcessorCollectionTest extends CakeTestCase {
  *
  * @return void
  */
-	public function startTest() {
+	public function setUp() {
 		
 	}
 
@@ -19,7 +19,7 @@ class PaymentProcessorCollectionTest extends CakeTestCase {
  *
  * @return void
  */
-	public function endTest() {
+	public function tearDown() {
 		
 	}
 
