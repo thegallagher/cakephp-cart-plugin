@@ -44,15 +44,21 @@ class CartManagerComponent extends Component {
  *
  * @var boolean
  */
-	public $_isLoggedIn = false;
+	protected $_isLoggedIn = false;
+
+/**
+ * CakeEventManager
+ */
+	protected $_EventManager = null;
 
 /**
  * Default settings
- * - model
+ *
+ * - model overrides the Controller defaults modelClass that is used by the cart manager
  * - buyAction the controller action to use or check for
  * - cartModel
- * - sessionKey
- * - useCookie
+ * - sessionKey the session key of the cart session data
+ * - useCookie use a cookie to store the cart persistent for non logged in users
  * - cookieName
  * - afterAddItemRedirect
  *   - false to disable it
@@ -94,15 +100,13 @@ class CartManagerComponent extends Component {
 	public function initialize(Controller $Controller) {
 		$this->settings = array_merge($this->_defaultSettings, $this->settings);
 		$this->Controller = $Controller;
+		$this->_EventManager = CakeEventManager::instance();
 
 		if (empty($this->settings['model'])) {
 			$this->settings['model'] = $this->Controller->modelClass;
 		}
 
 		$this->sessionKey = $this->settings['sessionKey'];
-
-		$this->_setLoggedInStatus();
-		$this->_initalizeCart();
 	}
 
 /**
@@ -119,7 +123,6 @@ class CartManagerComponent extends Component {
 /**
  * Initializes the cart data from session or database depending on if user is logged in or not and if the cart is present or not
  *
- * @todo Do not forget to merge existing itmes with the ones from the database when the user logs in!
  * @return void
  */
 	protected function _initalizeCart() {
@@ -128,19 +131,25 @@ class CartManagerComponent extends Component {
 		$this->CartModel = ClassRegistry::init($cartModel);
 
 		if (!$this->Session->check($sessionKey)) {
-			if ($userId) {
-				$this->Session->write($sessionKey, $this->CartModel->getActive($userId));
-			} else {
-				$this->Session->write($sessionKey, array(
+			$this->Session->write($sessionKey, array(
 					'Cart' => array(),
 					'CartsItem' => array()));
-			}
 		} else {
 			if ($userId && !$this->Session->check($sessionKey . '.Cart.id')) {
-				$this->Session->write($sessionKey, $this->CartModel->getActive($userId));
+				$merged = $this->CartModel->CartsItem->mergeItems(
+					$this->CartModel->getActive($userId),
+					$this->Session->read($sessionKey));
+
+				$this->_cartId = $merged['Cart']['id'];
+				$this->Session->write($sessionKey, $merged);
+
+				foreach ($merged['CartsItem'] as $item) {
+					$this->CartModel->CartsItem->addItem($this->_cartId, $item);
+				}
 			}
 		}
-		$this->_cartId = $this->Session->read($sessionKey . '.Cart.id');
+
+		$this->_cartId = $this->CartSession->read('Cart.id');
 	}
 
 /**
@@ -148,7 +157,9 @@ class CartManagerComponent extends Component {
  *
  * @return void
  */
-	public function startup() {
+	public function startup(Controller $controller) {
+		$this->_setLoggedInStatus();
+		$this->_initalizeCart();
 		extract($this->settings);
 		if ($this->Controller->action == $buyAction && !method_exists($this->Controller, $buyAction)) {
 			$this->captureBuy();
@@ -158,6 +169,7 @@ class CartManagerComponent extends Component {
 /**
  * Captures a buy from a post or get request
  *
+ * @param boolean $returnItem
  * @return mixed False if the catpure failed array with item data on success
  */
 	public function captureBuy($returnItem = false) {
@@ -334,11 +346,10 @@ class CartManagerComponent extends Component {
  * @return mixed false or array
  */
 	public function getBuy() {
-		if ($this->Controller->request->is('get') && $this->settings['getBuy'] && isset($this->Controller->request->params['named']['item'])) {
+		if ($this->Controller->request->is('get') && $this->settings['getBuy'] === true && isset($this->Controller->request->params['named']['item'])) {
 			$data = array(
 				'CartsItem' => array(
-					'foreign_key' => $this->Controller->request->params['named']['item'],
-			));
+					'foreign_key' => $this->Controller->request->params['named']['item']));
 
 			if (isset($this->Controller->request->params['named']['model'])) {
 				$data['CartsItem']['model'] = $this->Controller->request->params['named']['model'];
@@ -365,7 +376,7 @@ class CartManagerComponent extends Component {
  * @return mixed false or array
  */
 	public function postBuy() {
-		if ($this->Controller->request->is('post') && $this->settings['postBuy']) {
+		if ($this->Controller->request->is('post') && $this->settings['postBuy'] === true) {
 			return $this->Controller->request->data;
 		}
 		return false;
@@ -375,6 +386,7 @@ class CartManagerComponent extends Component {
  * Adds an item to the cart, the session and database if a user is logged in
  *
  * @param array $data
+ * @param boolean $recalculate
  * @return boolean
  */
 	public function addItem($data, $recalculate = true) {
@@ -384,7 +396,7 @@ class CartManagerComponent extends Component {
 		}
 
 		$Event = new CakeEvent('CartManager.beforeAddItem', $this, array($data));
-		CakeEventManager::dispatch($Event);;
+		$this->_EventManager->dispatch($Event);;
 
 		$Model = ClassRegistry::init($data['CartsItem']['model']);
 
@@ -416,7 +428,7 @@ class CartManagerComponent extends Component {
 		}
 
 		$Event = new CakeEvent('CartManager.afterAddItem', $this, array($result));
-		CakeEventManager::dispatch($Event);
+		$this->_EventManager->dispatch($Event);
 
 		return $result;
 	}
@@ -431,17 +443,22 @@ class CartManagerComponent extends Component {
 		extract($this->settings);
 
 		$Event = new CakeEvent('CartManager.beforeRemoveItem', $this, array($data));
-		CakeEventManager::dispatch($Event);
+		$this->_EventManager->dispatch($Event);
+		if ($Event->isStopped()) {
+			return false;
+		}
 
 		if ($this->_isLoggedIn) {
-			$this->CartModel->removeItem($this->_cartId, $data['CartsItem']);
+			if (!$this->CartModel->removeItem($this->_cartId, $data['CartsItem'])) {
+				return false;
+			}
 		}
-debug($data);
+
 		$result = $this->CartSession->removeItem($data['CartsItem']);
 		$this->calculateCart();
 
 		$Event = new CakeEvent('CartManager.afterRemoveItem', $this, array($result));
-		CakeEventManager::dispatch($Event);
+		$this->_EventManager->dispatch($Event);
 
 		return $result;
 	}
@@ -457,7 +474,7 @@ debug($data);
 			$this->CartModel->emptyCart($this->_cartId);
 		}
 
-		if ($this->settings['useCookie'] == true) {
+		if ($this->settings['useCookie'] === true) {
 			$this->Cookie->delete($this->settings['cookieName']);
 		}
 
@@ -499,6 +516,13 @@ debug($data);
 		return $this->CartSession->getItemKey($id, $model);
 	}
 
+/**
+ * @param $id
+ * @param $model
+ * @param string $field
+ * @return bool
+ * @internal param $
+ */
 	public function getItem($id, $model, $field = '') {
 		$key = $this->getItemKey($id, $model);
 		if ($key === false) {
@@ -559,14 +583,16 @@ debug($data);
  */
 	public function restoreFromCookie() {
 		$result = $this->Cookie->read($this->settings['cookieName']);
-		$this->Controller->Session->write($this->settings['sessionKey'], $result);
+		$this->Session->write($this->settings['sessionKey'], $result);
+		return !empty($result);
 	}
 
 /**
  * Adds multiple items to the cart, the session and database if a user is logged in
  *
- * @param array $data array of items
- * @param string Buy type, 'update' will replace quantity if present in cart, 'increment' will add to existing quantity
+ * @param $items
+ * @param string $type Buy type, 'update' will replace quantity if present in cart, 'increment' will add to existing quantity
+ * @internal param array $data array of items
  * @return boolean
  */
 	public function updateItems($items, $type = 'update') {
@@ -584,11 +610,12 @@ debug($data);
 	}
 
 /**
- * afterFilter callback
+ * shutdown callback
  *
+ * @param Controller $controller
  * @return void
  */
-	public function afterFilter() {
+	public function shutdown(Controller $controller) {
 		if ($this->settings['useCookie']) {
 			$this->writeCookie();
 		}
