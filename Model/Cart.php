@@ -114,6 +114,8 @@ class Cart extends CartAppModel {
  */
 	public function view($cartId = null, $userId = null) {
 		$result = $this->find('first', array(
+			'contain' => array(
+				'CartsItem'),
 			'conditions' => array(
 				$this->alias . '.user_id' => $userId)));
 

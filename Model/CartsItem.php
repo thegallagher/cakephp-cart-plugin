@@ -25,6 +25,11 @@ class CartsItem extends CartAppModel {
  * @var array
  */
 	public $validate = array(
+		'cart_id' => array(
+			'required' => array(
+				'rule' => array('notEmpty'),
+				'required' => true,
+				'allowEmpty' => false)),
 		'foreign_key' => array(
 			'required' => array(
 				'rule' => array('notEmpty'),
@@ -106,9 +111,9 @@ class CartsItem extends CartAppModel {
 		$item = $this->find('first', array(
 			'contain' => array(),
 			'conditions' => array(
-				'cart_id' => $cartId,
-				'model' => $itemData['model'],
-				'foreign_key' => $itemData['foreign_key'])));
+				$this->alias . '.cart_id' => $cartId,
+				$this->alias . '.model' => $itemData['model'],
+				$this->alias . '.foreign_key' => $itemData['foreign_key'])));
 
 		if (empty($item)) {
 			return false;

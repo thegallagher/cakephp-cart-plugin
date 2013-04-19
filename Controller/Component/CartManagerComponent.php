@@ -44,7 +44,12 @@ class CartManagerComponent extends Component {
  *
  * @var boolean
  */
-	public $_isLoggedIn = false;
+	protected $_isLoggedIn = false;
+
+/**
+ * CakeEventManager
+ */
+	protected $_EventManager = null;
 
 /**
  * Default settings
@@ -95,6 +100,7 @@ class CartManagerComponent extends Component {
 	public function initialize(Controller $Controller) {
 		$this->settings = array_merge($this->_defaultSettings, $this->settings);
 		$this->Controller = $Controller;
+		$this->_EventManager = CakeEventManager::instance();
 
 		if (empty($this->settings['model'])) {
 			$this->settings['model'] = $this->Controller->modelClass;
@@ -142,6 +148,8 @@ class CartManagerComponent extends Component {
 				}
 			}
 		}
+
+		$this->_cartId = $this->CartSession->read('Cart.id');
 	}
 
 /**
@@ -388,7 +396,7 @@ class CartManagerComponent extends Component {
 		}
 
 		$Event = new CakeEvent('CartManager.beforeAddItem', $this, array($data));
-		CakeEventManager::instance()->dispatch($Event);;
+		$this->_EventManager->dispatch($Event);;
 
 		$Model = ClassRegistry::init($data['CartsItem']['model']);
 
@@ -420,7 +428,7 @@ class CartManagerComponent extends Component {
 		}
 
 		$Event = new CakeEvent('CartManager.afterAddItem', $this, array($result));
-		CakeEventManager::instance()->dispatch($Event);
+		$this->_EventManager->dispatch($Event);
 
 		return $result;
 	}
@@ -435,17 +443,22 @@ class CartManagerComponent extends Component {
 		extract($this->settings);
 
 		$Event = new CakeEvent('CartManager.beforeRemoveItem', $this, array($data));
-		CakeEventManager::dispatch($Event);
+		$this->_EventManager->dispatch($Event);
+		if ($Event->isStopped()) {
+			return false;
+		}
 
 		if ($this->_isLoggedIn) {
-			$this->CartModel->removeItem($this->_cartId, $data['CartsItem']);
+			if (!$this->CartModel->removeItem($this->_cartId, $data['CartsItem'])) {
+				return false;
+			}
 		}
 
 		$result = $this->CartSession->removeItem($data['CartsItem']);
 		$this->calculateCart();
 
 		$Event = new CakeEvent('CartManager.afterRemoveItem', $this, array($result));
-		CakeEventManager::instance()->dispatch($Event);
+		$this->_EventManager->dispatch($Event);
 
 		return $result;
 	}

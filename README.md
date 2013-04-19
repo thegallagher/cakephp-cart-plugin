@@ -23,11 +23,6 @@ Features done:
  * CartManager - handles the cart, adding and removing items from it
  * Allow/deny anonymous checkouts
 
-Planed features:
-
- * Tax Rules
- * Discount Rules
-
 ### Cart Manager Component
 
 The Cart Manager is a component thought to capture post and get requests to a specified action, by default "buy" and add the result of this to the cart.

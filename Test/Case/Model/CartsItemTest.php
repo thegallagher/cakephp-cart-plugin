@@ -14,6 +14,7 @@ class CartsItemTest extends CakeTestCase {
  * @var array
  */
 	public $fixtures = array(
+		'plugin.Cart.User',
 		'plugin.Cart.Cart',
 		'plugin.Cart.Item',
 		'plugin.Cart.Order',
@@ -70,30 +71,62 @@ class CartsItemTest extends CakeTestCase {
 			'CartsItem' => array(
 				0 => array(
 					'foreign_key' => 'asf123',
-					'model' => 'Foo',
-				),
-			),
-		);
+					'model' => 'Foo')));
+
 		$data2 = array(
 			'CartsItem' => array(
 				0 => array(
 					'foreign_key' => 'ufsfasf123',
-					'model' => 'Boo',
-				),
+					'model' => 'Bar'),
 				1 => array(
 					'foreign_key' => 'asf123',
-					'model' => 'Foo',
-				),
+					'model' => 'Foo'),
 				2 => array(
 					'foreign_key' => '1111111',
-					'model' => 'Foo',
-				),
-			),
-		);
+					'model' => 'Foo')));
 
 		$result = $this->CartsItem->mergeItems($data2, $data1);
+		$this->assertEqual($result, array(
+			'CartsItem' => array(
+				0 => array(
+					'foreign_key' => 'ufsfasf123',
+					'model' => 'Bar'),
+				1 => array(
+					'foreign_key' => 'asf123',
+					'model' => 'Foo'),
+				2 => array(
+					'foreign_key' => '1111111',
+					'model' => 'Foo'))));
 
 		$result = $this->CartsItem->mergeItems($data1, $data2);
+		$this->assertEqual($result, array(
+			'CartsItem' => array(
+				0 => array(
+					'foreign_key' => 'asf123',
+					'model' => 'Foo'),
+				1 => array(
+					'foreign_key' => 'ufsfasf123',
+					'model' => 'Bar'),
+				2 => array(
+					'foreign_key' => '1111111',
+					'model' => 'Foo'))));
+	}
+
+	public function testRemoveItem() {
+		$data = array(
+			'foreign_key' => 'item-1',
+			'model' => 'Item');
+		$result = $this->CartsItem->removeItem('cart-1', $data);
+		$this->assertTrue($result);
+
+		$result = $this->CartsItem->find('count', array(
+			'contain' => array(),
+			'conditions' => array(
+				'CartsItem.foreign_key' => 'item-1',
+				'CartsItem.model' => 'Item',
+				'CartsItem.cart_id' => 'cart-1')));
+
+		$this->assertEqual($result, 0);
 	}
 
 }
