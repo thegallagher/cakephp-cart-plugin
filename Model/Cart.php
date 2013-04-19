@@ -6,7 +6,7 @@ App::uses('CakeEventManager', 'Event');
  * Cart Model
  *
  * @author Florian Krämer
- * @copyright 2012 Florian Krämer
+ * @copyright 2012 - 2013 Florian Krämer
  * @license MIT
  *
  * @property CartsItem CartsItem
@@ -142,7 +142,8 @@ class Cart extends CartAppModel {
  * Called from the CartManagerComponent when an item is removed from the cart
  *
  * @param string $cartId Cart UUID
- * @parma $itemData
+ * @param $itemData
+ * @return bool
  */
 	public function removeItem($cartId, $itemData) {
 		return $this->CartsItem->removeItem($cartId, $itemData);
@@ -184,7 +185,8 @@ class Cart extends CartAppModel {
  * @todo discounts/coupons
  */
 	public function calculateCart($cartData = array()) {
-		CakeEventManager::dispatch(new CakeEvent('Cart.beforeCalculateCart', $this, array($cartData)));
+		$Event = new CakeEvent('Cart.beforeCalculateCart', $this, array($cartData));
+		CakeEventManager::instance()->dispatch($Event);
 
 		if (isset($cartData['CartsItem'])) {
 			$cartData[$this->alias]['item_count'] = count($cartData['CartsItem']);
@@ -198,7 +200,9 @@ class Cart extends CartAppModel {
 		$cartData = $this->applyTaxRules($cartData);
 		$cartData = $this->calculateTotals($cartData);
 
-		CakeEventManager::dispatch(new CakeEvent('Cart.afterCalculateCart', $this, array($cartData)));
+		$Event = new CakeEvent('Cart.afterCalculateCart', $this, array($cartData));
+		CakeEventManager::instance()->dispatch($Event);
+
 		return $cartData;
 	}
 
@@ -207,7 +211,11 @@ class Cart extends CartAppModel {
  */
 	public function applyTaxRules($cartData) {
 		$Event = new CakeEvent('Cart.applyTaxRules', $this, array($cartData));
-		CakeEventManager::dispatch($Event);
+		CakeEventManager::instance()->dispatch($Event);
+
+		if ($Event->isStopped()) {
+
+		}
 		return $cartData;
 	}
 
@@ -216,7 +224,10 @@ class Cart extends CartAppModel {
  */
 	public function applyDiscounts($cartData) {
 		$Event = new CakeEvent('Cart.applyDiscounts', $this, array($cartData));
-		CakeEventManager::dispatch($Event);
+		CakeEventManager::instance()->dispatch($Event);
+		if ($Event->isStopped()) {
+
+		}
 		return $cartData;
 	}
 
@@ -250,7 +261,10 @@ class Cart extends CartAppModel {
  * from the non-logged in user into the users database cart.
  *
  * @todo finish me
- * @return 
+ *
+ * @param integer|string $cartId
+ * @param array $cartItems
+ * @return void
  */
 	public function mergeItems($cartId, $cartItems) {
 		$dbItems = $this->CartsItem->find('all', array(

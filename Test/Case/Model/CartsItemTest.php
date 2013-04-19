@@ -57,6 +57,43 @@ class CartsItemTest extends CakeTestCase {
 		$data = array(
 			'foo' => 'bar');
 		$result = $this->CartsItem->validateItem($data);
-		debug($this->CartsItem->invalidFields());
+		//debug($this->CartsItem->invalidFields());
 	}
+
+/**
+ * testMergeItems
+ *
+ * @return void
+ */
+	public function testMergeItems() {
+		$data1 = array(
+			'CartsItem' => array(
+				0 => array(
+					'foreign_key' => 'asf123',
+					'model' => 'Foo',
+				),
+			),
+		);
+		$data2 = array(
+			'CartsItem' => array(
+				0 => array(
+					'foreign_key' => 'ufsfasf123',
+					'model' => 'Boo',
+				),
+				1 => array(
+					'foreign_key' => 'asf123',
+					'model' => 'Foo',
+				),
+				2 => array(
+					'foreign_key' => '1111111',
+					'model' => 'Foo',
+				),
+			),
+		);
+
+		$result = $this->CartsItem->mergeItems($data2, $data1);
+
+		$result = $this->CartsItem->mergeItems($data1, $data2);
+	}
+
 }

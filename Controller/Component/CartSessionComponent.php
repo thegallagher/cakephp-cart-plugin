@@ -143,6 +143,16 @@ class CartSessionComponent extends Component {
 	}
 
 /**
+ * Checks if an key exists in the session
+ *
+ * @param string $name
+ * @return mixed
+ */
+	public function check($name) {
+		return parent::check($this->sessionKey . '.' . $name);
+	}
+
+/**
  * Deletes from the cart session
  *
  * @param string
