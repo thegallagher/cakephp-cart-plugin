@@ -8,12 +8,6 @@ App::uses('CartAppModel', 'Cart.Model');
  * @license MIT
  */
 class CartsItem extends CartAppModel {
-/**
- * Validation domain for translations
- *
- * @var string
- */
-	public $validationDomain = 'users';
 
 /**
  * belongsTo associations
@@ -36,7 +30,7 @@ class CartsItem extends CartAppModel {
 				'rule' => array('notEmpty'),
 				'required' => true,
 				'allowEmpty' => false)),
-		'foreign_key' => array(
+		'model' => array(
 			'required' => array(
 				'rule' => array('notEmpty'),
 				'required' => true,
@@ -72,8 +66,8 @@ class CartsItem extends CartAppModel {
  * @return mixed
  */
 	public function addItem($cartId, $itemData) {
-		if (isset($itemData['CartsItem'])) {
-			$itemData = $itemData['CartsItem'];
+		if (isset($itemData[$this->alias])) {
+			$itemData = $itemData[$this->alias];
 		}
 
 		if (!isset($itemData['foreign_key']) || !isset($itemData['model'])) {
@@ -92,7 +86,7 @@ class CartsItem extends CartAppModel {
 			$item[$this->alias]['cart_id'] = $cartId;
 			$this->create();
 		} else {
-			$item[$this->alias] = Set::merge($item['CartsItem'], $itemData);
+			$item[$this->alias] = Set::merge($item[$this->alias], $itemData);
 		}
 
 		return $this->save($item);
@@ -120,7 +114,7 @@ class CartsItem extends CartAppModel {
 			return false;
 		}
 
-		return $this->delete($item['CartsItem']['id']);
+		return $this->delete($item[$this->alias]['id']);
 	}
 
 /**
@@ -145,4 +139,40 @@ class CartsItem extends CartAppModel {
 		}
 	}
 
+/**
+ * Merges two item arrays, used to merge cookie/sesssion/database cart item arrays to synchronize them
+ *
+ * This method just merges the arrays it does NOT write them to the database
+ *
+ * @param array $array1 The array the 2nd array gets merged into
+ * @param array $array2 The array that will get merged into $array1 and override its item if present
+ * @return array
+ */
+	public function mergeItems($array1, $array2) {
+		if (!isset($array1[$this->alias])) {
+			$array1[$this->alias] = array();
+		}
+
+		if (!isset($array2[$this->alias])) {
+			$array2[$this->alias] = array();
+		}
+
+		foreach ($array1[$this->alias] as $key1 => $item1) {
+			foreach ($array2[$this->alias] as $key2 => $item2) {
+				if ($item2['foreign_key'] == $item1['foreign_key'] && $item2['model'] == $item1['model']) {
+					$array1[$this->alias][$key1] = $item2;
+					unset($array2[$this->alias][$key2]);
+					break;
+				}
+			}
+		}
+
+		if (!empty($array2)) {
+			foreach ($array2[$this->alias] as $key => $item) {
+				$array1[$this->alias][] = $item;
+			}
+		}
+
+		return $array1;
+	}
 }
