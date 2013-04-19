@@ -11,7 +11,7 @@ App::uses('CartAppController', 'Cart.Controller');
  * orders you will still need it to do refunds.
  *
  * @author Florian Krämer
- * @copyright 2012 Florian Krämer
+ * @copyright 2012 - 2013 Florian Krämer
  */
 class PaymentMethodsController extends CartAppController {
 

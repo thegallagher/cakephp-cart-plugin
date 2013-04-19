@@ -4,7 +4,7 @@ App::uses('AppController', 'Controller');
  * Cart App Controller
  *
  * @author Florian Krämer
- * @copyright 2012 Florian Krämer
+ * @copyright 2012 - 2013 Florian Krämer
  * @license MIT
  */
 class CartAppController extends AppController {

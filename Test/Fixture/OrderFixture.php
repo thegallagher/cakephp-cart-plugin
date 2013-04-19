@@ -3,7 +3,7 @@
  * OrderFixture
  *
  * @author Florian Krämer
- * @copyright 2012 Florian Krämer
+ * @copyright 2012 - 2013 Florian Krämer
  * @license MIT
  */
 class OrderFixture extends CakeTestFixture {

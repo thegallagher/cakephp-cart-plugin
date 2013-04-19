@@ -4,7 +4,7 @@ App::uses('CartAppModel', 'Cart.Model');
  * Payment Method Model
  *
  * @author Florian Krämer
- * @copyright 2012 Florian Krämer
+ * @copyright 2012 - 2013 Florian Krämer
  */
 class PaymentMethod extends CartAppModel {
 /**

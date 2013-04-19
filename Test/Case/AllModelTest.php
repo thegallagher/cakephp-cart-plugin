@@ -3,7 +3,7 @@
  * AllModelTest
  *
  * @author Florian Krämer
- * @copyright 2012 Florian Krämer
+ * @copyright 2012 - 2013 Florian Krämer
  * @license MIT
  */
 class AllModelTest extends PHPUnit_Framework_TestSuite {

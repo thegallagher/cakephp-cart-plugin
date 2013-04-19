@@ -14,7 +14,7 @@ App::uses('CartAppModel', 'Cart.Model');
  * - statistics
  *
  * @author Florian Krämer
- * @copyright 2012 Florian Krämer
+ * @copyright 2012 - 2013 Florian Krämer
  * @license MIT
  * @link http://book.cakephp.org/2.0/en/core-libraries/logging.html#creating-and-configuring-log-streams
  */

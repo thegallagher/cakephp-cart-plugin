@@ -4,7 +4,7 @@ App::uses('CartsItem', 'Cart.Model');
  * CartsItem Test
  * 
  * @author Florian Krämer
- * @copyright 2012 Florian Krämer
+ * @copyright 2012 - 2013 Florian Krämer
  * @license MIT
  */
 class CartsItemTest extends CakeTestCase {
