@@ -8,6 +8,7 @@ App::uses('AppModel', 'Model');
  * @license MIT
  */
 class CartAppModel extends AppModel {
+
 /**
  * Behaviors
  *
@@ -15,6 +16,13 @@ class CartAppModel extends AppModel {
  */
 	public $actsAs = array(
 		'Containable');
+
+/**
+ * Validation domain for translations
+ *
+ * @var string
+ */
+	public $validationDomain = 'cart';
 
 /**
  * Constructor
@@ -57,4 +65,5 @@ class CartAppModel extends AppModel {
 			}
 		}
 	}
+
 }
