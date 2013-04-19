@@ -40,7 +40,7 @@ class ChangesAndNewFields extends CakeMigration {
 					'order_item_count' => array('type' => 'integer', 'null' => false, 'default' => '0', 'length' => 8),
 					'order_number' => array('type'=>'string', 'null' => true, 'default' => NULL, 'length' => 64),
 				),
-				'cart_items' => array(
+				'carts_items' => array(
 					'quantity_limit' => array('type' => 'integer', 'null' => false, 'default' => '0', 'length' => 8),
 				),
 				'order_items' => array(
