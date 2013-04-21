@@ -1,12 +1,9 @@
 <?php
-/* ShippingMethods Test cases generated on: 2012-07-29 23:07:57 : 1343598897*/
-App::import('Controller', 'Cart.ShippingMethods');
-
-App::import('Lib', 'Templates.AppControllerTestCase');
-/**
+App::uses('ShippingMethodsController', 'Cart.Controller');
+/*
  * @property ShippingMethodsController ShippingMethods
  */
-class ShippingMethodsControllerTestCase extends AppControllerTestCase {
+class ShippingMethodsControllerTestCase extends CakeTestCase {
 /**
  * Autoload entrypoint for fixtures dependecy solver
  *

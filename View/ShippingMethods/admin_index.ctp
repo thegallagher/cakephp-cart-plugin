@@ -55,7 +55,7 @@ foreach ($shippingMethods as $shippingMethod):
 	</tr>
 <?php endforeach; ?>
 </table>
-<?php echo $this->element('paging', array(), array('plugin' => 'Templates')); ?>
+<?php echo $this->element('paging', array(), array('plugin' => 'Cart')); ?>
 </div>
 
 <div class="actions">
