@@ -146,6 +146,8 @@ class CartManagerComponent extends Component {
 				foreach ($merged['CartsItem'] as $item) {
 					$this->CartModel->CartsItem->addItem($this->_cartId, $item);
 				}
+
+				$this->calculateCart();
 			}
 		}
 
@@ -548,7 +550,6 @@ class CartManagerComponent extends Component {
 /**
  * (Re-)calculates a cart, this will run over all items, coupons and taxes
  *
- * @todo refactor saveAll?
  * @return array the cart data
  */
 	public function calculateCart() {
@@ -556,7 +557,7 @@ class CartManagerComponent extends Component {
 		$cartData = $this->CartModel->calculateCart($this->Session->read($sessionKey));
 
 		if ($this->_isLoggedIn) {
-			//$this->CartModel->saveAll($cartData);
+			$this->CartModel->saveAll($cartData);
 		}
 
 		$this->Session->write($sessionKey, $cartData);
