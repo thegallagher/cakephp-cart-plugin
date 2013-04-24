@@ -277,7 +277,7 @@ class CartsController extends CartAppController {
 			}
 
 			$sandboxMode = false;
-			$config = Configure::read($class);
+			$config = (array)Configure::read($class);
 			if (isset($config['sandboxMode']) && isset($config['sandbox'])) {
 				$config = $config['sandbox'];
 				$sandboxMode = true;
@@ -302,7 +302,7 @@ class CartsController extends CartAppController {
 	}
 
 /**
- * Checks if the processor name is mapped in the static configure class or if 
+ * Checks if the processor name is mapped in the static configure class or if
  * it is mapped in the PaymentMethod model.
  *
  * The payment method model gives you greater flexibility to en/disable processors
@@ -367,7 +367,7 @@ class CartsController extends CartAppController {
 	}
 
 /**
- * 
+ *
  */
 	public function admin_delete($cartId = null) {
 		//$this->Cart->delete($cartId);
