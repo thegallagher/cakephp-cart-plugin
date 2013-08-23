@@ -192,7 +192,7 @@ class Order extends CartAppModel {
 				'callbacks' => false));
 
 			$this->data = $result;
-			CakeEventManager::dispatch(new CakeEvent('Order.created', $this, array($this->data)));
+			CakeEventManager::instance()->dispatch(new CakeEvent('Order.created', $this, array($this->data)));
 		}
 
 		$this->_detectOrderChange();
@@ -207,7 +207,7 @@ class Order extends CartAppModel {
  * @param bool $primary
  * @return array
  */
-	public function afterFind($results, $primary) {
+	public function afterFind($results, $primary = false) {
 		$results = $this->unserializeCartSnapshot($results);
 		return $results;
 	}
@@ -281,7 +281,7 @@ class Order extends CartAppModel {
  * by default true, it will get just validated and by this maybe set
  * to invalid, when the cart requires shipping
  *
- * @param 
+ * @param
  * @return mixed
  */
 	public function validateOrder($order) {
@@ -335,7 +335,7 @@ class Order extends CartAppModel {
 
 		$order = Set::merge($cartData, $order);
 
-		CakeEventManager::dispatch(new CakeEvent('Order.beforeCreateOrder', $this, array($order)));
+		CakeEventManager::instance()->dispatch(new CakeEvent('Order.beforeCreateOrder', $this, array($order)));
 
 		$order = $this->validateOrder($order);
 		if ($order === false) {
@@ -366,7 +366,7 @@ class Order extends CartAppModel {
 
 		if ($result) {
 			$result[$this->alias][$this->primaryKey] = $this->getLastInsertId();
-			CakeEventManager::dispatch(new CakeEvent('Order.created', $this, array($result)));
+			CakeEventManager::instance()->dispatch(new CakeEvent('Order.created', $this, array($result)));
 		}
 
 		$result = Set::merge($result, unserialize($result[$this->alias]['cart_snapshop']));
@@ -382,7 +382,7 @@ class Order extends CartAppModel {
  */
 	public function invoiceNumber($data = array(), $date = null) {
 		$Event = new CakeEvent('Order.createInvoiceNumber', $this, array($data));
-		CakeEventManager::dispatch($Event);
+		CakeEventManager::instance()->dispatch($Event);
 		if ($Event->isStopped()) {
 			return $Event->data['result'];
 		}
