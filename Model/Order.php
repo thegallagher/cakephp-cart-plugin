@@ -300,9 +300,13 @@ class Order extends CartAppModel {
 		if (isset($order['Cart']['requires_shipping']) && $order['Cart']['requires_shipping'] == 1) {
 			$order['BillingAddress']['order_id'] = $orderId;
 			$order['ShippingAddress']['order_id'] = $orderId;
-			$this->BillingAddress->create();
+			if(!isset($order['BillingAddress']['id'])) {
+				$this->BillingAddress->create();
+			}
 			$this->BillingAddress->save($order);
-			$this->ShippingAddress->create();
+			if(!isset($order['ShippingAddress']['id'])) {
+				$this->ShippingAddress->create();	
+			}
 			$this->ShippingAddress->save($order);
 		}
 
