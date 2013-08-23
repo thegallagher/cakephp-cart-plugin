@@ -46,12 +46,12 @@ class OrdersController extends CartAppController {
  */
 	public function index() {
 		$userId = $this->Auth->user('id');
-		$this->paginate = array(
+		$this->Paginator->settings = array(
 			'contain' => array(),
 			'conditions' => array(
 				'Order.user_id' => $userId),
 			'order' => 'Order.created DESC');
-		$this->set('orders', $this->paginate());
+		$this->set('orders', $this->Paginator->paginate());
 	}
 
 /**
@@ -79,11 +79,11 @@ class OrdersController extends CartAppController {
  * @return void
  */
 	public function admin_index() {
-		$this->paginate = array(
+		$this->Paginator->settings = array(
 			'contain' => array(
 				'User'),
 			'order' => 'Order.created DESC');
-		$this->set('orders', $this->paginate());
+		$this->set('orders', $this->Paginator->paginate());
 	}
 
 /**

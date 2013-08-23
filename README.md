@@ -66,7 +66,17 @@ If you do not want to add it as submodule just clone it instead of doing submodu
 
 If you use another user model class in your application other than User you'll need to configure the plugin to use that model:
 
-	Configure::write('Cart.models.User', 'AppUser');
+```php
+Configure::write('Cart.models.User', 'AppUser');
+```
+
+## How to do I extend or modify the cart?
+
+There two ways to modify the cart, depending on the kind of changes one might be better than the other one for your case.
+
+You can simply do regular OOP an inherit the plugin classes on application level or you fork the plugin on github and do your modifications in your fork.
+
+It is highly recommended that if you fork it you do your changes in a branch and do not work in master or develop so that you can do easy pull request and it is easier for yourself to compare the branches then and to do merges from the original repository.
 
 ## Support
 

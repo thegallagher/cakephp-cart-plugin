@@ -1,5 +1,3 @@
-<?php //debug($cart); ?>
-
 <h2>
 	<?php echo __d('cart', 'Shopping Cart'); ?>
 </h2>
@@ -60,8 +58,11 @@
 		echo $this->Form->submit(__d('cart', 'Update cart'), array(
 			'class' => 'btn btn-primary'));
 		echo $this->Form->end();
+
+		echo $this->Html->link(__('cart', 'Checkout'), array(
+			'controller' => 'checkout',
+			'action' => 'index'));
 	?>
-	<?php echo $this->element('Cart.payment_methods'); ?>
 
 <?php else : ?>
 

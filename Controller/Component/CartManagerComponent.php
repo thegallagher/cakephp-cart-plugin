@@ -2,6 +2,7 @@
 App::uses('Component', 'Controller');
 App::uses('CartSessionComponent', 'Cart.Controller/Component');
 App::uses('CakeEvent', 'Event');
+
 /**
  * CartManagerComponent
  *
@@ -21,6 +22,7 @@ App::uses('CakeEvent', 'Event');
  * @license MIT
  */
 class CartManagerComponent extends Component {
+
 /**
  * Components
  *

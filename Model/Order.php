@@ -111,11 +111,65 @@ class Order extends CartAppModel {
  * @return boolean
  */
 	public function beforeSave($options = array()) {
+		$this->_getOrderRecordBeforeSave();
+		$this->_serializeCartSnapshot();
+		return true;
+	}
+
+/**
+ * Serializes the cart snapshot data
+ *
+ * This method is intended to be called only inside Order::beforeSave()
+ *
+ * @return void
+ */
+	protected function _serializeCartSnapshot() {
 		if (!empty($this->data[$this->alias]['cart_snapshop']) && is_array($this->data[$this->alias]['cart_snapshop'])) {
 			$this->data[$this->alias]['cart_snapshop'] = serialize($this->data[$this->alias]['cart_snapshop']);
 		}
+	}
 
-		return true;
+/**
+ * Gets the unchanged order data
+ *
+ * This method is intended to be called only inside Order::beforeSave()
+ *
+ * @return void
+ */
+	protected function _getOrderRecordBeforeSave() {
+		if (!empty($this->data[$this->alias][$this->primaryKey])) {
+			$this->orderRecordBeforeSave = $this->find('first', array(
+				'contain' => array(),
+				'conditions' => array(
+					$this->alias . '.' . $this->primaryKey = $this->data[$this->alias][$this->primaryKey]
+				)
+			));
+		}
+	}
+
+/**
+ * Compares changes to the order model fields of the just saved record with the
+ * Order::orderRecordBeforeSave and triggers an event if any field was changed
+ *
+ * This method is intended to be called only inside Order::afterSave()
+ *
+ * @return void
+ */
+	protected function _detectOrderChange() {
+		if (!empty($this->orderRecordBeforeSave)) {
+			$changedFields = array();
+			foreach ($this->data[$this->alias] as $field => $value) {
+				if (isset($this->orderRecordBeforeSave[$this->alias][$field]) && $this->orderRecordBeforeSave[$this->alias][$field] !== $value) {
+					$changedFields[] = $value;
+				}
+			}
+			if (!empty($changedFields)) {
+				CakeEventManager::instance()->dispatch(new CakeEvent('Order.changed', $this, array(
+					$this->data,
+					$this->orderRecordBeforeSave,
+					$changedFields)));
+			}
+		}
 	}
 
 /**
@@ -140,6 +194,10 @@ class Order extends CartAppModel {
 			$this->data = $result;
 			CakeEventManager::dispatch(new CakeEvent('Order.created', $this, array($this->data)));
 		}
+
+		$this->_detectOrderChange();
+
+		$this->orderRecordBeforeSave = null;
 	}
 
 /**
