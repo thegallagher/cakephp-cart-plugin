@@ -128,7 +128,7 @@ class CartHelper extends AppHelper {
 		$options = Set::merge($optionDefaults, $options);
 
 		if (!isset($url['item'])) {
-			throw new InvalidArgumentException(__('The 2nd argument $url array requires the item key to be present!'));
+			throw new InvalidArgumentException(__d('cart', 'The 2nd argument $url array requires the item key to be present!'));
 		}
 
 		return $this->Html->link($title, $url, $options);

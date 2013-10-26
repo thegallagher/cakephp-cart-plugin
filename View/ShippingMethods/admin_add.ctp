@@ -1,7 +1,7 @@
 <div class="shippingMethods form">
 <?php echo $this->Form->create('ShippingMethod', array('url' => array('action' => 'add')));?>
 	<fieldset>
- 		<legend><?php echo __('Admin Add Shipping Method');?></legend>
+ 		<legend><?php echo __d('cart', 'Admin Add Shipping Method');?></legend>
 	<?php
 		echo $this->Form->input('name');
 		echo $this->Form->input('price');
@@ -13,6 +13,6 @@
 </div>
 <div class="actions">
 	<ul>
-		<li><?php echo $this->Html->link(__('List Shipping Methods'), array('action' => 'index'));?></li>
+		<li><?php echo $this->Html->link(__d('cart', 'List Shipping Methods'), array('action' => 'index'));?></li>
 	</ul>
 </div>

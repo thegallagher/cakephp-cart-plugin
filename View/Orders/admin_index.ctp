@@ -3,13 +3,13 @@
 <?php
 	echo $this->Form->create();
 	echo $this->Form->input('invoice_number', array(
-		'label' => __('Invoice Number')));
+		'label' => __d('cart', 'Invoice Number')));
 	echo $this->Form->input('total', array(
-		'label' => __('Total')));
+		'label' => __d('cart', 'Total')));
 	echo $this->Form->input('username', array(
-		'label' => __('Username')));
+		'label' => __d('cart', 'Username')));
 	echo $this->Form->input('email', array(
-		'label' => __('Email')));
+		'label' => __d('cart', 'Email')));
 	echo $this->Form->end(__d('cart', 'Search'));
 ?>
 
@@ -18,12 +18,12 @@
 	<table class="table table-striped table-bordered table-condensed">
 		<thead>
 			<tr>
-				<th><?php echo $this->Paginator->sort('total', __('Total')); ?></th>
-				<th><?php echo $this->Paginator->sort('currency', __('Currency')); ?></th>
-				<th><?php echo $this->Paginator->sort('order_number', __('Order #')); ?></th>
-				<th><?php echo $this->Paginator->sort('invoice_number', __('Invoice #')); ?></th>
-				<th><?php echo $this->Paginator->sort('processor', __('Payment Method')); ?></th>
-				<th><?php echo $this->Paginator->sort('created', __('Created')); ?></th>
+				<th><?php echo $this->Paginator->sort('total', __d('cart', 'Total')); ?></th>
+				<th><?php echo $this->Paginator->sort('currency', __d('cart', 'Currency')); ?></th>
+				<th><?php echo $this->Paginator->sort('order_number', __d('cart', 'Order #')); ?></th>
+				<th><?php echo $this->Paginator->sort('invoice_number', __d('cart', 'Invoice #')); ?></th>
+				<th><?php echo $this->Paginator->sort('processor', __d('cart', 'Payment Method')); ?></th>
+				<th><?php echo $this->Paginator->sort('created', __d('cart', 'Created')); ?></th>
 			</tr>
 		</thead>
 		<tbody>

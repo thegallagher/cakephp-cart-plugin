@@ -59,7 +59,7 @@
 			'class' => 'btn btn-primary'));
 		echo $this->Form->end();
 
-		echo $this->Html->link(__('cart', 'Checkout'), array(
+		echo $this->Html->link(__d('cart', 'cart', 'Checkout'), array(
 			'controller' => 'checkout',
 			'action' => 'index'));
 	?>

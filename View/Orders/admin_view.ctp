@@ -1,13 +1,13 @@
-<h2><?php echo __('Your order #%s', $order['Order']['id']); ?></h2>
+<h2><?php echo __d('cart', 'Your order #%s', $order['Order']['id']); ?></h2>
 
 <dl>
-	<dt><?php echo __('Invoice Number'); ?></dt>
+	<dt><?php echo __d('cart', 'Invoice Number'); ?></dt>
 	<dd><?php echo h($order['Order']['invoice_number']); ?></dd>
-	<dt><?php echo __('Total'); ?></dt>
+	<dt><?php echo __d('cart', 'Total'); ?></dt>
 	<dd><?php echo h($order['Order']['total']); ?></dd>
-	<dt><?php echo __('Created'); ?></dt>
+	<dt><?php echo __d('cart', 'Created'); ?></dt>
 	<dd><?php echo h($order['Order']['created']); ?></dd>
-	<dt><?php echo __('Payment Method'); ?></dt>
+	<dt><?php echo __d('cart', 'Payment Method'); ?></dt>
 	<dd><?php echo h($order['Order']['processor']); ?></dd>
 </dl>
 
@@ -17,14 +17,14 @@
 	//debug($this->layout);
 ?>
 
-<h3><?php echo __('Ordered Items'); ?></h3>
+<h3><?php echo __d('cart', 'Ordered Items'); ?></h3>
 
 <table class="table table-striped table-bordered table-condensed">
 	<tr>
-		<th><?php echo $this->Paginator->sort('OrderItem.quantity', __('Quantity')); ?></th>
-		<th><?php echo $this->Paginator->sort('OrderItem.name', __('Name')); ?></th>
-		<th><?php echo $this->Paginator->sort('OrderItem.price', __('Price')); ?></th>
-		<th><?php echo $this->Paginator->sort('OrderItem.virtual', __('Virtual')); ?></th>
+		<th><?php echo $this->Paginator->sort('OrderItem.quantity', __d('cart', 'Quantity')); ?></th>
+		<th><?php echo $this->Paginator->sort('OrderItem.name', __d('cart', 'Name')); ?></th>
+		<th><?php echo $this->Paginator->sort('OrderItem.price', __d('cart', 'Price')); ?></th>
+		<th><?php echo $this->Paginator->sort('OrderItem.virtual', __d('cart', 'Virtual')); ?></th>
 	</tr>
 	<?php foreach ($orderItems as $item) : ?>
 		<tr>
@@ -40,9 +40,9 @@
 			<td>
 				<?php
 					if ($item['OrderItem']['virtual'] == 1) {
-						echo __('Yes');
+						echo __d('cart', 'Yes');
 					} else {
-						echo __('No');
+						echo __d('cart', 'No');
 					}
 				?>
 			</td>

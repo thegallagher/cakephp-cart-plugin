@@ -1,7 +1,7 @@
-<h2><?php echo __('Review Your Order')?></h2>
+<h2><?php echo __d('cart', 'Review Your Order')?></h2>
 <p>
 	<?php 
-		echo __('Please review your order and and click below to complete your payment.');
+		echo __d('cart', 'Please review your order and and click below to complete your payment.');
 	?>
 </p>
 
@@ -35,7 +35,7 @@
 </table>
 
 
-<h3><?php __('You must click on the "Complete my purchase" button below to complete your purchase'); ?></h3>
+<h3><?php __d('cart', 'You must click on the "Complete my purchase" button below to complete your purchase'); ?></h3>
 <?php 
 	echo $this->Form->create('Checkout', array('url' => env('REQUEST_URI')));
 	echo $this->Form->hidden('confirm_order', array('value' => 1));
@@ -47,7 +47,7 @@
 ?>
  
 <?php
-	echo $this->Form->submit(__('Complete my order', true), array(
+	echo $this->Form->submit(__d('cart', 'Complete my order', true), array(
 		'class' => 'btn btn-primary',
 		'div' => false,
 		'name' => 'complete',));

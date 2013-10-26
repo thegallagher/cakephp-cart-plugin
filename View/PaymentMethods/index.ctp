@@ -1,6 +1,6 @@
-<h2><?php echo __('Payment Methods'); ?></h2>
+<h2><?php echo __d('cart', 'Payment Methods'); ?></h2>
 <p>
-	<?php echo __('Please choose your payment method.'); ?>
+	<?php echo __d('cart', 'Please choose your payment method.'); ?>
 </p>
 <?php if (!empty($paymentMethods)) : ?>
 	<?php echo $this->Form->create(); ?>
@@ -17,6 +17,6 @@
 				</li>
 			<?php endforeach; ?>
 		</ul>
-	<?php echo $this->Form->submit(__('Submit')); ?>
+	<?php echo $this->Form->submit(__d('cart', 'Submit')); ?>
 	<?php echo $this->Form->end(); ?>
 <?php endif; ?>

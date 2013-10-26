@@ -8,6 +8,7 @@ App::uses('CartAppController', 'Cart.Controller');
  * @license MIT
  */
 class ShippingMethodsController extends CartAppController {
+
 /**
  * beforeFilter callback
  *
@@ -19,7 +20,7 @@ class ShippingMethodsController extends CartAppController {
 	public function beforeFilter() {
 		parent::beforeFilter();
 
-		if (Configure::read('Cart.anonymousCheckout') == true) {
+		if (Configure::read('Cart.anonymousCheckout') === true) {
 			$this->Auth->allow('*');
 		}
 	}
@@ -46,7 +47,7 @@ class ShippingMethodsController extends CartAppController {
 			$this->Session->setFlash($e->getMessage());
 			$this->redirect(array('action' => 'index'));
 		}
-		$this->set(compact('shippingMethod')); 
+		$this->set(compact('shippingMethod'));
 	}
 
 /**
@@ -56,7 +57,7 @@ class ShippingMethodsController extends CartAppController {
  */
 	public function admin_index() {
 		$this->ShippingMethod->recursive = 0;
-		$this->set('shippingMethods', $this->Paginator->paginate()); 
+		$this->set('shippingMethods', $this->Paginator->paginate());
 	}
 
 /**
@@ -72,7 +73,7 @@ class ShippingMethodsController extends CartAppController {
 			$this->Session->setFlash($e->getMessage());
 			$this->redirect(array('action' => 'index'));
 		}
-		$this->set(compact('shippingMethod')); 
+		$this->set(compact('shippingMethod'));
 	}
 
 /**
@@ -84,7 +85,7 @@ class ShippingMethodsController extends CartAppController {
 		try {
 			$result = $this->ShippingMethod->add($this->request->data);
 			if ($result === true) {
-				$this->Session->setFlash(__('The shipping method has been saved', true));
+				$this->Session->setFlash(__d('cart', 'The shipping method has been saved', true));
 				$this->redirect(array('action' => 'index'));
 			}
 		} catch (OutOfBoundsException $e) {
@@ -105,9 +106,8 @@ class ShippingMethodsController extends CartAppController {
 		try {
 			$result = $this->ShippingMethod->edit($id, $this->request->data);
 			if ($result === true) {
-				$this->Session->setFlash(__('Shipping Method saved', true));
+				$this->Session->setFlash(__d('cart', 'Shipping Method saved', true));
 				$this->redirect(array('action' => 'view', $this->ShippingMethod->data['ShippingMethod']['id']));
-				
 			} else {
 				$this->request->data = $result;
 			}
@@ -115,7 +115,6 @@ class ShippingMethodsController extends CartAppController {
 			$this->Session->setFlash($e->getMessage());
 			$this->redirect('/');
 		}
- 
 	}
 
 /**
@@ -128,7 +127,7 @@ class ShippingMethodsController extends CartAppController {
 		try {
 			$result = $this->ShippingMethod->validateAndDelete($id, $this->request->data);
 			if ($result === true) {
-				$this->Session->setFlash(__('Shipping method deleted', true));
+				$this->Session->setFlash(__d('cart', 'Shipping method deleted', true));
 				$this->redirect(array('action' => 'index'));
 			}
 		} catch (Exception $e) {

@@ -1,9 +1,9 @@
 <div class="shippingMethods index">
-<h2><?php echo __('Shipping Methods');?></h2>
+<h2><?php echo __d('cart', 'Shipping Methods');?></h2>
 <p>
 <?php
 echo $this->Paginator->counter(array(
-'format' => __('Page %page% of %pages%, showing %current% records out of %count% total, starting on record %start%, ending on %end%')
+'format' => __d('cart', 'Page %page% of %pages%, showing %current% records out of %count% total, starting on record %start%, ending on %end%')
 ));
 ?></p>
 <table cellpadding="0" cellspacing="0">
@@ -15,7 +15,7 @@ echo $this->Paginator->counter(array(
 	<th><?php echo $this->Paginator->sort('position');?></th>
 	<th><?php echo $this->Paginator->sort('created');?></th>
 	<th><?php echo $this->Paginator->sort('modified');?></th>
-	<th class="actions"><?php echo __('Actions');?></th>
+	<th class="actions"><?php echo __d('cart', 'Actions');?></th>
 </tr>
 <?php
 $i = 0;
@@ -48,9 +48,9 @@ foreach ($shippingMethods as $shippingMethod):
 			<?php echo $shippingMethod['ShippingMethod']['modified']; ?>
 		</td>
 		<td class="actions">
-			<?php echo $this->Html->link(__('View'), array('action' => 'view', $shippingMethod['ShippingMethod']['id'])); ?>
-			<?php echo $this->Html->link(__('Edit'), array('action' => 'edit', $shippingMethod['ShippingMethod']['id'])); ?>
-			<?php echo $this->Html->link(__('Delete'), array('action' => 'delete', $shippingMethod['ShippingMethod']['id'])); ?>
+			<?php echo $this->Html->link(__d('cart', 'View'), array('action' => 'view', $shippingMethod['ShippingMethod']['id'])); ?>
+			<?php echo $this->Html->link(__d('cart', 'Edit'), array('action' => 'edit', $shippingMethod['ShippingMethod']['id'])); ?>
+			<?php echo $this->Html->link(__d('cart', 'Delete'), array('action' => 'delete', $shippingMethod['ShippingMethod']['id'])); ?>
 		</td>
 	</tr>
 <?php endforeach; ?>
@@ -60,6 +60,6 @@ foreach ($shippingMethods as $shippingMethod):
 
 <div class="actions">
 	<ul>
-		<li><?php echo $this->Html->link(__('New Shipping Method'), array('action' => 'add')); ?></li>
+		<li><?php echo $this->Html->link(__d('cart', 'New Shipping Method'), array('action' => 'add')); ?></li>
 	</ul>
 </div>

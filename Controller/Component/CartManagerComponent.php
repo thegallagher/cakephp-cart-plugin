@@ -32,7 +32,8 @@ class CartManagerComponent extends Component {
 		'Auth',
 		'Session',
 		'Cookie',
-		'Cart.CartSession');
+		'Cart.CartSession'
+	);
 
 /**
  * Id of the active database cart
@@ -122,12 +123,16 @@ class CartManagerComponent extends Component {
 		}
 	}
 
+	public function initializeCart() {
+		$this->_initializeCart();
+	}
+
 /**
  * Initializes the cart data from session or database depending on if user is logged in or not and if the cart is present or not
  *
  * @return void
  */
-	protected function _initalizeCart() {
+	protected function _initializeCart() {
 		extract($this->settings);
 		$userId = $this->Auth->user('id');
 		$this->CartModel = ClassRegistry::init($cartModel);
@@ -159,11 +164,12 @@ class CartManagerComponent extends Component {
 /**
  * Component startup callback
  *
+ * @param Controller $Controller
  * @return void
  */
-	public function startup(Controller $controller) {
+	public function startup(Controller $Controller) {
 		$this->_setLoggedInStatus();
-		$this->_initalizeCart();
+		$this->_initializeCart();
 		extract($this->settings);
 		if ($this->Controller->action == $buyAction && !method_exists($this->Controller, $buyAction)) {
 			$this->captureBuy();
@@ -173,10 +179,12 @@ class CartManagerComponent extends Component {
 /**
  * Captures a buy from a post or get request
  *
+ * @throws InternalErrorException
  * @param boolean $returnItem
+ * @param array $options
  * @return mixed False if the catpure failed array with item data on success
  */
-	public function captureBuy($returnItem = false) {
+	public function captureBuy($returnItem = false, $options = array()) {
 		extract($this->settings);
 
 		if ($this->Controller->request->is('get')) {
@@ -188,7 +196,7 @@ class CartManagerComponent extends Component {
 		}
 		$type = $this->getType($data);
 		if (!$this->typeAllowed($type)) {
-			throw new InternalErrorException(__('Type %s is not allowed', $type));
+			throw new InternalErrorException(__d('cart', 'Type %s is not allowed', $type));
 		}
 
 		if (!$data) {
@@ -224,7 +232,7 @@ class CartManagerComponent extends Component {
 /**
  * Checks if the increment/decrement/update type is allowed.
  *
- * @param string|array $data array or type string
+ * @param string|array $type array or type string
  * @return boolean The type is allowed or not
  */
 	public function typeAllowed($type) {
@@ -265,8 +273,11 @@ class CartManagerComponent extends Component {
 	}
 
 /**
+ * Update an item
  *
  * @param array $data
+ * @param boolean $recalculate
+ * @return void
  */
 	public function updateItem($data, $recalculate = true) {
 		$type = $this->getType($data);
@@ -303,6 +314,7 @@ class CartManagerComponent extends Component {
  * want to be present in the before
  *
  * @param array $data
+ * @param string $type
  * @return array
  */
 	protected function _additionalData($data, $type = 'update') {
@@ -333,7 +345,7 @@ class CartManagerComponent extends Component {
 	public function afterAddItemRedirect($item) {
 		extract($this->settings);
 		if ($item === true) {
-			$this->Session->setFlash(__d('cart', 'Item was succesfully removed from your cart'));
+			$this->Session->setFlash(__d('cart', 'Item was successfully removed from your cart'));
 		} else {
 			$this->Session->setFlash(__d('cart', 'You now have %s %s in your cart', $item['quantity'], $item['name']));
 		}
@@ -389,6 +401,7 @@ class CartManagerComponent extends Component {
 /**
  * Adds an item to the cart, the session and database if a user is logged in
  *
+ * @throws InternalErrorException
  * @param array $data
  * @param boolean $recalculate
  * @return boolean
@@ -400,12 +413,15 @@ class CartManagerComponent extends Component {
 		}
 
 		$Event = new CakeEvent('CartManager.beforeAddItem', $this, array($data));
-		$this->_EventManager->dispatch($Event);;
+		$this->_EventManager->dispatch($Event);
+		if ($Event->isStopped()) {
+
+		}
 
 		$Model = ClassRegistry::init($data['CartsItem']['model']);
 
 		if (!$Model->hasMethod('isBuyable') || !$Model->hasMethod('beforeAddToCart')) {
-			throw new InternalErrorException(__('The model %s is not implementing isBuyable() or beforeAddToCart() or is not using the BuyableBehavior!', get_class($Model)));
+			throw new InternalErrorException(__d('cart', 'The model %s is not implementing isBuyable() or beforeAddToCart() or is not using the BuyableBehavior!', get_class($Model)));
 		}
 
 		if (!$Model->isBuyable($data)) {
@@ -433,6 +449,9 @@ class CartManagerComponent extends Component {
 
 		$Event = new CakeEvent('CartManager.afterAddItem', $this, array($result));
 		$this->_EventManager->dispatch($Event);
+		if ($Event->isStopped()) {
+
+		}
 
 		return $result;
 	}
@@ -470,8 +489,7 @@ class CartManagerComponent extends Component {
 /**
  * Drops all items and re-initializes the cart
  *
- * @param array $data
- * @return void
+ * @return boolean
  */
 	public function emptyCart() {
 		if ($this->_isLoggedIn) {
@@ -484,7 +502,7 @@ class CartManagerComponent extends Component {
 
 		$result = $this->CartSession->emptyCart();
 
-		$this->_initalizeCart();
+		$this->_initializeCart();
 		return $result;
 	}
 
@@ -499,7 +517,7 @@ class CartManagerComponent extends Component {
 	}
 
 /**
- * Find if an item already exists in the cart
+ * Find if an item that already exists in the cart
  *
  * @param mixed $id integer or string uuid
  * @param string $model Model name
@@ -546,7 +564,7 @@ class CartManagerComponent extends Component {
  * @return boolean
  */
 	public function requiresShipping() {
-		return (bool) $this->Session->read($this->settings['sessionKey'] . '.Cart.requires_shipping');
+		return (bool)$this->Session->read($this->settings['sessionKey'] . '.Cart.requires_shipping');
 	}
 
 /**
@@ -595,7 +613,7 @@ class CartManagerComponent extends Component {
  *
  * @param $items
  * @param string $type Buy type, 'update' will replace quantity if present in cart, 'increment' will add to existing quantity
- * @internal param array $data array of items
+ * @throws Exception
  * @return boolean
  */
 	public function updateItems($items, $type = 'update') {

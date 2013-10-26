@@ -8,6 +8,7 @@ App::uses('CartAppModel', 'Cart.Model');
  * @license MIT
  */
 class ShippingMethod extends CartAppModel {
+
 /**
  * Display field name
  *
@@ -45,7 +46,7 @@ class ShippingMethod extends CartAppModel {
 				$this->data = array_merge($data, $result);
 				return true;
 			} else {
-				throw new OutOfBoundsException(__('Could not save the shippingMethod, please check your inputs.', true));
+				throw new OutOfBoundsException(__d('cart', 'Could not save the shippingMethod, please check your inputs.', true));
 			}
 			return $return;
 		}
@@ -67,7 +68,7 @@ class ShippingMethod extends CartAppModel {
 				)));
 
 		if (empty($shippingMethod)) {
-			throw new OutOfBoundsException(__('Invalid Shipping Method', true));
+			throw new OutOfBoundsException(__d('cart', 'Invalid Shipping Method', true));
 		}
 		$this->set($shippingMethod);
 
@@ -99,7 +100,7 @@ class ShippingMethod extends CartAppModel {
 				"{$this->alias}.{$this->primaryKey}" => $id)));
 
 		if (empty($shippingMethod)) {
-			throw new OutOfBoundsException(__('Invalid Shipping Method', true));
+			throw new OutOfBoundsException(__d('cart', 'Invalid Shipping Method', true));
 		}
 
 		return $shippingMethod;
@@ -117,11 +118,13 @@ class ShippingMethod extends CartAppModel {
 	public function validateAndDelete($id = null, $data = array()) {
 		$shippingMethod = $this->find('first', array(
 			'conditions' => array(
-				"{$this->alias}.{$this->primaryKey}" => $id,
-				)));
+					$this->alias . '.' . $this->primaryKey => $id,
+				)
+			)
+		);
 
 		if (empty($shippingMethod)) {
-			throw new OutOfBoundsException(__('Invalid Shipping Method', true));
+			throw new OutOfBoundsException(__d('cart', 'Invalid Shipping Method', true));
 		}
 
 		$this->data['shippingMethod'] = $shippingMethod;
@@ -139,7 +142,7 @@ class ShippingMethod extends CartAppModel {
 				}
 			}
 			$this->validate = $tmp;
-			throw new Exception(__('You need to confirm to delete this Shipping Method', true));
+			throw new Exception(__d('cart', 'You need to confirm to delete this Shipping Method', true));
 		}
 	}
 

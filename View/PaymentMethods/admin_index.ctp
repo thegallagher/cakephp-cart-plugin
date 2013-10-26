@@ -1,4 +1,4 @@
-<h2><?php echo __('Payment Methods'); ?></h2>
+<h2><?php echo __d('cart', 'Payment Methods'); ?></h2>
 
 <?php if (!empty($paymentMethods)) : ?>
 	<ul class="payment-method-list">

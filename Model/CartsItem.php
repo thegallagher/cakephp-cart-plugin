@@ -123,6 +123,20 @@ class CartsItem extends CartAppModel {
 	}
 
 /**
+ * moveItem
+ *
+ * @return void
+ */
+	public function moveItem($fromCartId, $itemData, $toCartId) {
+		$item = $this->find('first', array(
+			'contain' => array(),
+			'conditions' => array(
+				$this->alias . '.cart_id' => $fromCartId,
+				$this->alias . '.model' => $itemData['model'],
+				$this->alias . '.foreign_key' => $itemData['foreign_key'])));
+	}
+
+/**
  * Add
  *
  * @return void
