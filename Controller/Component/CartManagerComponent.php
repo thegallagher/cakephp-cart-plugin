@@ -194,6 +194,7 @@ class CartManagerComponent extends Component {
 		if ($this->Controller->request->is('post')) {
 			$data = $this->postBuy();
 		}
+
 		$type = $this->getType($data);
 		if (!$this->typeAllowed($type)) {
 			throw new InternalErrorException(__d('cart', 'Type %s is not allowed', $type));

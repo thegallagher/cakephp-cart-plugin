@@ -51,7 +51,8 @@ class CartsController extends CartAppController {
 /**
  * Shows a cart for a user
  *
- * @param
+ * @param null $cartId
+ * @internal param $string $cartId UUID
  * @return void
  */
 	public function view($cartId = null) {
@@ -59,7 +60,11 @@ class CartsController extends CartAppController {
 			$this->CartManager->updateItems($this->request->data['CartsItem']);
 		}
 
-		$cart = $this->CartManager->content();
+		if (!empty($cartId)) {
+			$cart = $this->Cart->view($cartId, $this->Auth->user('id'));
+		} else {
+			$cart = $this->CartManager->content();
+		}
 
 		$this->request->data = $cart;
 		$this->set('cart', $cart);
@@ -68,6 +73,8 @@ class CartsController extends CartAppController {
 
 /**
  * Removes an item from the cart
+ *
+ * @return void
  */
 	public function remove_item() {
 		if (!isset($this->request->named['model']) || !isset($this->request->named['id'])) {
@@ -78,7 +85,9 @@ class CartsController extends CartAppController {
 		$result = $this->CartManager->removeItem(array(
 			'CartsItem' => array(
 				'foreign_key' => $this->request->named['id'],
-				'model' => $this->request->named['model'])));
+				'model' => $this->request->named['model']
+			)
+		));
 
 		if ($result) {
 			$this->Session->setFlash(__d('cart', 'Item removed'));
@@ -112,10 +121,19 @@ class CartsController extends CartAppController {
 	}
 
 /**
- * 
+ * Deletes a cart
+ *
+ * @param string $cartId UUID
+ * @return void
  */
 	public function admin_delete($cartId = null) {
-		//$this->Cart->delete($cartId);
+		if (!$this->request->is('get')) {
+			if (!$this->Cart->delete($cartId)) {
+				$this->Session->setFlash(__d('cart', 'Cart deleted.'));
+				$this->redirect(array('action' => 'index'));
+			}
+		}
+		$this->set('cart', $this->Cart->view($cartId));
 	}
 
 }

@@ -20,7 +20,9 @@ class Cart extends CartAppModel {
  */
 	public $belongsTo = array(
 		'User' => array(
-			'className' => 'User'));
+			'className' => 'User'
+		)
+	);
 
 /**
  * hasMany associations
@@ -29,7 +31,9 @@ class Cart extends CartAppModel {
  */
 	public $hasMany = array(
 		'CartsItem' => array(
-			'className' => 'Cart.CartsItem'));
+			'className' => 'Cart.CartsItem'
+		)
+	);
 
 /**
  * Validation domain for translations
@@ -83,9 +87,12 @@ class Cart extends CartAppModel {
 	public function getActive($userId = null, $create = true) {
 		$result = $this->find('first', array(
 			'contain' => array(
-				'CartsItem'),
+				'CartsItem'
+			),
 			'conditions' => array(
-				$this->alias . '.user_id' => $userId)));
+				$this->alias . '.user_id' => $userId
+			)
+		));
 
 		if (!empty($result)) {
 			return $result;
@@ -109,24 +116,31 @@ class Cart extends CartAppModel {
 /**
  * Returns a cart and its contents
  *
+ * @throws NotFoundException
  * @param string $cartId
  * @param string $userId
+ * @return array
  */
 	public function view($cartId = null, $userId = null) {
+		$conditions = array(
+			$this->alias . '.' . $this->primaryKey => $cartId
+		);
+
+		if (!empty($userId)) {
+			$conditions[$this->alias . '.user_id'] = $userId;
+		}
+
 		$result = $this->find('first', array(
 			'contain' => array(
-				'CartsItem'),
-			'conditions' => array(
-				$this->alias . '.user_id' => $userId)));
+				'CartsItem'
+			),
+			'conditions' => $conditions
+		));
 
-		$this->create();
-		$result = $this->save(array(
-			$this->alias => array(
-				'user_id' => $userId,
-				'active' => 1,
-				'name' => __d('cart', 'My cart'))));
-		$result[$this->alias]['id'] = $this->id;
-		$result['CartItems'] = array();
+		if (empty($result) && empty($userId)) {
+			throw new NotFoundException(__d('cart', 'Cart not found!'));
+		}
+
 		return $result;
 	}
 
@@ -135,6 +149,7 @@ class Cart extends CartAppModel {
  *
  * @param string $cartId
  * @param array $itemData
+ * @return boolean
  */
 	public function addItem($cartId, $itemData) {
 		return $this->CartsItem->addItem($cartId, $itemData);
@@ -145,7 +160,7 @@ class Cart extends CartAppModel {
  *
  * @param string $cartId Cart UUID
  * @param $itemData
- * @return bool
+ * @return boolean
  */
 	public function removeItem($cartId, $itemData) {
 		return $this->CartsItem->removeItem($cartId, $itemData);
@@ -185,6 +200,8 @@ class Cart extends CartAppModel {
  *
  * @todo taxes
  * @todo discounts/coupons
+ * @param array $cartData
+ * @return array
  */
 	public function calculateCart($cartData = array()) {
 		$Event = new CakeEvent('Cart.beforeCalculateCart', $this, array($cartData));
@@ -209,7 +226,10 @@ class Cart extends CartAppModel {
 	}
 
 /**
+ * Applies tax rules to the cart
  *
+ * @param array $cartData
+ * @return array
  */
 	public function applyTaxRules($cartData) {
 		$Event = new CakeEvent('Cart.applyTaxRules', $this, array($cartData));
@@ -222,7 +242,10 @@ class Cart extends CartAppModel {
 	}
 
 /**
- * 
+ * Applies discount rules to the cart
+ *
+ * @param array $cartData
+ * @return array
  */
 	public function applyDiscounts($cartData) {
 		$Event = new CakeEvent('Cart.applyDiscounts', $this, array($cartData));
@@ -245,10 +268,9 @@ class Cart extends CartAppModel {
 
 		if (!empty($cartData['CartsItem'])) {
 			foreach ($cartData['CartsItem'] as $key => $item) {
-
-				$cartData['CartsItem'][$key]['total'] = (float) $item['quantity'] * (float) $item['price'];
-				$cartData[$this->alias]['total'] += (float) $cartData['CartsItem'][$key]['total'];
-				$cartData[$this->alias]['total_price'] += (float) $cartData['CartsItem'][$key]['total'];
+				$cartData['CartsItem'][$key]['total'] = (float)$item['quantity'] * (float)$item['price'];
+				$cartData[$this->alias]['total'] += (float)$cartData['CartsItem'][$key]['total'];
+				$cartData[$this->alias]['total_price'] += (float)$cartData['CartsItem'][$key]['total'];
 			}
 		}
 
@@ -262,8 +284,6 @@ class Cart extends CartAppModel {
  * happens but after the user was authenticated if you want to take the items
  * from the non-logged in user into the users database cart.
  *
- * @todo finish me
- *
  * @param integer|string $cartId
  * @param array $cartItems
  * @return void
@@ -272,7 +292,9 @@ class Cart extends CartAppModel {
 		$dbItems = $this->CartsItem->find('all', array(
 			'contain' => array(),
 			'conditions' => array(
-				'CartsItem.cart_id' => $cartId)));
+				'CartsItem.cart_id' => $cartId
+			)
+		));
 
 		foreach ($cartItems as $cartKey => $cartItem) {
 			$matched = false;
