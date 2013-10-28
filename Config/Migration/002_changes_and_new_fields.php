@@ -38,7 +38,7 @@ class ChangesAndNewFields extends CakeMigration {
 			'create_field' => array(
 				'orders' => array(
 					'order_item_count' => array('type' => 'integer', 'null' => false, 'default' => '0', 'length' => 8),
-					'order_number' => array('type'=>'string', 'null' => true, 'default' => NULL, 'length' => 64),
+					'order_number' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 64),
 				),
 				'carts_items' => array(
 					'quantity_limit' => array('type' => 'integer', 'null' => false, 'default' => '0', 'length' => 8),

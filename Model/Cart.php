@@ -52,12 +52,17 @@ class Cart extends CartAppModel {
 			'required' => array(
 				'rule' => array('notEmpty'),
 				'required' => true, 'allowEmpty' => false,
-				'message' => 'Please enter a name for your cart.')),
+				'message' => 'Please enter a name for your cart.'
+			)
+		),
 		'user_id' => array(
 			'required' => array(
 				'rule' => array('notEmpty'),
 				'required' => true, 'allowEmpty' => false,
-				'message' => 'You have to add a user id.')));
+				'message' => 'You have to add a user id.'
+			)
+		)
+	);
 
 /**
  * Checks if a cart is active or not
@@ -73,7 +78,9 @@ class Cart extends CartAppModel {
 		$result = $this->find('count', array(
 			'conditions' => array(
 				$this->alias . '.active' => 1,
-				$this->alias . '.' . $this->primaryKey => $cartId)));
+				$this->alias . '.' . $this->primaryKey => $cartId)
+			)
+		);
 
 		return ($result != 0);
 	}
@@ -82,6 +89,7 @@ class Cart extends CartAppModel {
  * Returns the active cart for a user, if there is no one it will create one and return it
  *
  * @param string user uuid
+ * @param boolean $create
  * @return array
  */
 	public function getActive($userId = null, $create = true) {
@@ -90,6 +98,7 @@ class Cart extends CartAppModel {
 				'CartsItem'
 			),
 			'conditions' => array(
+				$this->alias . '.active' => 1,
 				$this->alias . '.user_id' => $userId
 			)
 		));
@@ -107,10 +116,42 @@ class Cart extends CartAppModel {
 			$this->alias => array(
 				'user_id' => $userId,
 				'active' => 1,
-				'name' => __d('cart', 'My cart'))));
+				'name' => __d('cart', 'My cart'))
+			)
+		);
 
 		$result[$this->alias]['id'] = $this->getLastInsertId();
 		return $result;
+	}
+
+/**
+ * Sets a cart as active cart in the case there multiple carts present for an user
+ *
+ * @throws NotFoundException
+ * @param string $cartId
+ * @param string $userId
+ * @return boolean
+ */
+	public function setActive($cartId, $userId = null) {
+		$result = $this->find('first', array(
+			'contain' => array(),
+			'conditions' => array(
+				$this->alias . '.' . $this->primaryKey => $userId,
+				$this->alias . '.user_id' => $userId
+			)
+		));
+
+		if (empty($result)) {
+			throw new NotFoundException(__d('cart', 'Invalid cart!'));
+		}
+
+		$this->updateAll(
+			array('active' => 0),
+			array('user_id' => $userId)
+		);
+
+		$this->id = $cartId;
+		return $this->saveField('active', 1);
 	}
 
 /**
@@ -169,6 +210,7 @@ class Cart extends CartAppModel {
 /**
  * Drops the cart an all its items
  *
+ * @param string $cartId
  * @return boolean
  */
 	public function emptyCart($cartId) {
@@ -312,9 +354,30 @@ class Cart extends CartAppModel {
 	}
 
 /**
+ * Add a new cart
+ *
+ * @param array $postData
+ * @param $userId
+ * @return boolean
+ */
+	public function add($postData, $userId = null) {
+		if (!empty($userId)) {
+			$postData[$this->alias]['user_id'] = $userId;
+		}
+		$this->create();
+		$result = $this->save($postData);
+		if ($result) {
+			$result[$this->alias][$this->primaryKey] = $this->getLastInsertID();
+			return true;
+		}
+		return false;
+	}
+
+/**
  * 
  */
 	public function confirmCheckout($data) {
 		return (isset($data[$this->alias]['confirm_checkout']) && $data[$this->alias]['confirm_checkout'] == 1);
 	}
+
 }

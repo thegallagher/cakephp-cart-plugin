@@ -18,7 +18,8 @@ class CartsController extends CartAppController {
  */
 	public $components = array(
 		'Cart.CartManager',
-		'Session');
+		'Session'
+	);
 
 /**
  * beforeFilter callback
@@ -69,6 +70,20 @@ class CartsController extends CartAppController {
 		$this->request->data = $cart;
 		$this->set('cart', $cart);
 		$this->set('requiresShipping', $this->CartManager->requiresShipping());
+	}
+
+/**
+ * Adds a new cart
+ *
+ * @return boolean
+ */
+	public function add() {
+		if (!$this->request->is('get')) {
+			if ($this->Cart->add($this->request->data)) {
+				$this->Session->setFlash(__d('cart', 'New cart created'));
+				$this->redirect(array('action' => 'view', $this->Cart->data['Cart']['id']));
+			}
+		}
 	}
 
 /**

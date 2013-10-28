@@ -195,8 +195,8 @@ class CartManagerComponent extends Component {
 			$data = $this->postBuy();
 		}
 
-		$type = $this->getType($data);
-		if (!$this->typeAllowed($type)) {
+		$type = $this->getItemAction($data);
+		if (!$this->itemActionAllowed($type)) {
 			throw new InternalErrorException(__d('cart', 'Type %s is not allowed', $type));
 		}
 
@@ -236,9 +236,9 @@ class CartManagerComponent extends Component {
  * @param string|array $type array or type string
  * @return boolean The type is allowed or not
  */
-	public function typeAllowed($type) {
+	public function itemActionAllowed($type) {
 		if (is_array($type)) {
-			$type = $this->getType($type);
+			$type = $this->getItemAction($type);
 		}
 		if (in_array($type, array('update', 'remove'))) {
 			$key = $type;
@@ -262,7 +262,7 @@ class CartManagerComponent extends Component {
  * @param array $data
  * @return string type for the buy action
  */
-	public function getType($data) {
+	public function getItemAction($data) {
 		if (!empty($data['CartsItem']['increment'])) {
 			return 'increment';
 		} elseif (!empty($data['CartsItem']['decrement'])) {
@@ -281,7 +281,7 @@ class CartManagerComponent extends Component {
  * @return void
  */
 	public function updateItem($data, $recalculate = true) {
-		$type = $this->getType($data);
+		$type = $this->getItemAction($data);
 		$data = $this->_additionalData($data, $type);
 		if ($type == 'update') {
 			return $this->addItem($data, $recalculate);

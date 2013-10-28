@@ -25,15 +25,15 @@ class CartsItemFixture extends CakeTestFixture {
  * @var array
  */
 	public $fields = array(
-		'id' => array('type'=>'string', 'null' => false, 'default' => NULL, 'length' => 36, 'key' => 'primary'),
-		'cart_id' => array('type'=>'string', 'null' => true, 'default' => NULL, 'length' => 36),
-		'foreign_key' => array('type'=>'string', 'null' => true, 'default' => NULL, 'length' => 36),
-		'model' => array('type'=>'string', 'null' => true, 'default' => NULL, 'length' => 64),
-		'quantity' => array('type'=>'integer', 'null' => true, 'default' => NULL, 'length' => 4),
-		'name' => array('type'=>'string', 'null' => true, 'default' => NULL),
-		'price' => array('type'=>'float', 'null' => true, 'default' => NULL),
-		'created' => array('type'=>'datetime', 'null' => true, 'default' => NULL),
-		'modified' => array('type'=>'datetime', 'null' => true, 'default' => NULL),
+		'id' => array('type' => 'string', 'null' => false, 'default' => null, 'length' => 36, 'key' => 'primary'),
+		'cart_id' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 36),
+		'foreign_key' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 36),
+		'model' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 64),
+		'quantity' => array('type' => 'integer', 'null' => true, 'default' => null, 'length' => 4),
+		'name' => array('type' => 'string', 'null' => true, 'default' => null),
+		'price' => array('type' => 'float', 'null' => true, 'default' => null),
+		'created' => array('type' => 'datetime', 'null' => true, 'default' => null),
+		'modified' => array('type' => 'datetime', 'null' => true, 'default' => null),
 		'indexes' => array(
 			'PRIMARY' => array('column' => 'id', 'unique' => 1)
 		)
@@ -53,6 +53,28 @@ class CartsItemFixture extends CakeTestFixture {
 			'quantity' => 1,
 			'name' => 'Eizo Flexscan S2431W',
 			'price' => 720.37,
+			'created' => '2012-01-01 12:30:00',
+			'modified' => '2012-01-01 12:30:00',
+		),
+		array(
+			'id' => 'carts-item-2',
+			'cart_id' => 'cart-2',
+			'foreign_key' => 'item-2',
+			'model' => 'Item',
+			'quantity' => 2,
+			'name' => 'CakePHP',
+			'price' => 999.10,
+			'created' => '2012-01-01 12:30:00',
+			'modified' => '2012-01-01 12:30:00',
+		),
+		array(
+			'id' => 'carts-item-3',
+			'cart_id' => 'cart-2',
+			'foreign_key' => 'item-3',
+			'model' => 'Item',
+			'quantity' => 15,
+			'name' => 'Low quality code',
+			'price' => 0.99,
 			'created' => '2012-01-01 12:30:00',
 			'modified' => '2012-01-01 12:30:00',
 		),

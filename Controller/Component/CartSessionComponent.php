@@ -40,8 +40,9 @@ class CartSessionComponent extends Component {
 /**
  * Adds an item to the cart or updates an existing item
  *
- * @param array
- * @return boolean
+ * @throws InvalidArgumentException
+ * @param array $item
+ * @return nuxed
  */
 	public function addItem($item) {
 		if (!isset($item['foreign_key']) || !isset($item['model'])) {
@@ -173,4 +174,5 @@ class CartSessionComponent extends Component {
 	public function emptyCart() {
 		return $this->delete();
 	}
+
 }

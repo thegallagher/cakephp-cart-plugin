@@ -63,6 +63,44 @@ class CartTest extends CakeTestCase {
 	}
 
 /**
+ * testGetActive
+ *
+ * @return void
+ */
+	public function testGetActive() {
+		$expected = array(
+			'Cart' => array(
+				'id' => 'cart-1',
+				'user_id' => 'user-1',
+				'name' => 'Default Cart',
+				'total' => '720.37',
+				'active' => true,
+				'item_count' => '1',
+				'created' => '2012-01-01 12:12:12',
+				'modified' => '2012-01-01 12:12:12'
+			),
+			'CartsItem' => array(
+				0 => array(
+					'id' => 'carts-item-1',
+					'cart_id' => 'cart-1',
+					'foreign_key' => 'item-1',
+					'model' => 'Item',
+					'quantity' => '1',
+					'name' => 'Eizo Flexscan S2431W',
+					'price' => '720.37',
+					'created' => '2012-01-01 12:30:00',
+					'modified' => '2012-01-01 12:30:00'
+				)
+			)
+		);
+		$result = $this->Cart->getActive('user-1');
+		$this->assertEqual($result, $expected);
+
+		$result = $this->Cart->getActive('user-does-not-exist', false);
+		$this->assertFalse($result);
+	}
+
+/**
  * testRequiresShipping
  *
  * @return void

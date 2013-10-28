@@ -113,7 +113,9 @@ class BuyableBehavior extends ModelBehavior {
 		$record = $Model->find('first', array(
 			'contain' => array(),
 			'conditions' => array(
-				$Model->alias . '.' . $Model->primaryKey => $cartsItem['CartsItem']['foreign_key'])));
+				$Model->alias . '.' . $Model->primaryKey => $cartsItem['CartsItem']['foreign_key'])
+			)
+		);
 
 		return $this->composeItemData($Model, $record, $cartsItem);
 	}
@@ -144,7 +146,8 @@ class BuyableBehavior extends ModelBehavior {
 			'foreign_key' => $record[$Model->alias][$Model->primaryKey],
 			'name' => $record[$Model->alias][$nameField],
 			'price' => $record[$Model->alias][$priceField],
-			'additional_data' => serialize($Model->additionalBuyData()));
+			'additional_data' => serialize($Model->additionalBuyData())
+		);
 
 		return Set::merge($cartsItem['CartsItem'], $result);
 	}

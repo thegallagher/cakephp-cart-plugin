@@ -28,14 +28,14 @@ class CartFixture extends CakeTestFixture {
  * @var array
  */
 	public $fields = array(
-		'id' => array('type'=>'string', 'null' => false, 'default' => NULL, 'length' => 36, 'key' => 'primary'),
-		'user_id' => array('type'=>'string', 'null' => true, 'default' => NULL, 'length' => 36),
-		'name' => array('type'=>'string', 'null' => true, 'default' => NULL),
-		'total' => array('type'=>'float', 'null' => true, 'default' => NULL),
-		'active' => array('type'=>'boolean', 'null' => true, 'default' => '0'),
-		'item_count' => array('type'=>'integer', 'null' => false, 'default' => 0, 'length' => 6),
-		'created' => array('type'=>'datetime', 'null' => true, 'default' => NULL),
-		'modified' => array('type'=>'datetime', 'null' => true, 'default' => NULL),
+		'id' => array('type' => 'string', 'null' => false, 'default' => null, 'length' => 36, 'key' => 'primary'),
+		'user_id' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 36),
+		'name' => array('type' => 'string', 'null' => true, 'default' => null),
+		'total' => array('type' => 'float', 'null' => true, 'default' => null),
+		'active' => array('type' => 'boolean', 'null' => true, 'default' => '0'),
+		'item_count' => array('type' => 'integer', 'null' => false, 'default' => 0, 'length' => 6),
+		'created' => array('type' => 'datetime', 'null' => true, 'default' => null),
+		'modified' => array('type' => 'datetime', 'null' => true, 'default' => null),
 		'indexes' => array(
 			'PRIMARY' => array('column' => 'id', 'unique' => 1)
 		)
@@ -51,8 +51,28 @@ class CartFixture extends CakeTestFixture {
 			'id' => 'cart-1',
 			'user_id' => 'user-1',
 			'name' => 'Default Cart',
-			'total' => '1000.00',
+			'total' => 720.37,
 			'active' => 1,
+			'item_count' => 1,
+			'created' => '2012-01-01 12:12:12',
+			'modified' => '2012-01-01 12:12:12'
+		),
+		array(
+			'id' => 'cart-2',
+			'user_id' => 'user-1',
+			'name' => 'Second Cart',
+			'total' => '1000.00',
+			'active' => 0,
+			'item_count' => 3,
+			'created' => '2012-01-01 12:12:12',
+			'modified' => '2012-01-01 12:12:12'
+		),
+		array(
+			'id' => 'cart-3',
+			'user_id' => 'user-2',
+			'name' => 'Default Cart',
+			'total' => '1000.00',
+			'active' => 0,
 			'item_count' => 1,
 			'created' => '2012-01-01 12:12:12',
 			'modified' => '2012-01-01 12:12:12'

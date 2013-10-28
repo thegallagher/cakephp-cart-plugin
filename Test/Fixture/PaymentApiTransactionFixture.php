@@ -28,13 +28,13 @@ class PaymentApiTransactionFixture extends CakeTestFixture {
  * @var array
  */
 	public $fields = array(
-		'id' => array('type'=>'string', 'null' => false, 'default' => NULL, 'length' => 36, 'key' => 'primary'),
-		'order_id' => array('type'=>'string', 'null' => false, 'default' => NULL, 'length' => 36),
-		'token' => array('type'=>'string', 'null' => false, 'default' => NULL),
-		'processor' => array('type'=>'string', 'null' => false, 'default' => NULL),
-		'type' => array('type'=>'string', 'null' => false, 'default' => NULL),
-		'message' => array('type'=>'text', 'null' => false, 'default' => NULL),
-		'created' => array('type'=>'datetime', 'null' => true, 'default' => NULL),
+		'id' => array('type' => 'string', 'null' => false, 'default' => null, 'length' => 36, 'key' => 'primary'),
+		'order_id' => array('type' => 'string', 'null' => false, 'default' => null, 'length' => 36),
+		'token' => array('type' => 'string', 'null' => false, 'default' => null),
+		'processor' => array('type' => 'string', 'null' => false, 'default' => null),
+		'type' => array('type' => 'string', 'null' => false, 'default' => null),
+		'message' => array('type' => 'text', 'null' => false, 'default' => null),
+		'created' => array('type' => 'datetime', 'null' => true, 'default' => null),
 		'indexes' => array(
 			'PRIMARY' => array('column' => 'id', 'unique' => 1),
 			'ORDER_INDEX' => array('column' => 'order_id')),
