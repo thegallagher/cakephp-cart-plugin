@@ -136,8 +136,13 @@ class Cart extends CartAppModel {
 		$result = $this->find('first', array(
 			'contain' => array(),
 			'conditions' => array(
-				$this->alias . '.' . $this->primaryKey => $userId,
+				$this->alias . '.' . $this->primaryKey => $cartId,
 				$this->alias . '.user_id' => $userId
+			),
+			'fields' => array(
+				$this->alias . '.' . $this->primaryKey,
+				$this->alias . '.active',
+				$this->alias . '.user_id',
 			)
 		));
 
@@ -145,13 +150,19 @@ class Cart extends CartAppModel {
 			throw new NotFoundException(__d('cart', 'Invalid cart!'));
 		}
 
+		if ($result[$this->alias]['active'] == 1) {
+			return false;
+		}
+
 		$this->updateAll(
 			array('active' => 0),
 			array('user_id' => $userId)
 		);
 
-		$this->id = $cartId;
-		return $this->saveField('active', 1);
+		if ($this->saveField('active', 1)) {
+			return true;
+		};
+		return false;
 	}
 
 /**
@@ -188,6 +199,8 @@ class Cart extends CartAppModel {
 /**
  * Adds and updates an item if it already exists in the cart
  *
+ * Passing this through to the join table model
+ *
  * @param string $cartId
  * @param array $itemData
  * @return boolean
@@ -199,6 +212,8 @@ class Cart extends CartAppModel {
 /**
  * Called from the CartManagerComponent when an item is removed from the cart
  *
+ * Passing this through to the join table model
+ *
  * @param string $cartId Cart UUID
  * @param $itemData
  * @return boolean
@@ -208,7 +223,7 @@ class Cart extends CartAppModel {
 	}
 
 /**
- * Drops the cart an all its items
+ * Drops the cart an all it's items
  *
  * @param string $cartId
  * @return boolean
@@ -242,29 +257,40 @@ class Cart extends CartAppModel {
  *
  * @todo taxes
  * @todo discounts/coupons
- * @param array $cartData
+ * @param array $data
+ * @param array $options
  * @return array
  */
-	public function calculateCart($cartData = array()) {
-		$Event = new CakeEvent('Cart.beforeCalculateCart', $this, array($cartData));
+	public function calculateCart($data, $options = array()) {
+		$Event = new CakeEvent('Cart.beforeCalculateCart', $this, array($data));
 		CakeEventManager::instance()->dispatch($Event);
-
-		if (isset($cartData['CartsItem'])) {
-			$cartData[$this->alias]['item_count'] = count($cartData['CartsItem']);
-		} else {
-			return $cartData[$this->alias]['total'] = 0.00;
+		if ($Event->isStopped()) {
+			return false;
 		}
 
-		$cart[$this->alias]['requires_shipping'] = $this->requiresShipping($cartData['CartsItem']);
+		if (isset($data['CartsItem'])) {
+			$data[$this->alias]['item_count'] = count($data['CartsItem']);
+		} else {
+			return $data[$this->alias]['total'] = 0.00;
+		}
 
-		$cartData = $this->applyDiscounts($cartData);
-		$cartData = $this->applyTaxRules($cartData);
-		$cartData = $this->calculateTotals($cartData);
+		$cart[$this->alias]['requires_shipping'] = $this->requiresShipping($data['CartsItem']);
 
-		$Event = new CakeEvent('Cart.afterCalculateCart', $this, array($cartData));
+		$data = $this->applyDiscounts($data);
+		$data = $this->applyTaxRules($data);
+		$data = $this->calculateTotals($data);
+
+		if (isset($data[$this->alias][$this->primaryKey])) {
+			$this->save($data, array(
+				'validate' => false,
+				'callbacks' => false,
+			));
+		}
+
+		$Event = new CakeEvent('Cart.afterCalculateCart', $this, array($data));
 		CakeEventManager::instance()->dispatch($Event);
 
-		return $cartData;
+		return $data;
 	}
 
 /**
@@ -276,10 +302,6 @@ class Cart extends CartAppModel {
 	public function applyTaxRules($cartData) {
 		$Event = new CakeEvent('Cart.applyTaxRules', $this, array($cartData));
 		CakeEventManager::instance()->dispatch($Event);
-
-		if ($Event->isStopped()) {
-
-		}
 		return $cartData;
 	}
 
@@ -292,9 +314,6 @@ class Cart extends CartAppModel {
 	public function applyDiscounts($cartData) {
 		$Event = new CakeEvent('Cart.applyDiscounts', $this, array($cartData));
 		CakeEventManager::instance()->dispatch($Event);
-		if ($Event->isStopped()) {
-
-		}
 		return $cartData;
 	}
 
@@ -364,10 +383,15 @@ class Cart extends CartAppModel {
 		if (!empty($userId)) {
 			$postData[$this->alias]['user_id'] = $userId;
 		}
+
 		$this->create();
 		$result = $this->save($postData);
 		if ($result) {
-			$result[$this->alias][$this->primaryKey] = $this->getLastInsertID();
+			$cartId = $this->getLastInsertID();
+			$result[$this->alias][$this->primaryKey] = $cartId;
+			if (isset($postData[$this->alias]['active']) && $postData[$this->alias]['active'] == 1) {
+				$this->setActive($cartId, $userId);
+			}
 			return true;
 		}
 		return false;

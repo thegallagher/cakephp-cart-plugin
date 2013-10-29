@@ -11,6 +11,7 @@ App::uses('Cart', 'Cart.Model');
  * @property Cart Cart
  */
 class CartTest extends CakeTestCase {
+
 /**
  * Fixtures
  *
@@ -18,9 +19,10 @@ class CartTest extends CakeTestCase {
  */
 	public $fixtures = array(
 		'plugin.Cart.Cart',
+		'plugin.Cart.CartsItem',
 		'plugin.Cart.Item',
 		'plugin.Cart.Order',
-		'plugin.Cart.CartsItem',
+		'plugin.Cart.User',
 	);
 
 /**
@@ -60,6 +62,40 @@ class CartTest extends CakeTestCase {
 		$this->Cart->cartId = 1;
 		$result = $this->Cart->addItem(1, array('CartsItem' => array(), 'model' => 'CartsItem', 'foreign_key' => '1'));
 		//debug($result);
+	}
+
+/**
+ * testIsActive
+ *
+ * @return void
+ */
+	public function testIsActive() {
+		$result = $this->Cart->isActive('cart-1');
+		$this->assertTrue($result);
+		$result = $this->Cart->isActive('cart-2');
+		$this->assertFalse($result);
+	}
+
+/**
+ * testSetActive
+ *
+ * @return void
+ */
+	public function testSetActive() {
+		$result = $this->Cart->setActive('cart-1', 'user-1');
+		$this->assertFalse($result);
+		$result = $this->Cart->setActive('cart-2', 'user-1');
+		$this->assertTrue($result);
+	}
+
+/**
+ * testSetActiveNotFoundException
+ *
+ * @expectedException NotFoundException
+ * @return void
+ */
+	public function testSetActiveNotFoundException() {
+		$this->Cart->setActive('invalid-cart', 'user-1');
 	}
 
 /**
@@ -128,9 +164,11 @@ class CartTest extends CakeTestCase {
 		$cart = array(
 			'CartsItem' => array(
 				array('price' => 12.01, 'quantity' => 2),
-				array('price' => 21.10, 'quantity' => 1)));
+				array('price' => 21.10, 'quantity' => 1)
+			)
+		);
 		$result = $this->Cart->calculateTotals($cart);
-		$this->assertEqual($result['Cart']['total'], 33.11);
+		$this->assertEqual($result['Cart']['total'], 45.12);
 	}
 
 /**
@@ -172,6 +210,21 @@ class CartTest extends CakeTestCase {
 		$this->assertEqual(count($itemsAfter), $itemCount + 1);
 		$this->assertEqual($itemsAfter[0]['CartsItem']['name'], 'Eizo Flexscan S2431W');
 		$this->assertEqual($itemsAfter[0]['CartsItem']['quantity'], 2);
+	}
+
+/**
+ * testAdd
+ *
+ * @return void
+ */
+	public function testAdd() {
+		$data = array(
+			'Cart' => array(
+				'name' => 'test'
+			)
+		);
+		$result = $this->Cart->add($data, 'user-1');
+		$this->assertTrue($result);
 	}
 
 }
