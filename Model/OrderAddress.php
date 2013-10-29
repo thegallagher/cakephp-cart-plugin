@@ -14,7 +14,8 @@ class OrderAddress extends CartAppModel {
  * @var array
  */
 	public $actsAs = array(
-		'Search.Searchable');
+		'Search.Searchable'
+	);
 
 /**
  * belongsTo associations
@@ -23,7 +24,9 @@ class OrderAddress extends CartAppModel {
  */
 	public $belongsTo = array(
 		'Order' => array(
-			'className' => 'Cart.Order'));
+			'className' => 'Cart.Order'
+		)
+	);
 
 /**
  * Validation rules
@@ -69,7 +72,7 @@ class OrderAddress extends CartAppModel {
 
 /**
  * Gets all addresses by user id ordered by primary address first and then first
- * name ascendencing
+ * name ascending
  *
  * @param string $userId
  * @return array

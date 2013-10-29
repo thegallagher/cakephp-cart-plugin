@@ -54,14 +54,46 @@ class CartTest extends CakeTestCase {
 	}
 
 /**
+ * testView
+ *
+ * @return void
+ */
+	public function testView() {
+		$result = $this->Cart->view('cart-1');
+		$this->assertTrue(is_array($result));
+		$this->assertEqual($result['Cart']['id'], 'cart-1');
+	}
+
+/**
+ * testView
+ *
+ * @expectedException NotFoundException
+ * @return void
+ */
+	public function testViewNotFoundException() {
+		$this->Cart->view('invalid-cart-id');
+	}
+
+/**
  * testAddItem
  *
  * @return void
  */
 	public function testAddItem() {
 		$this->Cart->cartId = 1;
-		$result = $this->Cart->addItem(1, array('CartsItem' => array(), 'model' => 'CartsItem', 'foreign_key' => '1'));
-		//debug($result);
+		$result = $this->Cart->addItem('cart-1',
+			array(
+				'model' => 'CartsItem',
+				'foreign_key' => '1',
+				'quantity' => 1,
+				'price' => 52.00,
+			)
+		);
+		$this->assertTrue(is_array($result));
+		$this->assertEqual($result['CartsItem']['model'], 'CartsItem');
+		$this->assertEqual($result['CartsItem']['foreign_key'], 1);
+		$this->assertEqual($result['CartsItem']['quantity'], 1);
+		$this->assertEqual($result['CartsItem']['price'], 52.00);
 	}
 
 /**
@@ -199,13 +231,19 @@ class CartTest extends CakeTestCase {
 					'model' => 'Item',
 					'foreign_key' => 'item-1',
 					'quantity' => 2,
-					'price' => 12)));
+					'price' => 12
+				)
+			)
+		);
+
 		$result = $this->Cart->mergeItems('cart-1', $sessionData['CartsItem']);
 
 		$itemsAfter = $this->Cart->CartsItem->find('all', array(
 			'contain' => array(),
 			'conditions' => array(
-				'cart_id' => 'cart-1')));
+				'cart_id' => 'cart-1'
+			)
+		));
 
 		$this->assertEqual(count($itemsAfter), $itemCount + 1);
 		$this->assertEqual($itemsAfter[0]['CartsItem']['name'], 'Eizo Flexscan S2431W');

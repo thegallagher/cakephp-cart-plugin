@@ -17,7 +17,9 @@ class CartsItem extends CartAppModel {
 	public $belongsTo = array(
 		'Cart' => array(
 			'className' => 'Cart.Cart',
-			'counterCache' => 'item_count'));
+			'counterCache' => 'item_count'
+		)
+	);
 
 /**
  * Validation parameters
@@ -49,7 +51,9 @@ class CartsItem extends CartAppModel {
 			'required' => array(
 				'rule' => array('notEmpty'),
 				'required' => true,
-				'allowEmpty' => false))
+				'allowEmpty' => false
+			)
+		)
 	);
 
 /**
@@ -84,7 +88,9 @@ class CartsItem extends CartAppModel {
 			'conditions' => array(
 				'cart_id' => $cartId,
 				'model' => $itemData['model'],
-				'foreign_key' => $itemData['foreign_key'])));
+				'foreign_key' => $itemData['foreign_key']
+			)
+		));
 
 		if (empty($item)) {
 			$item = array($this->alias => $itemData);
