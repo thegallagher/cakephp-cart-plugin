@@ -101,7 +101,8 @@ class CartManagerComponentTest extends CakeTestCase {
 		$this->Controller->request->params['named'] = array(
 			'item' => 'item-1',
 			'model' => 'Item',
-			'quantity' => 1);
+			'quantity' => 1
+		);
 
 		$this->CartManager->Controller->request->expects($this->any())
 			->method('is')
@@ -114,7 +115,9 @@ class CartManagerComponentTest extends CakeTestCase {
 			'CartsItem' => array(
 				'model' => 'Item',
 				'quantity' => 1,
-				'foreign_key' => 'item-1')));
+				'foreign_key' => 'item-1')
+			)
+		);
 	}
 
 /**
@@ -129,7 +132,9 @@ class CartManagerComponentTest extends CakeTestCase {
 			'CartsItem' => array(
 				'model' => 'Item',
 				'quantity' => 1,
-				'foreign_key' => 'item-1'));
+				'foreign_key' => 'item-1'
+			)
+		);
 
 		$this->CartManager->Controller->request->expects($this->any())
 			->method('is')
@@ -141,7 +146,9 @@ class CartManagerComponentTest extends CakeTestCase {
 			'CartsItem' => array(
 				'model' => 'Item',
 				'quantity' => 1,
-				'foreign_key' => 'item-1')));
+				'foreign_key' => 'item-1')
+			)
+		);
 	}
 
 /**
@@ -175,7 +182,7 @@ class CartManagerComponentTest extends CakeTestCase {
  * @return void
  */
 	public function testAfterAddItemRedirect() {
-		$this->CartManager->Controller =  $this->getMock('CartTestItemsController', array('redirect'));
+		$this->CartManager->Controller = $this->getMock('CartTestItemsController', array('redirect'));
 		$this->CartManager->settings['afterAddItemRedirect'] = '/bought';
 
 		$this->CartManager->Controller->expects($this->any())
@@ -185,4 +192,14 @@ class CartManagerComponentTest extends CakeTestCase {
 
 		$this->CartManager->afterAddItemRedirect(array('name' => 'CakePHP', 'quantity' => '1'));
 	}
+
+/**
+ * testCaptureBuy
+ *
+ * @return void
+ */
+	public function testCaptureBuy() {
+
+	}
+
 }

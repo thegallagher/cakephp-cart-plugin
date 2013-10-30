@@ -49,8 +49,10 @@ class OrdersController extends CartAppController {
 		$this->Paginator->settings = array(
 			'contain' => array(),
 			'conditions' => array(
-				'Order.user_id' => $userId),
-			'order' => 'Order.created DESC');
+				'Order.user_id' => $userId
+			),
+			'order' => 'Order.created DESC'
+		);
 		$this->set('orders', $this->Paginator->paginate());
 	}
 
@@ -89,6 +91,7 @@ class OrdersController extends CartAppController {
 /**
  * Displays a more detailed information about a single order
  *
+ * @param string $orderId UUID
  * @return void
  */
 	public function admin_view($orderId = null) {
@@ -107,7 +110,7 @@ class OrdersController extends CartAppController {
 	}
 
 /**
- * 
+ * @todo finish it
  */
 	public function admin_refund($orderId) {
 		$order = $this->Order->find('first', array(
@@ -117,7 +120,6 @@ class OrdersController extends CartAppController {
 		if ($this->request->is('post')) {
 			$this->Order->refund($orderId);
 		}
-
 	}
 
 }

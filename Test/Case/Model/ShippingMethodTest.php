@@ -28,11 +28,9 @@ class ShippingMethodTestCase extends CakeTestCase {
 	protected $_testsToRun = array();
 
 /**
- * Start Test callback
+ * setUp
  *
- * @param string $method
  * @return void
- * @access public
  */
 	public function setUp() {
 		$this->ShippingMethod = ClassRegistry::init('ShippingMethod');
@@ -41,16 +39,22 @@ class ShippingMethodTestCase extends CakeTestCase {
 	}
 
 /**
- * End Test callback
+ * tearDown
  *
- * @param string $method
  * @return void
- * @access public
  */
 	public function tearDown() {
-		parent::tearDown();
 		unset($this->ShippingMethod);
 		ClassRegistry::flush();
+	}
+
+/**
+ * testInstance
+ *
+ * @return void
+ */
+	public function testInstance() {
+		$this->assertTrue(is_a($this->ShippingMethod, 'ShippingMethod'));
 	}
 
 }

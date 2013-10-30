@@ -15,7 +15,8 @@ class Order extends CartAppModel {
  * @var array
  */
 	public $actsAs = array(
-		'Search.Searchable');
+		'Search.Searchable'
+	);
 
 /**
  * Order status
@@ -27,7 +28,8 @@ class Order extends CartAppModel {
 		'failed',
 		'completed',
 		'refunded',
-		'partial-refunded');
+		'partial-refunded'
+	);
 
 /**
  * belongsTo associations
@@ -175,9 +177,11 @@ class Order extends CartAppModel {
 /**
  * afterSave callback
  *
+ * @param boolean $created
+ * @param array $options
  * @var boolean $created
  */
-	public function afterSave($created) {
+	public function afterSave($created, $options = array()) {
 		if ($created) {
 			if (empty($this->data[$this->alias]['currency'])) {
 				$this->data[$this->alias]['currency'] = Configure::read('Cart.defaultCurrency');
