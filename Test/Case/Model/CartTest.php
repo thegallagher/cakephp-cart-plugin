@@ -265,4 +265,42 @@ class CartTest extends CakeTestCase {
 		$this->assertTrue($result);
 	}
 
+/**
+ * testCalculateCart
+ *
+ * @return void
+ */
+	public function testCalculateCart() {
+		$data = array(
+			'Cart' => array(
+				'id' => 'cart-1',
+				'active' => true,
+				'item_count' => '2',
+			),
+			'CartsItem' => array(
+				0 => array(
+					'id' => 'carts-item-1',
+					'cart_id' => 'cart-1',
+					'foreign_key' => 'item-1',
+					'model' => 'Item',
+					'quantity' => '1',
+					'name' => 'Eizo Flexscan S2431W',
+					'price' => '720.37',
+				),
+				1 => array(
+					'id' => 'carts-item-2',
+					'cart_id' => 'cart-1',
+					'foreign_key' => 'item-2',
+					'model' => 'Item',
+					'quantity' => '15',
+					'name' => 'Some other Item',
+					'price' => '0.59',
+				),
+			)
+		);
+
+		$result = $this->Cart->calculateCart($data);
+		$this->assertEqual($result['Cart']['total'], 729.22);
+	}
+
 }
