@@ -15,7 +15,8 @@ class CartAppModel extends AppModel {
  * @var array
  */
 	public $actsAs = array(
-		'Containable');
+		'Containable'
+	);
 
 /**
  * Validation domain for translations

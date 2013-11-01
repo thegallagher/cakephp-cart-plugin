@@ -31,27 +31,42 @@ class CartsItem extends CartAppModel {
 			'required' => array(
 				'rule' => array('notEmpty'),
 				'required' => true,
-				'allowEmpty' => false)),
+				'allowEmpty' => false
+			)
+		),
 		'foreign_key' => array(
 			'required' => array(
 				'rule' => array('notEmpty'),
 				'required' => true,
-				'allowEmpty' => false)),
+				'allowEmpty' => false
+			)
+		),
 		'model' => array(
 			'required' => array(
 				'rule' => array('notEmpty'),
 				'required' => true,
-				'allowEmpty' => false)),
+				'allowEmpty' => false
+			)
+		),
 		'price' => array(
 			'required' => array(
 				'rule' => array('notEmpty'),
 				'required' => true,
-				'allowEmpty' => false)),
+				'allowEmpty' => false
+			)
+		),
 		'quantity' => array(
 			'required' => array(
 				'rule' => array('notEmpty'),
 				'required' => true,
-				'allowEmpty' => false
+				'allowEmpty' => false,
+				'message' => 'You must enter a quantity'
+			),
+			'naturalNumber' => array(
+				'rule' => array('naturalNumber'),
+				'required' => true,
+				'allowEmpty' => false,
+				'message' => 'Must be a natural number'
 			)
 		)
 	);
@@ -60,9 +75,13 @@ class CartsItem extends CartAppModel {
  * Validates an item record set
  *
  * @param array $data
+ * @param boolean $loggedIn
  * @return void
  */
-	public function validateItem($data) {
+	public function validateItem($data, $loggedIn = false) {
+		if ($loggedIn === false) {
+			unset($this->validate['cart_id']);
+		}
 		$this->set($data);
 		return $this->validates();
 	}

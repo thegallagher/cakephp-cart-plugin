@@ -432,8 +432,7 @@ class CartManagerComponent extends Component {
 
 		$data = $ItemModel->beforeAddToCart($data);
 
-		$this->CartModel->CartsItem->set($data);
-		if ($data === false || !is_array($data) || !$this->CartModel->CartsItem->validates()) {
+		if ($data === false || !is_array($data) || !$this->CartModel->CartsItem->validateItem($data, $this->_isLoggedIn)) {
 			return false;
 		}
 
