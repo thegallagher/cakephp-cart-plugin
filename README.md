@@ -70,6 +70,16 @@ If you use another user model class in your application other than User you'll n
 Configure::write('Cart.models.User', 'AppUser');
 ```
 
+## How it works
+
+When an user is not logged in the all cart items will be added to the session.
+
+When the user logins in the session gets merged with the users currently active cart. If not cart was present in the database before it is created.
+
+For a logged in user the cart session data is always kept in sync with the database to preserve the items when the user comes back later.
+
+The CartManager will deal with all of this and make sure that items get added to the session and the configured cart model and the associated cart items table.
+
 ## How to do I extend or modify the cart?
 
 There two ways to modify the cart, depending on the kind of changes one might be better than the other one for your case.
