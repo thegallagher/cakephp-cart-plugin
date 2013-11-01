@@ -416,27 +416,31 @@ class CartManagerComponent extends Component {
 		$Event = new CakeEvent('CartManager.beforeAddItem', $this, array($data));
 		$this->_EventManager->dispatch($Event);
 		if ($Event->isStopped()) {
-
+			return false;
 		}
 
-		$Model = ClassRegistry::init($data['CartsItem']['model']);
+		$ItemModel = ClassRegistry::init($data['CartsItem']['model']);
 
-		if (!$Model->hasMethod('isBuyable') || !$Model->hasMethod('beforeAddToCart')) {
+		if (!$ItemModel->hasMethod('isBuyable') || !$ItemModel->hasMethod('beforeAddToCart')) {
 			throw new InternalErrorException(__d('cart', 'The model %s is not implementing isBuyable() or beforeAddToCart() or is not using the BuyableBehavior!', get_class($Model)));
 		}
 
-		if (!$Model->isBuyable($data)) {
+		if (!$ItemModel->isBuyable($data)) {
 			// throw exception?
 			return false;
 		}
 
-		$data = $Model->beforeAddToCart($data);
-		if ($data === false || !is_array($data)) {
+		$data = $ItemModel->beforeAddToCart($data);
+
+		$this->CartModel->CartsItem->set($data);
+		if ($data === false || !is_array($data) || !$this->CartModel->CartsItem->validates()) {
 			return false;
 		}
 
 		if ($this->_isLoggedIn) {
-			$data = $this->CartModel->addItem($this->_cartId, $data);
+			$data = $this->CartModel->addItem($this->_cartId, $data, array(
+				'validates' => false // Has been already validated before!
+			));
 			if ($data === false) {
 				return false;
 			}

@@ -72,9 +72,16 @@ class CartsItem extends CartAppModel {
  *
  * @param string $cartId
  * @param array $itemData
+ * @param array $options
+ * @throws InvalidArgumentException
  * @return mixed
  */
-	public function addItem($cartId, $itemData) {
+	public function addItem($cartId, $itemData, $options = array()) {
+		$defaults = array(
+			'validates' => true
+		);
+		$options = Set::merge($defaults, $options);
+
 		if (isset($itemData[$this->alias])) {
 			$itemData = $itemData[$this->alias];
 		}
@@ -100,7 +107,9 @@ class CartsItem extends CartAppModel {
 			$item[$this->alias] = Set::merge($item[$this->alias], $itemData);
 		}
 
-		return $this->save($item);
+		return $this->save($item, array(
+			'validates' => $options['validates']
+		));
 	}
 
 /**
