@@ -9,6 +9,7 @@ App::uses('CakeEventManager', 'Event');
  * @license MIT
  */
 class BuyableBehavior extends ModelBehavior {
+
 /**
  * Default settings
  * - recurring: Whether or not all items are recurring subscriptions [default: false]
@@ -33,7 +34,8 @@ class BuyableBehavior extends ModelBehavior {
 		'billingFrequencyField' => 'billing_frequency',
 		'billingPeriodField' => 'billing_period',
 		'defaultCurrency' => 'USD',
-		'maxQuantity' => PHP_INT_MAX);
+		'maxQuantity' => PHP_INT_MAX
+	);
 
 /**
  * Setup
@@ -60,13 +62,15 @@ class BuyableBehavior extends ModelBehavior {
 /**
  * Default method for additionalItemData model callback
  *
- * No additional data is returned
+ * No additional data is returned by default. Create this method in your model
+ * and return whatever you want to be end up in the additional data field.
  *
  * @param Model $Model
+ * @param array $record Data returned by BuyableBehavior::beforeAddToCart(), usually passed through in BuyableBehavior::composeItemData()
  * @return mixed Data to be serialized as additional data for the current item, null otherwise
  * @access public
  */
-	public function additionalBuyData(Model $Model) {
+	public function additionalBuyData(Model $Model, $record = array()) {
 		return array();
 	}
 
@@ -79,14 +83,20 @@ class BuyableBehavior extends ModelBehavior {
 	public function bindCartModel(Model $Model) {
 		extract($this->settings[$Model->alias]);
 		if (!isset($Model->hasAndBelongsToMany['Cart'])) {
-			$Model->bindModel(array(
-				'hasAndBelongsToMany' => array(
-					'Cart' => array(
-						'className' => 'Cart.Cart',
-						'foreignKey' => 'foreign_key',
-						'associationForeignKey' => 'cart_id',
-						'joinTable' => 'carts_items',
-						'with' => 'Cart.CartsItem'))), false);
+			$Model->bindModel(
+				array(
+					'hasAndBelongsToMany' => array(
+						'Cart' => array(
+							'className' => 'Cart.Cart',
+							'foreignKey' => 'foreign_key',
+							'associationForeignKey' => 'cart_id',
+							'joinTable' => 'carts_items',
+							'with' => 'Cart.CartsItem'
+						)
+					)
+				),
+				false
+			);
 		}
 	}
 
@@ -146,7 +156,7 @@ class BuyableBehavior extends ModelBehavior {
 			'foreign_key' => $record[$Model->alias][$Model->primaryKey],
 			'name' => $record[$Model->alias][$nameField],
 			'price' => $record[$Model->alias][$priceField],
-			'additional_data' => serialize($Model->additionalBuyData())
+			'additional_data' => serialize($Model->additionalBuyData($record))
 		);
 
 		return Set::merge($cartsItem['CartsItem'], $result);

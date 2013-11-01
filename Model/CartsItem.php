@@ -115,8 +115,10 @@ class CartsItem extends CartAppModel {
 /**
  * Called from the CartManagerComponent when an item is removed from the cart
  *
+ * @throws InvalidArgumentException
  * @param string $cartId Cart UUID
- * @parma $itemData
+ * @param $itemData
+ * @return boolean
  */
 	public function removeItem($cartId, $itemData) {
 		if (!isset($itemData['foreign_key']) || !isset($itemData['model'])) {
@@ -140,6 +142,7 @@ class CartsItem extends CartAppModel {
 /**
  * moveItem
  *
+ * @todo finish it
  * @return void
  */
 	public function moveItem($fromCartId, $itemData, $toCartId) {
@@ -148,12 +151,15 @@ class CartsItem extends CartAppModel {
 			'conditions' => array(
 				$this->alias . '.cart_id' => $fromCartId,
 				$this->alias . '.model' => $itemData['model'],
-				$this->alias . '.foreign_key' => $itemData['foreign_key'])));
+				$this->alias . '.foreign_key' => $itemData['foreign_key']
+			)
+		));
 	}
 
 /**
  * Add
  *
+ * @param array $data
  * @return void
  */
 	public function add($data) {

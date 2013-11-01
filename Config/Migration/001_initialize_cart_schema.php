@@ -29,7 +29,8 @@ class D287dbf03fef11e1b86c0800200c9a66 extends CakeMigration {
 					'created' => array('type' => 'datetime', 'null' => true, 'default' => null),
 					'modified' => array('type' => 'datetime', 'null' => true, 'default' => null),
 					'indexes' => array(
-						'PRIMARY' => array('column' => 'id', 'unique' => 1))
+						'PRIMARY' => array('column' => 'id', 'unique' => 1)
+					)
 				),
 				'order_addresses' => array(
 					'id' => array('type' => 'string', 'null' => false, 'default' => null, 'length' => 36, 'key' => 'primary'),
@@ -49,7 +50,8 @@ class D287dbf03fef11e1b86c0800200c9a66 extends CakeMigration {
 					'indexes' => array(
 						'PRIMARY' => array('column' => 'id', 'unique' => 1),
 						'USER_INDEX' => array('column' => 'user_id'),
-						'ORDER_INDEX' => array('column' => 'order_id'))
+						'ORDER_INDEX' => array('column' => 'order_id')
+					)
 				),
 				'carts_items' => array(
 					'id' => array('type' => 'string', 'null' => false, 'default' => null, 'length' => 36, 'key' => 'primary'),
@@ -64,7 +66,8 @@ class D287dbf03fef11e1b86c0800200c9a66 extends CakeMigration {
 					'created' => array('type' => 'datetime', 'null' => true, 'default' => null),
 					'modified' => array('type' => 'datetime', 'null' => true, 'default' => null),
 					'indexes' => array(
-						'PRIMARY' => array('column' => 'id', 'unique' => 1))
+						'PRIMARY' => array('column' => 'id', 'unique' => 1)
+					)
 				),
 				'orders' => array(
 					'id' => array('type' => 'string', 'null' => false, 'default' => null, 'length' => 36, 'key' => 'primary'),
@@ -88,7 +91,8 @@ class D287dbf03fef11e1b86c0800200c9a66 extends CakeMigration {
 						'PRIMARY' => array('column' => 'id', 'unique' => 1),
 						'USER_INDEX' => array('column' => 'user_id'),
 						'CART_INDEX' => array('column' => 'cart_id'),
-						'TOKEN_INDEX' => array('column' => 'token'))
+						'TOKEN_INDEX' => array('column' => 'token')
+					)
 				),
 				'order_items' => array(
 					'id' => array('type' => 'string', 'null' => false, 'default' => null, 'length' => 36, 'key' => 'primary'),
@@ -107,7 +111,8 @@ class D287dbf03fef11e1b86c0800200c9a66 extends CakeMigration {
 					'indexes' => array(
 						'PRIMARY' => array('column' => 'id', 'unique' => 1),
 						'FOREIGN_KEY_INDEX' => array('column' => 'foreign_key'),
-						'ORDER_INDEX' => array('column' => 'order_id')),
+						'ORDER_INDEX' => array('column' => 'order_id')
+					),
 				),
 				'cart_rules' => array(
 					'id' => array('type' => 'string', 'null' => false, 'default' => null, 'length' => 36, 'key' => 'primary'),
@@ -117,7 +122,8 @@ class D287dbf03fef11e1b86c0800200c9a66 extends CakeMigration {
 					'created' => array('type' => 'datetime', 'null' => true, 'default' => null),
 					'modified' => array('type' => 'datetime', 'null' => true, 'default' => null),
 					'indexes' => array(
-						'PRIMARY' => array('column' => 'id', 'unique' => 1))
+						'PRIMARY' => array('column' => 'id', 'unique' => 1)
+					)
 				),
 				'cart_rule_conditions' => array(
 					'id' => array('type' => 'string', 'null' => false, 'default' => null, 'length' => 36, 'key' => 'primary'),
@@ -139,7 +145,8 @@ class D287dbf03fef11e1b86c0800200c9a66 extends CakeMigration {
 					'created' => array('type' => 'datetime', 'null' => true, 'default' => null),
 					'modified' => array('type' => 'datetime', 'null' => true, 'default' => null),
 					'indexes' => array(
-						'PRIMARY' => array('column' => 'id', 'unique' => 1))
+						'PRIMARY' => array('column' => 'id', 'unique' => 1)
+					)
 				),
 				'payment_methods' => array(
 					'id' => array('type' => 'string', 'null' => false, 'default' => null, 'length' => 36, 'key' => 'primary'),
@@ -153,7 +160,8 @@ class D287dbf03fef11e1b86c0800200c9a66 extends CakeMigration {
 					'created' => array('type' => 'datetime', 'null' => true, 'default' => null),
 					'modified' => array('type' => 'datetime', 'null' => true, 'default' => null),
 					'indexes' => array(
-						'PRIMARY' => array('column' => 'id', 'unique' => 1))
+						'PRIMARY' => array('column' => 'id', 'unique' => 1)
+					)
 				),
 				'payment_api_transactions' => array(
 					'id' => array('type' => 'string', 'null' => false, 'default' => null, 'length' => 36, 'key' => 'primary'),
@@ -168,7 +176,8 @@ class D287dbf03fef11e1b86c0800200c9a66 extends CakeMigration {
 					'created' => array('type' => 'datetime', 'null' => true, 'default' => null),
 					'indexes' => array(
 						'PRIMARY' => array('column' => 'id', 'unique' => 1),
-						'ORDER_INDEX' => array('column' => 'order_id')),
+						'ORDER_INDEX' => array('column' => 'order_id')
+					),
 				),
 			),
 		),
