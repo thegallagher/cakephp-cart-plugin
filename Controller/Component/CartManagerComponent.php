@@ -422,7 +422,7 @@ class CartManagerComponent extends Component {
 		$ItemModel = ClassRegistry::init($data['CartsItem']['model']);
 
 		if (!$ItemModel->hasMethod('isBuyable') || !$ItemModel->hasMethod('beforeAddToCart')) {
-			throw new InternalErrorException(__d('cart', 'The model %s is not implementing isBuyable() or beforeAddToCart() or is not using the BuyableBehavior!', get_class($Model)));
+			throw new InternalErrorException(__d('cart', 'The model %s is not implementing isBuyable() or beforeAddToCart() or is not using the BuyableBehavior!', get_class($ItemModel)));
 		}
 
 		if (!$ItemModel->isBuyable($data)) {
