@@ -49,4 +49,5 @@ class FixingOrdersTableCartSnapshotField extends CakeMigration {
 	public function after($direction) {
 		return true;
 	}
+
 }

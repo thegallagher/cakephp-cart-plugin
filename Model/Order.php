@@ -1,5 +1,6 @@
 <?php
 App::uses('CartAppModel', 'Cart.Model');
+
 /**
  * Order Model
  *
@@ -335,7 +336,9 @@ class Order extends CartAppModel {
 				'cart_id' => empty($cartData['Cart']['id']) ? null : $cartData['Cart']['id'],
 				'user_id' => empty($cartData['Cart']['user_id']) ? null : $cartData['Cart']['user_id'],
 				'cart_snapshot' => $cartData,
-				'total' => $cartData['Cart']['total']));
+				'total' => $cartData['Cart']['total']
+			)
+		);
 
 		$order = Set::merge($cartData, $order);
 
@@ -362,12 +365,12 @@ class Order extends CartAppModel {
 		if (isset($order['Cart']['requires_shipping']) && $order['Cart']['requires_shipping'] == 1) {
 			$order['BillingAddress']['order_id'] = $orderId;
 			$order['ShippingAddress']['order_id'] = $orderId;
-			if(!isset($order['BillingAddress']['id'])) {
+			if (!isset($order['BillingAddress']['id'])) {
 				$this->BillingAddress->create();
 			}
 			$this->BillingAddress->save($order);
-			if(!isset($order['ShippingAddress']['id'])) {
-				$this->ShippingAddress->create();	
+			if (!isset($order['ShippingAddress']['id'])) {
+				$this->ShippingAddress->create();
 			}
 			$this->ShippingAddress->save($order);
 		}
@@ -402,7 +405,9 @@ class Order extends CartAppModel {
 		$count = $this->find('count', array(
 			'contain' => array(),
 			'conditions' => array(
-				$this->alias . '.created LIKE' => substr($date, 0, -2) .'%')));
+				$this->alias . '.created LIKE' => substr($date, 0, -2) . '%'
+			)
+		));
 
 		if ($count == 1) {
 			$increment = $count;
@@ -410,7 +415,7 @@ class Order extends CartAppModel {
 			$increment = $count + 1;
 		}
 
-		return str_replace('-', '', $date) . '-'. $increment;
+		return str_replace('-', '', $date) . '-' . $increment;
 	}
 
 /**

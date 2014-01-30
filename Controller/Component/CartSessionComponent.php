@@ -16,7 +16,8 @@ class CartSessionComponent extends Component {
  * @var array
  */
 	public $components = array(
-		'Session');
+		'Session'
+	);
 
 /**
  * Cart session key
@@ -132,9 +133,9 @@ class CartSessionComponent extends Component {
 /**
  * Write to the cart session
  *
- * @param
- * @param
- * @return
+ * @param string $key
+ * @param mixed $data
+ * @return boolean
  */
 	public function write($key = '', $data = null) {
 		if (!empty($key)) {

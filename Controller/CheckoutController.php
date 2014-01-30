@@ -60,8 +60,6 @@ class CheckoutController extends CartAppController {
  * @return void
  */
 	public function callback($token = null) {
-		//$this->log($this->request, 'payment-callback');
-
 		$order = $this->Order->find('first', array(
 			'contain' => array(),
 			'conditions' => array(
@@ -88,7 +86,9 @@ class CheckoutController extends CartAppController {
 						'payment_reference' => $order['Order']['payment_reference'])),
 				array(
 					'validate' => false,
-					'callbacks' => false));
+					'callbacks' => false
+				)
+			);
 		} catch (Exception $e) {
 			$this->log($e->getMessage(), 'payment-error');
 			$this->log($this->request, 'payment-error');

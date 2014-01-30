@@ -1,6 +1,7 @@
 <?php
 App::uses('CakeSession', 'Model/Datasource');
 App::uses('CartAppModel', 'Cart.Model');
+
 /**
  * Payment Api Transaction Model
  *
@@ -19,6 +20,7 @@ App::uses('CartAppModel', 'Cart.Model');
  * @link http://book.cakephp.org/2.0/en/core-libraries/logging.html#creating-and-configuring-log-streams
  */
 class PaymentApiTransaction extends CartAppModel {
+
 /**
  * belongsTo associations
  *
@@ -40,13 +42,15 @@ class PaymentApiTransaction extends CartAppModel {
  *
  * @param string $processorClass 
  * @param string $orderId Order UUID
+ * @return string
  */
 	public function initialize($processorClass, $orderId) {
 		$token = str_replace('-', '', String::uuid());
 		CakeSession::write('Payment', array(
 			'orderId' => $orderId,
 			'token' => $token,
-			'processor' => $processorClass));
+			'processor' => $processorClass
+		));
 
 		CakeSession::write('Payment.token', $token);
 		CakeSession::write('Payment.processor', $processorClass);
@@ -93,7 +97,9 @@ class PaymentApiTransaction extends CartAppModel {
 				'token' => $token,
 				'order_id' => $orderId,
 				'type' => $type,
-				'message' => $message)));
+				'message' => $message
+			)
+		));
 	}
 
 }
