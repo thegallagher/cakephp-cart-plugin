@@ -126,8 +126,8 @@ class Order extends CartAppModel {
  * @return void
  */
 	protected function _serializeCartSnapshot() {
-		if (!empty($this->data[$this->alias]['cart_snapshop']) && is_array($this->data[$this->alias]['cart_snapshop'])) {
-			$this->data[$this->alias]['cart_snapshop'] = serialize($this->data[$this->alias]['cart_snapshop']);
+		if (!empty($this->data[$this->alias]['cart_snapshot']) && is_array($this->data[$this->alias]['cart_snapshot'])) {
+			$this->data[$this->alias]['cart_snapshot'] = serialize($this->data[$this->alias]['cart_snapshot']);
 		}
 	}
 
@@ -226,8 +226,8 @@ class Order extends CartAppModel {
 	public function unserializeCartSnapshot($results) {
 		if (!empty($results)) {
 			foreach ($results as $key => $result) {
-				if (isset($result[$this->alias]['cart_snapshop'])) {
-					$results[$key][$this->alias]['cart_snapshop'] = unserialize($result[$this->alias]['cart_snapshop']);
+				if (isset($result[$this->alias]['cart_snapshot'])) {
+					$results[$key][$this->alias]['cart_snapshot'] = unserialize($result[$this->alias]['cart_snapshot']);
 				}
 			}
 		}
@@ -334,7 +334,7 @@ class Order extends CartAppModel {
 				'payment_status' => $paymentStatus,
 				'cart_id' => empty($cartData['Cart']['id']) ? null : $cartData['Cart']['id'],
 				'user_id' => empty($cartData['Cart']['user_id']) ? null : $cartData['Cart']['user_id'],
-				'cart_snapshop' => $cartData,
+				'cart_snapshot' => $cartData,
 				'total' => $cartData['Cart']['total']));
 
 		$order = Set::merge($cartData, $order);
@@ -377,7 +377,7 @@ class Order extends CartAppModel {
 			CakeEventManager::instance()->dispatch(new CakeEvent('Order.created', $this, array($result)));
 		}
 
-		$result = Set::merge($result, unserialize($result[$this->alias]['cart_snapshop']));
+		$result = Set::merge($result, unserialize($result[$this->alias]['cart_snapshot']));
 		return $result;
 	}
 

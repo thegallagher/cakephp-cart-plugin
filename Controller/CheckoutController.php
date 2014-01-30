@@ -193,7 +193,7 @@ class CheckoutController extends CartAppController {
 			$this->redirect(array('action' => 'view'));
 		}
 
-		$this->set('cart', array_merge($order, $order['Order']['cart_snapshop']));
+		$this->set('cart', array_merge($order, $order['Order']['cart_snapshot']));
 		$Processor->confirmOrder($order);
 
 		if (!empty($this->request->data)) {

@@ -31,7 +31,7 @@ class OrderFixture extends CakeTestFixture {
 		'id' => array('type' => 'string', 'null' => false, 'default' => null, 'length' => 36, 'key' => 'primary'),
 		'user_id' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 36),
 		'cart_id' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 36),
-		'cart_snapshop' => array('type' => 'text', 'null' => true, 'default' => null),
+		'cart_snapshot' => array('type' => 'text', 'null' => true, 'default' => null),
 		'token' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 32),
 		'processor' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 32),
 		'status' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 16, 'comment' => 'internal status, up to the app'), // completed, refunded, partial-refund, cancelled, shipped
@@ -64,7 +64,7 @@ class OrderFixture extends CakeTestFixture {
 			'id' => 'order-1',
 			'user_id' => 'user-1',
 			'cart_id' => null,
-			'cart_snapshop' => array(
+			'cart_snapshot' => array(
 				'Cart' => array(
 					),
 				'CartsItem' => array(
@@ -90,12 +90,12 @@ class OrderFixture extends CakeTestFixture {
 /**
  * Constructor
  *
- * @return void
+ * @return OrderFixture
  */
 	public function __construct() {
 		parent::__construct();
 		foreach ($this->records as &$record) {
-			$record['cart_snapshop'] = serialize($record['cart_snapshop']);
+			$record['cart_snapshot'] = serialize($record['cart_snapshot']);
 		}
 	}
 }
