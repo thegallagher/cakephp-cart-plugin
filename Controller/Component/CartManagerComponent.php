@@ -283,7 +283,7 @@ class CartManagerComponent extends Component {
 	public function updateItem($data, $recalculate = true) {
 		$type = $this->getItemAction($data);
 		$data = $this->_additionalData($data, $type);
-		if ($type === 'update') {
+		if ($type == 'update') {
 			return $this->addItem($data, $recalculate);
 		}
 
@@ -295,7 +295,7 @@ class CartManagerComponent extends Component {
 		}
 
 		$item = $this->getItem($data['CartsItem']['foreign_key'], $data['CartsItem']['model']);
-		if ($type === 'increment') {
+		if ($type == 'increment') {
 			$data['CartsItem']['quantity'] += $item['quantity'];
 			return $this->addItem($data, $recalculate);
 		} elseif ($type == 'decrement') {
@@ -513,11 +513,24 @@ class CartManagerComponent extends Component {
 /**
  * Cart content
  *
+ * @param array $options
  * @return array
  */
-	public function content() {
+	public function content($options = array()) {
+		$defaults = array(
+			'unserialize' => true,
+		);
+		$options = Set::merge($defaults, $options);
 		$this->calculateCart();
-		return $this->CartSession->read();
+		$cart = $this->CartSession->read();
+		if ($options['unserialize'] === true) {
+			foreach ($cart['CartsItem'] as $key => &$cartItem) {
+				if (isset($cartItem['additional_data'])) {
+					$cartItem['additional_data'] = unserialize($cartItem['additional_data']);
+				}
+			}
+		}
+		return $cart;
 	}
 
 /**
