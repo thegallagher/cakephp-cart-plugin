@@ -12,7 +12,7 @@ class ShippingMethod extends CartAppModel {
 /**
  * Display field name
  *
- * @var string
+ * @var    string
  * @access public
  */
 	public $displayField = 'name';
@@ -20,9 +20,9 @@ class ShippingMethod extends CartAppModel {
 /**
  * Constructor
  *
- * @param mixed $id Model ID
- * @param string $table Table name
- * @param string $ds Datasource
+ * @param  mixed $id Model ID
+ * @param  string $table Table name
+ * @param  string $ds Datasource
  * @access public
  */
 	public function __construct($id = false, $table = null, $ds = null) {
@@ -34,7 +34,8 @@ class ShippingMethod extends CartAppModel {
 /**
  * Adds a new record to the database
  *
- * @param array post data, should be Contoller->data
+ * @param  array post data, should be Contoller->data
+ * @throws OutOfBoundsException
  * @return array
  * @access public
  */
@@ -55,8 +56,8 @@ class ShippingMethod extends CartAppModel {
 /**
  * Edits an existing Shipping Method.
  *
- * @param string $id, shipping method id 
- * @param array $data, controller post data usually $this->data
+ * @param  string $id, shipping method id
+ * @param  array $data, controller post data usually $this->data
  * @return mixed True on successfully save else post data as array
  * @throws OutOfBoundsException If the element does not exists
  * @access public
@@ -89,7 +90,7 @@ class ShippingMethod extends CartAppModel {
 /**
  * Returns the record of a Shipping Method.
  *
- * @param string $id, shipping method id.
+ * @param  string $id, shipping method id.
  * @return array
  * @throws OutOfBoundsException If the element does not exists
  * @access public
@@ -109,10 +110,11 @@ class ShippingMethod extends CartAppModel {
 /**
  * Validates the deletion
  *
- * @param string $id, shipping method id 
- * @param array $data, controller post data usually $this->data
- * @return boolean True on success
+ * @param  string $id, shipping method id
+ * @param  array $data, controller post data usually $this->data
  * @throws OutOfBoundsException If the element does not exists
+ * @throws Exception
+ * @return boolean True on success
  * @access public
  */
 	public function validateAndDelete($id = null, $data = array()) {

@@ -273,7 +273,7 @@ class CheckoutController extends CartAppController {
  * @return string
  */
 	protected function _mapProcessorClass($processorAlias) {
-		$processorClass = Configure::read('Cart.PaymentMethod.'. $processorAlias . '.processor');
+		$processorClass = Configure::read('Cart.PaymentMethod.' . $processorAlias . '.processor');
 		if (!empty($processorClass)) {
 			return $processorClass;
 		}

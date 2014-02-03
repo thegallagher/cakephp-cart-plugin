@@ -6,6 +6,7 @@ App::uses('AppHelper', 'View/Helper');
  * @author Florian Krämer
  */
 class CartHelper extends AppHelper {
+
 /**
  * Helpers
  *
@@ -26,8 +27,9 @@ class CartHelper extends AppHelper {
 	protected $_itemsInCart = array();
 
 /**
- * @param View $View the view object the helper is attached to.
- * @param array $settings Array of settings.
+ * Construct method
+ * @param  View $View the view object the helper is attached to.
+ * @param  array $settings Array of settings.
  * @throws CakeException When the AjaxProvider helper does not implement a link method.
  */
 	public function __construct(View $View, $settings = array()) {
@@ -45,8 +47,9 @@ class CartHelper extends AppHelper {
 /**
  * Checks if an item exists in the cart session
  *
- * @param string $id
- * @param string $model
+ * @param  string $id
+ * @param  string $model
+ * @return boolean
  */
 	public function inCart($id, $model = '') {
 		$item = $id . '-' . $model;
@@ -56,11 +59,12 @@ class CartHelper extends AppHelper {
 /**
  * Checks if an item exists in the cart session
  *
- * @param string $id
- * @param string $model
+ * @param  string $id
+ * @param  string $model
+ * @return integer
  */
 	public function quantity($id, $model = '') {
-		if($this->inCart($id, $model)) {
+		if ($this->inCart($id, $model)) {
 			$items = $this->Session->read('Cart.CartsItem');
 			foreach ($items as $key => $item) {
 				if ($item['foreign_key'] == $id && $item['model'] == $model) {
@@ -71,6 +75,14 @@ class CartHelper extends AppHelper {
 		return 0;
 	}
 
+/**
+ * Input
+ *
+ * @param  $id
+ * @param  $model
+ * @param  array $options
+ * @return void;
+ */
 	public function input($id, $model, $options = array()) {
 		$defaults = array('form');
 
@@ -93,13 +105,25 @@ class CartHelper extends AppHelper {
 		}
 	}
 
+/**
+ * Hidden
+ *
+ * @param  $name
+ * @param  $value
+ * @param  $options
+ * @return void
+ */
 	public function hidden($name, $value, $options) {
 		$options = array_merge($options, array('value' => $value));
 		$this->Form->hidden($name, $options);
 	}
 
 /**
+ * Multi Input
  *
+ * @param  $id
+ * @param  $model
+ * @return string
  */
 	public function multiInput($id, $model = '') {
 		$string = $this->Form->input('Cart.' . $this->iterator . '.quantity', array(
@@ -116,7 +140,13 @@ class CartHelper extends AppHelper {
 	}
 
 /**
+ * Link
  *
+ * @param  string $title
+ * @param  array $url
+ * @param  array $options
+ * @throws InvalidArgumentException
+ * @return string
  */
 	public function link($title, $url = array(), $options = array()) {
 		$urlDefaults = array(
@@ -135,7 +165,9 @@ class CartHelper extends AppHelper {
 	}
 
 /**
+ * Reset
  *
+ * @return void
  */
 	public function reset() {
 		$this->iterator = 0;

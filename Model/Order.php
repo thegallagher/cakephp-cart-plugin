@@ -5,7 +5,7 @@ App::uses('CartAppModel', 'Cart.Model');
  * Order Model
  *
  * @author Florian Krämer
- * @copyright 2012 Florian Krämer
+ * @copyright 2014 Florian Krämer
  * @license MIT
  */
 class Order extends CartAppModel {
@@ -110,7 +110,7 @@ class Order extends CartAppModel {
 /**
  * beforeSave callback
  *
- * @param array $options
+ * @param  array $options, not used
  * @return boolean
  */
 	public function beforeSave($options = array()) {
@@ -178,9 +178,9 @@ class Order extends CartAppModel {
 /**
  * afterSave callback
  *
- * @param boolean $created
- * @param array $options
- * @var boolean $created
+ * @param  boolean $created
+ * @param  array $options
+ * @return void
  */
 	public function afterSave($created, $options = array()) {
 		if ($created) {
@@ -189,7 +189,7 @@ class Order extends CartAppModel {
 			}
 
 			$this->data[$this->alias]['order_number'] = $this->orderNumber($this->data);
-			$this->data[$this->alias]['invoice_number'] = $this->invoiceNumber($this->data);;
+			$this->data[$this->alias]['invoice_number'] = $this->invoiceNumber($this->data);
 			$this->data[$this->alias][$this->primaryKey] = $this->getLastInsertId();
 
 			$result = $this->save($this->data, array(
@@ -208,8 +208,8 @@ class Order extends CartAppModel {
 /**
  * afterFind callback
  *
- * @param array $results
- * @param bool $primary
+ * @param  array $results
+ * @param  bool $primary, not used
  * @return array
  */
 	public function afterFind($results, $primary = false) {
@@ -220,9 +220,9 @@ class Order extends CartAppModel {
 /**
  * Unserializes the data in the cart_snapshot field when it is present
  *
- * @param $results
- * @internal param array $resuls
- * @return array modified results array
+ * @param    array $results
+ * @internal param array $results
+ * @return   array modified results array
  */
 	public function unserializeCartSnapshot($results) {
 		if (!empty($results)) {
@@ -238,8 +238,8 @@ class Order extends CartAppModel {
 /**
  * Returns the data for a user to view an order he made
  *
- * @param string $orderId Order UUID
- * @param string $userId User UUId
+ * @param  string $orderId Order UUID
+ * @param  string $userId User UUId
  * @return array
  * @throws NotFoundException
  */
@@ -260,7 +260,7 @@ class Order extends CartAppModel {
 /**
  * Returns the data for an order for the admin
  *
- * @param string $orderId Order UUID
+ * @param  string $orderId Order UUID
  * @return array
  * @throws NotFoundException
  */
@@ -286,7 +286,7 @@ class Order extends CartAppModel {
  * by default true, it will get just validated and by this maybe set
  * to invalid, when the cart requires shipping
  *
- * @param
+ * @param  array $order
  * @return mixed
  */
 	public function validateOrder($order) {
@@ -319,9 +319,9 @@ class Order extends CartAppModel {
  * This method will create a new order record and does the validation work for
  * the different cases that might apply before you can issue a new order
  *
- * @param $cartData
- * @param $processorClass
- * @param string $paymentStatus
+ * @param    array $cartData
+ * @param    string $processorClass
+ * @param    string $paymentStatus
  * @internal param $
  * @internal param $
  * @internal param $
@@ -387,8 +387,8 @@ class Order extends CartAppModel {
 /**
  * Generates an invoice number
  *
- * @param array $data Order data
- * @param $date
+ * @param  array  $data Order data
+ * @param  string $date
  * @return string
  */
 	public function invoiceNumber($data = array(), $date = null) {
@@ -420,6 +420,9 @@ class Order extends CartAppModel {
 
 /**
  * Order number
+ *
+ * @param $data, not currently used
+ * @return string
  */
 	public function orderNumber($data = array()) {
 		return $this->find('count');

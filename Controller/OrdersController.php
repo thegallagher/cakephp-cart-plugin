@@ -72,7 +72,6 @@ class OrdersController extends CartAppController {
 	}
 
 	public function cancel($orderId) {
-
 	}
 
 /**
