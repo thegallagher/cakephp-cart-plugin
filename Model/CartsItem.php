@@ -34,6 +34,13 @@ class CartsItem extends CartAppModel {
 				'allowEmpty' => false
 			)
 		),
+		'name' => array(
+			'required' => array(
+				'rule' => array('notEmpty'),
+				'required' => true,
+				'allowEmpty' => false
+			)
+		),
 		'foreign_key' => array(
 			'required' => array(
 				'rule' => array('notEmpty'),

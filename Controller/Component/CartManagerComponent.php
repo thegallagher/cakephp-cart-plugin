@@ -283,7 +283,7 @@ class CartManagerComponent extends Component {
 	public function updateItem($data, $recalculate = true) {
 		$type = $this->getItemAction($data);
 		$data = $this->_additionalData($data, $type);
-		if ($type == 'update') {
+		if ($type === 'update') {
 			return $this->addItem($data, $recalculate);
 		}
 
@@ -295,7 +295,7 @@ class CartManagerComponent extends Component {
 		}
 
 		$item = $this->getItem($data['CartsItem']['foreign_key'], $data['CartsItem']['model']);
-		if ($type == 'increment') {
+		if ($type === 'increment') {
 			$data['CartsItem']['quantity'] += $item['quantity'];
 			return $this->addItem($data, $recalculate);
 		} elseif ($type == 'decrement') {
@@ -433,6 +433,10 @@ class CartManagerComponent extends Component {
 		$data = $ItemModel->beforeAddToCart($data);
 
 		if ($data === false || !is_array($data) || !$this->CartModel->CartsItem->validateItem($data, $this->_isLoggedIn)) {
+			$this->validationErrors = $this->CartModel->CartsItem->invalidFields;
+			if (Configure::read('debug') > 0 && !empty($this->CartModel->CartsItem->invalidFields)) {
+				throw new RuntimeException(__d('cart', 'Cart item did not validate!'));
+			}
 			return false;
 		}
 
@@ -453,10 +457,6 @@ class CartManagerComponent extends Component {
 
 		$Event = new CakeEvent('CartManager.afterAddItem', $this, array($result));
 		$this->_EventManager->dispatch($Event);
-		if ($Event->isStopped()) {
-
-		}
-
 		return $result;
 	}
 
