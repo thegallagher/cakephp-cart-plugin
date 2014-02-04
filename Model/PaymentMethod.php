@@ -1,12 +1,15 @@
 <?php
 App::uses('CartAppModel', 'Cart.Model');
+
 /**
  * Payment Method Model
  *
  * @author Florian Krämer
- * @copyright 2012 - 2013 Florian Krämer
+ * @copyright 2012 - 2014 Florian Krämer
  */
+
 class PaymentMethod extends CartAppModel {
+
 /**
  * Returns a list of payment methods a customer can pay with
  *
@@ -21,13 +24,15 @@ class PaymentMethod extends CartAppModel {
 	}
 
 /**
- * 
+ * Get payment methods
+ *
+ * @return array
  */
 	public function getPaymentMethods() {
 		$methods = Configure::read('Cart.PaymentMethod');
 		$validMethods = array();
 		if (!empty($methods)) {
-			foreach($methods as $method) {
+			foreach ($methods as $method) {
 				if (isset($method['active']) && $method['active'] == 1) {
 					$validMethods[] = array($this->alias => $method);
 				}
@@ -40,7 +45,7 @@ class PaymentMethod extends CartAppModel {
  * Gets the processor class name for a payment method based on id, alias or 
  * classname. This will return it only if the payment method is active.
  *
- * @param $processorAlias
+ * @param  $processorAlias
  * @return mixed string on success or false
  */
 	public function getMappedClassName($processorAlias = null) {
@@ -59,5 +64,4 @@ class PaymentMethod extends CartAppModel {
 		}
 		return false;
 	}
-
 }

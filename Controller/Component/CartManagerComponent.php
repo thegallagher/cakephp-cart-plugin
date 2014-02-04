@@ -402,9 +402,10 @@ class CartManagerComponent extends Component {
 /**
  * Adds an item to the cart, the session and database if a user is logged in
  *
+ * @param  array $data
+ * @param  boolean $recalculate
  * @throws InternalErrorException
- * @param array $data
- * @param boolean $recalculate
+ * @throws RuntimeException
  * @return boolean
  */
 	public function addItem($data, $recalculate = true) {

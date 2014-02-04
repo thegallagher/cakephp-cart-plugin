@@ -21,9 +21,9 @@ echo $this->Paginator->counter(array(
 $i = 0;
 foreach ($shippingMethods as $shippingMethod):
 	$class = null;
-	if ($i++ % 2 == 0) {
+	if ($i++ % 2 == 0) :
 		$class = ' class="altrow"';
-	}
+	endif;
 ?>
 	<tr<?php echo $class;?>>
 		<td>

@@ -1,7 +1,7 @@
 <?php 
-if (empty($Paginator) || !is_a($Paginator, 'PaginatorHelper')) {
+if (empty($Paginator) || !is_a($Paginator, 'PaginatorHelper')) :
 	$Paginator = $this->Paginator;
-}
+endif;
 ?>
 <?php if ($Paginator->hasNext() || $Paginator->hasPrev()): ?>
 	<div class="paging">

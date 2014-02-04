@@ -10,10 +10,10 @@
 					?>
 				</h3>
 				<?php
-					if (!empty($paymentMethod['PaymentMethod']['logo'])) {
+					if (!empty($paymentMethod['PaymentMethod']['logo'])) :
 						$image = $this->Html->image($paymentMethod['PaymentMethod']['logo'], array(
 							'alt' => $paymentMethod['PaymentMethod']['name']));
-					}
+					endif;
 				?>
 				<?php echo $paymentMethod['PaymentMethod']['description']; ?>
 			</li>

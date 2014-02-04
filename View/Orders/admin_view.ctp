@@ -39,11 +39,11 @@
 			</td>
 			<td>
 				<?php
-					if ($item['OrderItem']['virtual'] == 1) {
+					if ($item['OrderItem']['virtual'] == 1) :
 						echo __d('cart', 'Yes');
-					} else {
+					else :
 						echo __d('cart', 'No');
-					}
+					endif;
 				?>
 			</td>
 		</tr>
