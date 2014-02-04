@@ -255,17 +255,19 @@ class Cart extends CartAppModel {
 /**
  * Calculates the totals of a cart
  *
- * @todo taxes
- * @todo discounts/coupons
  * @param array $data
  * @param array $options
  * @return array
  */
 	public function calculateCart($data, $options = array()) {
-		$Event = new CakeEvent('Cart.beforeCalculateCart', $this, array($data));
-		CakeEventManager::instance()->dispatch($Event);
+		$Event = new CakeEvent('Cart.beforeCalculateCart', $this, array('cartData' => $data));
+		$this->getEventManager()->dispatch($Event);
 		if ($Event->isStopped()) {
 			return false;
+		}
+
+		if (!empty($Event->result)) {
+			$data = $Event->result;
 		}
 
 		if (isset($data['CartsItem'])) {
@@ -287,8 +289,11 @@ class Cart extends CartAppModel {
 			));
 		}
 
-		$Event = new CakeEvent('Cart.afterCalculateCart', $this, array($data));
-		CakeEventManager::instance()->dispatch($Event);
+		$Event = new CakeEvent('Cart.afterCalculateCart', $this, array('cartData' => $data));
+		$this->getEventManager()->dispatch($Event);
+		if (!empty($Event->result)) {
+			return $Event->result;
+		}
 
 		return $data;
 	}
@@ -300,8 +305,11 @@ class Cart extends CartAppModel {
  * @return array
  */
 	public function applyTaxRules($cartData) {
-		$Event = new CakeEvent('Cart.applyTaxRules', $this, array($cartData));
-		CakeEventManager::instance()->dispatch($Event);
+		$Event = new CakeEvent('Cart.applyTaxRules', $this, array('cartData' => $cartData));
+		$this->getEventManager()->dispatch($Event);
+		if (!empty($Event->result)) {
+			return $Event->result;
+		}
 		return $cartData;
 	}
 
@@ -312,8 +320,11 @@ class Cart extends CartAppModel {
  * @return array
  */
 	public function applyDiscounts($cartData) {
-		$Event = new CakeEvent('Cart.applyDiscounts', $this, array($cartData));
-		CakeEventManager::instance()->dispatch($Event);
+		$Event = new CakeEvent('Cart.applyDiscounts', $this, array('cartData' => $cartData));
+		$this->getEventManager()->dispatch($Event);
+		if (!empty($Event->result)) {
+			return $Event->result;
+		}
 		return $cartData;
 	}
 
@@ -325,13 +336,11 @@ class Cart extends CartAppModel {
  */
 	public function calculateTotals($cartData) {
 		$cartData[$this->alias]['total'] = 0.00;
-		$cartData[$this->alias]['total_price'] = 0.00;
 
 		if (!empty($cartData['CartsItem'])) {
 			foreach ($cartData['CartsItem'] as $key => $item) {
 				$cartData['CartsItem'][$key]['total'] = (float)$item['quantity'] * (float)$item['price'];
 				$cartData[$this->alias]['total'] += (float)$cartData['CartsItem'][$key]['total'];
-				$cartData[$this->alias]['total_price'] += (float)$cartData['CartsItem'][$key]['total'];
 			}
 		}
 

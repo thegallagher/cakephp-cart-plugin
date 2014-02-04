@@ -34,6 +34,7 @@ class CartFixture extends CakeTestFixture {
 		'total' => array('type' => 'float', 'null' => true, 'default' => null),
 		'active' => array('type' => 'boolean', 'null' => true, 'default' => '0'),
 		'item_count' => array('type' => 'integer', 'null' => false, 'default' => 0, 'length' => 6),
+		'additional_data' => array('type' => 'text', 'null' => true, 'default' => null, 'comment' => 'For serialized data'),
 		'created' => array('type' => 'datetime', 'null' => true, 'default' => null),
 		'modified' => array('type' => 'datetime', 'null' => true, 'default' => null),
 		'indexes' => array(
@@ -54,6 +55,7 @@ class CartFixture extends CakeTestFixture {
 			'total' => 720.37,
 			'active' => 1,
 			'item_count' => 1,
+			'additional_data' => null,
 			'created' => '2012-01-01 12:12:12',
 			'modified' => '2012-01-01 12:12:12'
 		),
@@ -64,6 +66,7 @@ class CartFixture extends CakeTestFixture {
 			'total' => '1000.00',
 			'active' => 0,
 			'item_count' => 3,
+			'additional_data' => null,
 			'created' => '2012-01-01 12:12:12',
 			'modified' => '2012-01-01 12:12:12'
 		),
@@ -74,6 +77,7 @@ class CartFixture extends CakeTestFixture {
 			'total' => '1000.00',
 			'active' => 0,
 			'item_count' => 1,
+			'additional_data' => null,
 			'created' => '2012-01-01 12:12:12',
 			'modified' => '2012-01-01 12:12:12'
 		),
