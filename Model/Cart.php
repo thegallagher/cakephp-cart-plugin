@@ -282,17 +282,17 @@ class Cart extends CartAppModel {
 		$data = $this->applyTaxRules($data);
 		$data = $this->calculateTotals($data);
 
+		$Event = new CakeEvent('Cart.afterCalculateCart', $this, array('cartData' => $data));
+		$this->getEventManager()->dispatch($Event);
+		if (!empty($Event->result)) {
+			$data = $Event->result;
+		}
+
 		if (isset($data[$this->alias][$this->primaryKey])) {
 			$this->save($data, array(
 				'validate' => false,
 				'callbacks' => false,
 			));
-		}
-
-		$Event = new CakeEvent('Cart.afterCalculateCart', $this, array('cartData' => $data));
-		$this->getEventManager()->dispatch($Event);
-		if (!empty($Event->result)) {
-			return $Event->result;
 		}
 
 		return $data;
