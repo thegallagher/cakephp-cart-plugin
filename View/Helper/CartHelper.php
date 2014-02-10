@@ -12,7 +12,11 @@ class CartHelper extends AppHelper {
  *
  * @var array
  */
-	public $helpers = array('Html', 'Form', 'Session');
+	public $helpers = array(
+		'Html',
+		'Form',
+		'Session'
+	);
 
 /**
  *
@@ -91,9 +95,11 @@ class CartHelper extends AppHelper {
 			'label' => false,
 			'default' => 1));
 		$string .= $this->Form->hidden('Cart.' . $this->iterator . '.Model', array(
-			'value' => $model));
+			'value' => $model
+		));
 		$string .= $this->Form->hidden('Cart.' . $this->iterator . '.foreign_key', array(
-			'value' => $id));
+			'value' => $id
+		));
 
 		if (isset($options['div']) && $options['div'] !== false) {
 			if (is_array($options['div'])) {
@@ -151,9 +157,11 @@ class CartHelper extends AppHelper {
 	public function link($title, $url = array(), $options = array()) {
 		$urlDefaults = array(
 			'controller' => $this->params['controller'],
-			'action' => 'buy');
+			'action' => 'buy'
+		);
 		$optionDefaults = array(
-			'class' => 'buy-link');
+			'class' => 'buy-link'
+		);
 		$url = Set::merge($urlDefaults, $url);
 		$options = Set::merge($optionDefaults, $options);
 
