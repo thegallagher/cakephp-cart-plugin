@@ -92,7 +92,14 @@ class CartManagerComponent extends Component {
 		'postBuy' => true,
 		'update' => true,
 		'incremental' => true,
-		'remove' => true
+		'remove' => true,
+		'emptyCartStructure' => array(
+			'Cart' => array(
+				'item_count' => 0.00,
+				'total' => 0.00
+			),
+			'CartsItem' => array()
+		)
 	);
 
 /**
@@ -124,28 +131,18 @@ class CartManagerComponent extends Component {
 	}
 
 	public function initializeCart() {
-		$this->_initializeCart();
-	}
-
-/**
- * Initializes the cart data from session or database depending on if user is logged in or not and if the cart is present or not
- *
- * @return void
- */
-	protected function _initializeCart() {
 		extract($this->settings);
 		$userId = $this->Auth->user('id');
 		$this->CartModel = ClassRegistry::init($cartModel);
 
 		if (!$this->Session->check($sessionKey)) {
-			$this->Session->write($sessionKey, array(
-					'Cart' => array(),
-					'CartsItem' => array()));
+			$this->Session->write($sessionKey, $emptyCartStructure);
 		} else {
 			if ($userId && !$this->Session->check($sessionKey . '.Cart.id')) {
 				$merged = $this->CartModel->CartsItem->mergeItems(
 					$this->CartModel->getActive($userId),
-					$this->Session->read($sessionKey));
+					$this->Session->read($sessionKey)
+				);
 
 				$this->_cartId = $merged['Cart']['id'];
 				$this->Session->write($sessionKey, $merged);
@@ -169,7 +166,7 @@ class CartManagerComponent extends Component {
  */
 	public function startup(Controller $Controller) {
 		$this->_setLoggedInStatus();
-		$this->_initializeCart();
+		$this->initializeCart();
 		extract($this->settings);
 		if ($this->Controller->action == $buyAction && !method_exists($this->Controller, $buyAction)) {
 			$this->captureBuy();
@@ -507,7 +504,7 @@ class CartManagerComponent extends Component {
 
 		$result = $this->CartSession->emptyCart();
 
-		$this->_initializeCart();
+		$this->initializeCart();
 		return $result;
 	}
 
