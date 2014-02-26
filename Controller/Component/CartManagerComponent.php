@@ -519,7 +519,7 @@ class CartManagerComponent extends Component {
 			'unserialize' => true,
 		);
 		$options = Set::merge($defaults, $options);
-		$this->calculateCart();
+		$this->calculateCart($options);
 		$cart = $this->CartSession->read();
 		if ($options['unserialize'] === true) {
 			foreach ($cart['CartsItem'] as $key => &$cartItem) {
