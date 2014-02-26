@@ -407,7 +407,10 @@ class Cart extends CartAppModel {
 	}
 
 /**
- * 
+ * Checkout confirmation
+ *
+ * @param array $data
+ * @return boolean
  */
 	public function confirmCheckout($data) {
 		return (isset($data[$this->alias]['confirm_checkout']) && $data[$this->alias]['confirm_checkout'] == 1);

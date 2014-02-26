@@ -585,17 +585,23 @@ class CartManagerComponent extends Component {
 /**
  * (Re-)calculates a cart, this will run over all items, coupons and taxes
  *
+ * @param array $options
  * @return array the cart data
  */
-	public function calculateCart() {
-		$sessionKey = $this->settings['sessionKey'];
-		$cartData = $this->CartModel->calculateCart($this->Session->read($sessionKey));
+	public function calculateCart($options = array()) {
+		$cartData = $this->Session->read($this->settings['sessionKey']);
+
+		if (isset($options['cartData'])) {
+			$cartData = Set::merge($cartData, $options['cartData']);
+		}
+
+		$cartData = $this->CartModel->calculateCart($cartData, $options);
 
 		if ($this->_isLoggedIn) {
 			$this->CartModel->saveAll($cartData);
 		}
 
-		$this->Session->write($sessionKey, $cartData);
+		$this->Session->write($this->settings['sessionKey'], $cartData);
 		return $cartData;
 	}
 
@@ -620,7 +626,7 @@ class CartManagerComponent extends Component {
 	public function restoreFromCookie() {
 		$result = $this->Cookie->read($this->settings['cookieName']);
 		$this->Session->write($this->settings['sessionKey'], $result);
-		return !empty($result);
+		return (!empty($result));
 	}
 
 /**
@@ -639,7 +645,7 @@ class CartManagerComponent extends Component {
 				$results[] = $this->updateItem(array('CartsItem' => $item), false);
 			}
 			$this->calculateCart();
-			return !in_array(false, $results, true);
+			return (!in_array(false, $results, true));
 		} catch (Exception $e) {
 			throw $e;
 		}
