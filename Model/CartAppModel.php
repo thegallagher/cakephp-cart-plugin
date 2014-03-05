@@ -67,4 +67,20 @@ class CartAppModel extends AppModel {
 		}
 	}
 
+	public function serializeFields($fields = true) {
+		foreach ($fields as $field) {
+			if (isset($this->data[$this->alias][$field])) {
+				$this->data[$this->alias][$field] = serialize($this->data[$this->alias][$field]);
+			}
+		}
+	}
+
+	public function unserializeFields($fields) {
+		foreach ($fields as $field) {
+			if (isset($this->data[$this->alias][$field])) {
+				$this->data[$this->alias][$field] = unserialize($this->data[$this->alias][$field]);
+			}
+		}
+	}
+
 }

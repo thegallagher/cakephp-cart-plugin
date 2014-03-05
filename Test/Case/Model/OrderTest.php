@@ -217,4 +217,45 @@ class OrderTest extends CakeTestCase {
 		$this->assertEqual('20661212-3', $result);
 	}
 
+/**
+ * testSameAsBilling
+ *
+ * @return void
+ */
+	public function shippingIsSameAsBilling() {
+		$data = array(
+			'BillingAddress' => array(
+				'first_name' => 'John',
+				'last_name' => 'Doe',
+				'street' => 'First Street',
+				'street2' => 'Second Street',
+				'city' => 'Las Vegas',
+				'state' => 'NV',
+				'zip' => '25252',
+				'country' => 'US'
+			),
+			'ShippingAddress' => array(
+				'same_as_billing' => '1',
+				'first_name' => '',
+				'last_name' => '',
+				'street' => '',
+				'street2' => '',
+				'city' => '',
+				'state' => 'NV',
+				'zip' => '',
+				'country' => 'US'
+			),
+		);
+		$result = $this->Order->sameAsBilling($data);
+		$this->assertTrue($result);
+
+		$data['ShippingAddress']['same_as_billing'] = '0';
+		$result = $this->Order->sameAsBilling($data);
+		$this->assertFalse($result);
+
+		$data = array();
+		$result = $this->Order->sameAsBilling($data);
+		$this->assertFalse($result);
+	}
+
 }

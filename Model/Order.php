@@ -39,24 +39,18 @@ class Order extends CartAppModel {
  */
 	public $belongsTo = array(
 		'Cart' => array(
-			'className' => 'Cart.Cart'),
+			'className' => 'Cart.Cart'
+		),
 		'User' => array(
-			'className' => 'User'));
-
-/**
- * belongsTo associations
- *
- * @var array
- */
-	public $hasOne = array(
+			'className' => 'User'
+		),
 		'BillingAddress' => array(
 			'className' => 'Cart.OrderAddress',
-			'conditions' => array(
-				'BillingAddress.type' => 'billing')),
+		),
 		'ShippingAddress' => array(
 			'className' => 'Cart.OrderAddress',
-			'conditions' => array(
-				'ShippingAddress.type' => 'shipping')));
+		)
+	);
 
 /**
  * hasMany associations
@@ -65,7 +59,9 @@ class Order extends CartAppModel {
  */
 	public $hasMany = array(
 		'OrderItem' => array(
-			'className' => 'Cart.OrderItem'));
+			'className' => 'Cart.OrderItem'
+		)
+	);
 
 /**
  * Validation rules
@@ -76,23 +72,34 @@ class Order extends CartAppModel {
 		'total' => array(
 			'numeric' => array(
 				'rule' => array('numeric'),
-				'message' => 'This must be a number')),
+				'message' => 'This must be a number'
+			)
+		),
 		'status' => array(
 			'notEmpty' => array(
 				'rule' => array('notEmpty'),
-				'message' => 'The order requires a status')),
+				'message' => 'The order requires a status'
+			)
+		),
 		'currency' => array(
 			'notEmpty' => array(
 				'rule' => array('notEmpty'),
-				'message' => 'You must select a currency')),
+				'message' => 'You must select a currency'
+			)
+		),
 		'processor' => array(
 			'notEmpty' => array(
 				'rule' => array('notEmpty'),
-				'message' => 'The order requires a payment processor')),
+				'message' => 'The order requires a payment processor'
+			)
+		),
 		'cart_snapshot' => array(
 			'notEmpty' => array(
 				'rule' => array('notEmpty'),
-				'message' => 'You must add the cart data to the order')));
+				'message' => 'You must add the cart data to the order'
+			)
+		)
+	);
 
 /**
  * Filters args for search
@@ -167,7 +174,7 @@ class Order extends CartAppModel {
 				}
 			}
 			if (!empty($changedFields)) {
-				CakeEventManager::instance()->dispatch(new CakeEvent('Order.changed', $this, array(
+				$this->getEventManager()->dispatch(new CakeEvent('Order.changed', $this, array(
 					$this->data,
 					$this->orderRecordBeforeSave,
 					$changedFields)));
@@ -197,7 +204,7 @@ class Order extends CartAppModel {
 				'callbacks' => false));
 
 			$this->data = $result;
-			CakeEventManager::instance()->dispatch(new CakeEvent('Order.created', $this, array($this->data)));
+			$this->getEventManager()->dispatch(new CakeEvent('Order.created', $this, array($this->data)));
 		}
 
 		$this->_detectOrderChange();
@@ -246,10 +253,15 @@ class Order extends CartAppModel {
 	public function view($orderId = null, $userId = null) {
 		$order = $this->find('first', array(
 			'contain' => array(
-				'OrderItem'),
+				'OrderItem',
+				'BillingAddress',
+				'ShippingAddress'
+			),
 			'conditions' => array(
 				$this->alias . '.' . $this->primaryKey => $orderId,
-				$this->alias . '.user_id' => $userId)));
+				$this->alias . '.user_id' => $userId
+			)
+		));
 
 		if (empty($order)) {
 			throw new NotFoundException(__d('cart', 'The order does not exist.'));
@@ -286,6 +298,7 @@ class Order extends CartAppModel {
  * by default true, it will get just validated and by this maybe set
  * to invalid, when the cart requires shipping
  *
+ * @deprecated
  * @param  array $order
  * @return mixed
  */
@@ -319,6 +332,7 @@ class Order extends CartAppModel {
  * This method will create a new order record and does the validation work for
  * the different cases that might apply before you can issue a new order
  *
+ * @deprecated
  * @param    array $cartData
  * @param    string $processorClass
  * @param    string $paymentStatus
@@ -326,9 +340,8 @@ class Order extends CartAppModel {
  * @internal param $
  * @internal param $
  * @return mixed Array with order data on success, false if not
- * @todo finish me
  */
-	public function createOrder($cartData, $processorClass, $paymentStatus = 'pending') {
+	public function legacyCreateOrder($data, $processorClass, $paymentStatus = 'pending') {
 		$order = array(
 			$this->alias => array(
 				'processor' => $processorClass,
@@ -340,9 +353,14 @@ class Order extends CartAppModel {
 			)
 		);
 
-		$order = Set::merge($cartData, $order);
+		$order = Hash::merge($cartData, $order);
 
-		CakeEventManager::instance()->dispatch(new CakeEvent('Order.beforeCreateOrder', $this, array($order)));
+		$this->getEventManager->dispatch(new CakeEvent(
+			'Order.beforeCreateOrder',
+			$this, array(
+				'order' => $order
+			)
+		));
 
 		$order = $this->validateOrder($order);
 		if ($order === false) {
@@ -377,7 +395,7 @@ class Order extends CartAppModel {
 
 		if ($result) {
 			$result[$this->alias][$this->primaryKey] = $this->getLastInsertId();
-			CakeEventManager::instance()->dispatch(new CakeEvent('Order.created', $this, array($result)));
+			$this->getEventManager->dispatch(new CakeEvent('Order.created', $this, array($result)));
 		}
 
 		$result = Set::merge($result, unserialize($result[$this->alias]['cart_snapshot']));
@@ -392,10 +410,16 @@ class Order extends CartAppModel {
  * @return string
  */
 	public function invoiceNumber($data = array(), $date = null) {
-		$Event = new CakeEvent('Order.createInvoiceNumber', $this, array($data));
-		CakeEventManager::instance()->dispatch($Event);
+		$Event = new CakeEvent(
+			'Order.createInvoiceNumber',
+			$this,
+			array(
+				$data
+			)
+		);
+		$this->getEventManager()->dispatch($Event);
 		if ($Event->isStopped()) {
-			return $Event->data['result'];
+			return $Event->result;
 		}
 
 		if (empty($date)) {
@@ -426,6 +450,109 @@ class Order extends CartAppModel {
  */
 	public function orderNumber($data = array()) {
 		return $this->find('count');
+	}
+
+/**
+ * Checks the order data if the shipping address is the same as the billing address
+ *
+ * @param array
+ * @return boolean
+ */
+	public function shippingIsSameAsBilling($data) {
+		if (isset($data['ShippingAddress']['same_as_billing'])) {
+			return (bool)$data['ShippingAddress']['same_as_billing'];
+		}
+		return false;
+	}
+
+/**
+ * Validates the shipping and billing address
+ *
+ * @param array $data The order data with the shipping and billing address
+ * @return boolean
+ */
+	public function validateAddresses($data) {
+		$sameAsBilling = $this->shippingIsSameAsBilling($data);
+
+		$this->BillingAddress->set($data);
+		$validBillingAddress = $this->BillingAddress->validates($data);
+
+		if ($sameAsBilling === true) {
+			$validShippingAddress = true;
+		} else {
+			$this->ShippingAddress->set($data);
+			$validShippingAddress = $this->ShippingAddress->validates($data);
+		}
+
+		return ($validBillingAddress && $validShippingAddress);
+	}
+
+/**
+ * saveAddresses
+ *
+ * @param $data
+ * @return array
+ */
+	public function saveAddresses($data) {
+		$sameAsBilling = $this->shippingIsSameAsBilling($data);
+
+		$billingAddressId = $this->BillingAddress->findDuplicate();
+		if ($billingAddressId === false) {
+			$this->BillingAddress->create();
+			$this->BillingAddress->save($data, array('validate' => false));
+			$billingAddressId = $this->BillingAddress->getLastInsertId();
+		}
+
+		if ($sameAsBilling === false) {
+			$shippingAddressId = $this->ShippingAddress->findDuplicate();
+			if ($shippingAddressId === false) {
+				$this->ShippingAddress->create();
+				$this->ShippingAddress->save($data, array('validate' => false));
+				$shippingAddressId = $this->BillingAddress->getLastInsertId();
+			}
+		} else {
+			$shippingAddressId = $billingAddressId;
+			$data['ShippingAddress'] = $data['BillingAddress'];
+		}
+
+		$data[$this->alias]['shipping_address_id'] = $shippingAddressId;
+		$data[$this->alias]['billing_address_id'] = $billingAddressId;
+
+		return $data;
+	}
+
+/**
+ * Saves all the items for the order in the persistent order_items table
+ *
+ * @param $orderId
+ * @param array $data
+ * @return void
+ */
+	public function saveItems($orderId, $data) {
+		foreach ($data['CartsItem'] as $item) {
+			$item['order_id'] = $orderId;
+			$this->OrderItem->create();
+			$this->OrderItem->save($item);
+		}
+	}
+
+/**
+ * This method validates all data, the order and all associated data
+ *
+ * All associated data is validates as well and not skipped on the first
+ * false result to get the errors displayed in the form.
+ *
+ * @param array $data
+ * @param array $options
+ * @return boolean
+ */
+	public function beforeOrderValidation($data, $options = array()) {
+		$this->set($data);
+		$validOrder = $this->validates();
+		$validCreditCard = $this->validateCreditCard($data);
+		$validAddresses = $this->validateAddresses($data);
+
+		return ($validOrder && $validCreditCard && $validAddresses);
 	}
 
 }

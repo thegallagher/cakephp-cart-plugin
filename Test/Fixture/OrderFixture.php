@@ -31,6 +31,8 @@ class OrderFixture extends CakeTestFixture {
 		'id' => array('type' => 'string', 'null' => false, 'default' => null, 'length' => 36, 'key' => 'primary'),
 		'user_id' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 36),
 		'cart_id' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 36),
+		'shipping_address_id' => array('type' => 'string', 'null' => true, 'default' => null, 'lenght' => 36),
+		'billing_address_id' => array('type' => 'string', 'null' => true, 'default' => null, 'lenght' => 36),
 		'cart_snapshot' => array('type' => 'text', 'null' => true, 'default' => null),
 		'token' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 32),
 		'processor' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 32),
@@ -64,6 +66,8 @@ class OrderFixture extends CakeTestFixture {
 			'id' => 'order-1',
 			'user_id' => 'user-1',
 			'cart_id' => null,
+			'shipping_address_id' => null,
+			'billing_address_id' => null,
 			'cart_snapshot' => array(
 				'Cart' => array(
 					),

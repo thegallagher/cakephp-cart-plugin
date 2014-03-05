@@ -16,7 +16,8 @@ class ShippingMethodTestCase extends CakeTestCase {
 		'plugin.Cart.CartsItem',
 		'plugin.Cart.OrderAddress',
 		'plugin.Cart.User',
-		'plugin.Cart.ShippingMethod');
+		'plugin.Cart.ShippingMethod'
+	);
 
 /**
  * Test to run for the test case (e.g array('testFind', 'testView'))

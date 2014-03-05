@@ -54,7 +54,8 @@ class OrderAddress extends CartAppModel {
 			'rule' => 'notEmpty')),
 		'type' => array(
 			'notEmpty' => array(
-			'rule' => 'notEmpty')),
+			'rule' => 'notEmpty')
+		),
 	);
 
 /**
@@ -81,10 +82,61 @@ class OrderAddress extends CartAppModel {
 		$this->find('all', array(
 			'contain' => array(),
 			'conditions' => array(
-				$this->alias . '.user_id' => $userId ),
+				$this->alias . '.user_id' => $userId
+			),
 			'order' => array(
 				'primary' => 'ASC',
-				'first_name' => 'ASC')));
+				'first_name' => 'ASC'
+			)
+		));
+	}
+
+/**
+ * Detects a duplicate address based on the first argument or if null Model::$data
+ *
+ * - fullReturn: Returns the full record set instead of just the id of the duplicate
+ * - fields: List of table fields to compare
+ *
+ * @param array $data
+ * @param array $options
+ * @return boolean|array
+ */
+	public function findDuplicate($data = null, $options = array()) {
+		$defaults = array(
+			'fullReturn' => false,
+			'fields' => array_keys($this->validate)
+		);
+
+		$options = Hash::merge($defaults, $options);
+
+		if (empty($data)) {
+			$data = $this->data;
+		}
+
+		if (empty($options['fields'])) {
+			$options['fields'] = array_keys($this->validate);
+		}
+
+		foreach ($options['fields'] as $field) {
+			if (isset($data[$this->alias][$field])) {
+				$conditions[$this->alias . '.' . $field][$field] = $data[$this->alias][$field];
+			}
+		}
+
+		$result = $this->find('first', array(
+			'contain' => array(),
+			'conditions' => $conditions
+		));
+
+		if (empty($result)) {
+			return false;
+		}
+
+		if ($options['fullReturn'] === true) {
+			return $result;
+		}
+
+		return $result[$this->alias][$this->primaryKey];
 	}
 
 }

@@ -38,8 +38,9 @@ class OrderAddressFixture extends CakeTestFixture {
 		'street2' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 128),
 		'city' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 128),
 		'zip' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 128),
-		'country' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 2),
-		'type' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 2, 'comment' => 'billing or shipping'),
+		'country' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 3),
+		'state' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 2),
+		'type' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 16, 'comment' => 'billing or shipping'),
 		'created' => array('type' => 'datetime', 'null' => true, 'default' => null),
 		'modified' => array('type' => 'datetime', 'null' => true, 'default' => null),
 		'indexes' => array(
@@ -54,6 +55,22 @@ class OrderAddressFixture extends CakeTestFixture {
  * @var array
  */
 	public $records = array(
+		array(
+			'id' => 'order-address-1',
+			'order_id' => null,
+			'user_id' => null,
+			'first_name' => 'Florian',
+			'last_name' => 'Krämer',
+			'company' => 'CakeDC',
+			'street' => 'Programmers Road 51',
+			'street2' => '',
+			'city' => 'German Town',
+			'country' => 'DEU',
+			'state' => 'HE',
+			'type' => 'billing',
+			'created' => '2012-12-12 12:12:12',
+			'modified' => '2012-12-12 12:12:12',
+		)
 	);
 
 }
