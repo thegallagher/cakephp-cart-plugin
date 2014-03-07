@@ -78,11 +78,11 @@ class CartAppModel extends AppModel {
 		foreach ($fields as $field) {
 			if (!empty($data[$this->alias][$field])) {
 				if (!is_array($data[$this->alias][$field])) {
-					$data = array();
+					$serializedData = serialize($data[$this->alias][$field]);
 				} else {
-					$data = serialize($data[$this->alias][$field]);
+					$serializedData = serialize(array());
 				}
-				$data[$this->alias][$field] = $data;
+				$data[$this->alias][$field] = $serializedData;
 			}
 		}
 		return $data;
@@ -101,6 +101,18 @@ class CartAppModel extends AppModel {
 			}
 		}
 		return $data;
+	}
+
+	public function isArray($check, $notEmpty = true) {
+		$value = array_values($check);
+		$value = $value[0];
+		if (is_array($value)) {
+			if ($notEmpty === true) {
+				return (!empty($value));
+			}
+			true;
+		}
+		return false;
 	}
 
 }

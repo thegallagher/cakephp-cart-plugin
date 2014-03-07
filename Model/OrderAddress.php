@@ -117,10 +117,15 @@ class OrderAddress extends CartAppModel {
 			$options['fields'] = array_keys($this->validate);
 		}
 
+		$conditions = array();
 		foreach ($options['fields'] as $field) {
 			if (isset($data[$this->alias][$field])) {
 				$conditions[$this->alias . '.' . $field][$field] = $data[$this->alias][$field];
 			}
+		}
+
+		if (empty($conditions)) {
+			return false;
 		}
 
 		$result = $this->find('first', array(

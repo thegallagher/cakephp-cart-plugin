@@ -2,21 +2,18 @@
 
 http://github.com/burzum/cart
 
-A CakePHP shopping cart plugin with an interface for different payment providers
+A CakePHP shopping cart plugin.
 
 The cart plugin is a stand alone cart only plugin, no payment processors are included you'll have to write them or get them from somewhere else.
 
 The shopping cart part of this plugin is finished but needs to be polished. There callbacks for many things in place that give you customization possibilities.
 
-Consider this as still in development.
+**This is in development** backward compatibility breaking changes are expected!
 
 ## Requirements
 
  * CakePHP 2.x
- * Payments Plugin https://github.com/burzum/Payments
  * Search Plugin https://github.com/cakedc/search
-
-The cart is using the Payments plugin, or more accurate, payment processors built on top of it.
 
 ## Parts of the Plugin explained 
 
@@ -24,6 +21,10 @@ Features done:
 
  * CartManager - handles the cart, adding and removing items from it
  * Allow/deny anonymous checkouts
+ * Buy items via HTTP POST or GET
+ * Saves the cart to session
+ * Saves the cart to a cookie to make it persistent if not logged in
+ * Saves the cart to DB if user is logged
 
 ### Cart Manager Component
 
@@ -35,15 +36,15 @@ The Session, Cookie and Database Storage of the Cart Manager is pretty much deco
 
 List of events that are triggered in this plugin
 
-	Cart.applyDiscounts
-	Cart.applyTaxRules
-	Cart.afterCalculateCart
-	CartManager.beforeAddItem
-	CartManager.afterAddItem
-	CartManager.beforeRemoveItem
-	CartManager.afterRemoveItem
-	Order.beforeCreateOrder
-	Order.created
+ * Cart.applyDiscounts
+ * Cart.applyTaxRules
+ * Cart.afterCalculateCart
+ * CartManager.beforeAddItem
+ * CartManager.afterAddItem
+ * CartManager.beforeRemoveItem
+ * CartManager.afterRemoveItem
+ * Order.beforeCreateOrder
+ * Order.created
 
 ### Sample Application
 
@@ -96,7 +97,7 @@ https://github.com/burzum/Cart/issues
 
 ## License
 
-Copyright 2012, Florian Krämer
+Copyright 2012-2014, Florian Krämer
 
 Licensed under The MIT License
 Redistributions of files must retain the above copyright notice.

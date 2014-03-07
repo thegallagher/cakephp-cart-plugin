@@ -34,7 +34,7 @@ class ShippingMethodTestCase extends CakeTestCase {
  * @return void
  */
 	public function setUp() {
-		$this->ShippingMethod = ClassRegistry::init('ShippingMethod');
+		$this->ShippingMethod = ClassRegistry::init('Cart.ShippingMethod');
 		$fixture = new ShippingMethodFixture();
 		$this->record = array('ShippingMethod' => $fixture->records[0]);
 	}

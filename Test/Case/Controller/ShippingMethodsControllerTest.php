@@ -20,7 +20,7 @@ class ShippingMethodsControllerTestCase extends CakeTestCase {
  * @access public
  */
 	public function setUp() {
-		parent::startUp();
+		parent::setUp();
 		$this->ShippingMethods = $this->generate(
 			'ShippingMethods', array(
 			  'methods' => array(
