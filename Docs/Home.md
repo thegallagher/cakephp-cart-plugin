@@ -16,6 +16,7 @@ Documentation
 
 * [Overview](Documentation/Overview.md)
 * [Installation](Documentation/Installation.md)
+* [List of Events](Documentation/List-of-Events.md)
 
 Tutorials
 ---------
