@@ -122,7 +122,15 @@ class Order extends CartAppModel {
  */
 	public function beforeSave($options = array()) {
 		$this->_getOrderRecordBeforeSave();
-		$this->_serializeCartSnapshot();
+		$this->data = $this->_serializeFields(
+			array(
+				'cart_snapshot',
+				'additional_data',
+				'shipping_address',
+				'billing_address'
+			),
+			$this->data
+		);
 		return true;
 	}
 
@@ -173,11 +181,13 @@ class Order extends CartAppModel {
 					$changedFields[] = $value;
 				}
 			}
+
 			if (!empty($changedFields)) {
 				$this->getEventManager()->dispatch(new CakeEvent('Order.changed', $this, array(
 					$this->data,
 					$this->orderRecordBeforeSave,
-					$changedFields)));
+					$changedFields
+				)));
 			}
 		}
 	}
@@ -220,7 +230,7 @@ class Order extends CartAppModel {
  * @return array
  */
 	public function afterFind($results, $primary = false) {
-		$results = $this->unserializeCartSnapshot($results);
+		$results = $this->unserializeFields($results);
 		return $results;
 	}
 
@@ -231,12 +241,10 @@ class Order extends CartAppModel {
  * @internal param array $results
  * @return   array modified results array
  */
-	public function unserializeCartSnapshot($results) {
+	public function unserializeFields($results) {
 		if (!empty($results)) {
 			foreach ($results as $key => $result) {
-				if (isset($result[$this->alias]['cart_snapshot'])) {
-					$results[$key][$this->alias]['cart_snapshot'] = unserialize($result[$this->alias]['cart_snapshot']);
-				}
+				$results[$key] = $this->_unserializeFields(array('cart_snapshot'), $result);
 			}
 		}
 		return $results;
@@ -326,6 +334,79 @@ class Order extends CartAppModel {
 		}
 
 		return $order;
+	}
+
+/**
+ * Turns the cart into an order
+ *
+ * - validates all data for the order first
+ * - starts a DB transaction
+ * - saves all data
+ * - if no exception thrown commits the DB transaction, else rolls it back
+ *
+ * @throws Exception
+ * @param array $data Post data
+ * @param array $options
+ * @return boolean
+ */
+	public function createOrder($data, $options = array()) {
+		$data['ShippingAddress']['type'] = AddressType::SHIPPING;
+		$data['BillingAddress']['type'] = AddressType::BILLING;
+
+		$data[$this->alias] = array(
+			'cart_id' => empty($data['Cart']['id']) ? null : $data['Cart']['id'],
+			'user_id' => empty($data['Cart']['user_id']) ? null : $data['Cart']['user_id'],
+			'cart_snapshot' => $data,
+			'total' => $data['Cart']['total']
+		);
+
+		unset($data[$this->alias][$this->primaryKey]);
+		$data[$this->alias]['status'] = OrderStatus::PENDING;
+
+		$Event = new CakeEvent(
+			'Order.beforeCreateOrder',
+			$this,
+			array(
+				'order' => $data
+			)
+		);
+		$this->getEventManager()->dispatch($Event);
+		if ($Event->result === false) {
+			return false;
+		}
+
+		if ($this->beforeOrderValidation($data)) {
+			$DataSource = $this->getDataSource();
+			$DataSource->begin();
+
+			try {
+				$data = $this->saveAddresses($data);
+
+				$this->create();
+				$this->save($data, array('validate' => false));
+				$data[$this->alias][$this->primaryKey] = $orderId = $this->getLastInsertId();
+
+				$this->saveItems($orderId, $data);
+			} catch (Exception $e) {
+				$DataSource->rollback();
+				throw $e;
+			}
+
+			$DataSource->commit();
+
+			$Event = new CakeEvent(
+				'Order.created',
+				$this, array(
+					'order' => $data
+				)
+			);
+			$this->getEventManager()->dispatch($Event);
+
+			$this->data = $data;
+			return true;
+		}
+
+		return false;
 	}
 
 /**

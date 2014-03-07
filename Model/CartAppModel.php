@@ -67,20 +67,40 @@ class CartAppModel extends AppModel {
 		}
 	}
 
-	public function serializeFields($fields = true) {
+	protected function _serializeFields($fields = array(), $data = null) {
+		if (empty($fields)) {
+			return $data;
+		}
+		if (empty($data)) {
+			$data = $this->data;
+		}
+
 		foreach ($fields as $field) {
-			if (isset($this->data[$this->alias][$field])) {
-				$this->data[$this->alias][$field] = serialize($this->data[$this->alias][$field]);
+			if (!empty($data[$this->alias][$field])) {
+				if (!is_array($data[$this->alias][$field])) {
+					$data = array();
+				} else {
+					$data = serialize($data[$this->alias][$field]);
+				}
+				$data[$this->alias][$field] = $data;
 			}
 		}
+		return $data;
 	}
 
-	public function unserializeFields($fields) {
+	protected function _unserializeFields($fields = array(), $data = null) {
+		if (empty($fields)) {
+			return $data;
+		}
+		if (empty($data)) {
+			$data = $this->data;
+		}
 		foreach ($fields as $field) {
-			if (isset($this->data[$this->alias][$field])) {
-				$this->data[$this->alias][$field] = unserialize($this->data[$this->alias][$field]);
+			if (isset($data[$this->alias][$field])) {
+				$data[$this->alias][$field] = unserialize($data[$this->alias][$field]);
 			}
 		}
+		return $data;
 	}
 
 }
