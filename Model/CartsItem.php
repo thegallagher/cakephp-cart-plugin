@@ -106,7 +106,7 @@ class CartsItem extends CartAppModel {
 		$defaults = array(
 			'validates' => true
 		);
-		$options = Set::merge($defaults, $options);
+		$options = Hash::merge($defaults, $options);
 
 		if (isset($itemData[$this->alias])) {
 			$itemData = $itemData[$this->alias];
@@ -130,7 +130,7 @@ class CartsItem extends CartAppModel {
 			$item[$this->alias]['cart_id'] = $cartId;
 			$this->create();
 		} else {
-			$item[$this->alias] = Set::merge($item[$this->alias], $itemData);
+			$item[$this->alias] = Hash::merge($item[$this->alias], $itemData);
 		}
 
 		return $this->save($item, array(

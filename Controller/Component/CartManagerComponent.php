@@ -531,7 +531,7 @@ class CartManagerComponent extends Component {
 		$defaults = array(
 			'unserialize' => true,
 		);
-		$options = Set::merge($defaults, $options);
+		$options = Hash::merge($defaults, $options);
 		$cart = $this->CartSession->read();
 		if ($options['unserialize'] === true) {
 			foreach ($cart['CartsItem'] as $key => &$cartItem) {
@@ -604,7 +604,7 @@ class CartManagerComponent extends Component {
 		$cartData = $this->Session->read($this->settings['sessionKey']);
 
 		if (isset($options['cartData'])) {
-			$cartData = Set::merge($cartData, $options['cartData']);
+			$cartData = Hash::merge($cartData, $options['cartData']);
 		}
 
 		$cartData = $this->CartModel->calculateCart($cartData, $options);
