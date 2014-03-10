@@ -18,13 +18,14 @@ Requirements
 Features
 --------
 
+ * Make *any* of your models a buy-able item with just a few steps
  * CartManager - handles the cart, adding and removing items from it
- * Allow/deny anonymous checkouts
  * Buy items via HTTP POST or GET
  * Saves the cart to session
  * Saves the cart to a cookie to make it persistent if not logged in
  * Saves the cart to DB if user is logged
  * Most, if not all steps are customizable by Events
+ * Allow/deny anonymous checkouts
 
 Documentation
 -------------
