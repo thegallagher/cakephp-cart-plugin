@@ -242,7 +242,6 @@ class CartsItem extends CartAppModel {
 		return $array1;
 	}
 
-
 /**
  * beforeSave callback
  *

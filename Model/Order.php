@@ -154,7 +154,7 @@ class Order extends CartAppModel {
 			$this->orderRecordBeforeSave = $this->find('first', array(
 				'contain' => array(),
 				'conditions' => array(
-					$this->alias . '.' . $this->primaryKey = $this->data[$this->alias][$this->primaryKey]
+					$this->alias . '.' . $this->primaryKey => $this->data[$this->alias][$this->primaryKey]
 				)
 			));
 		}
@@ -286,7 +286,9 @@ class Order extends CartAppModel {
 				'OrderItem'
 			),
 			'conditions' => array(
-				$this->alias . '.' . $this->primaryKey => $orderId)));
+				$this->alias . '.' . $this->primaryKey => $orderId)
+			)
+		);
 
 		if (empty($order)) {
 			throw new NotFoundException(__d('cart', 'The order does not exist.'));
@@ -294,17 +296,21 @@ class Order extends CartAppModel {
 		return $order;
 	}
 
+/**
+ *
+ */
 	public function beforeCreateOrder($data) {
-		$data[$this->alias] = array(
+		$defaults = array(
 			'cart_id' => empty($data['Cart']['id']) ? null : $data['Cart']['id'],
 			'user_id' => empty($data['Cart']['user_id']) ? null : $data['Cart']['user_id'],
+			'status' => empty($data[$this->alias]['status']) ? 'pending' : $data[$this->alias]['status'],
 			'cart_snapshot' => $data,
 			'total' => $data['Cart']['total'],
-			'cart_snapshot' => $data
 		);
 
+		$data[$this->alias] = Hash::merge($data[$this->alias], $defaults);
+
 		unset($data[$this->alias][$this->primaryKey]);
-		$data[$this->alias]['status'] = 'pending';
 		return $data;
 	}
 
@@ -352,7 +358,7 @@ class Order extends CartAppModel {
 				$this->save($data, Hash::merge($options, $saveOptions));
 				$data[$this->alias][$this->primaryKey] = $orderId = $this->getLastInsertId();
 
-				$this->saveItems($orderId, $data);
+				$data = $this->saveItems($orderId, $data);
 			} catch (Exception $e) {
 				$DataSource->rollback();
 				throw $e;
@@ -382,7 +388,6 @@ class Order extends CartAppModel {
  * @return string
  */
 	public function invoiceNumber($data = array(), $date = null) {
-		debug('invoiceNumber');
 		$Event = new CakeEvent(
 			'Order.createInvoiceNumber',
 			$this,
@@ -510,8 +515,13 @@ class Order extends CartAppModel {
 		foreach ($data['CartsItem'] as $item) {
 			$item['order_id'] = $orderId;
 			$this->OrderItem->create();
-			$this->OrderItem->save($item);
+			$this->OrderItem->save(array(
+				'OrderItem' => $item
+			));
+			$item['id'] = $this->OrderItem->getLastInsertId();
+			$data['OrderItem'][] = $item;
 		}
+		return $data;
 	}
 
 /**
