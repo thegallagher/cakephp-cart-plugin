@@ -92,6 +92,38 @@ class OrderAddress extends CartAppModel {
 	}
 
 /**
+ * beforeSave callback
+ *
+ * @param array $options
+ * @return boolean
+ */
+	public function beforeSave($options = array()) {
+		if (!parent::beforeSave($options)) {
+			return false;
+		}
+
+		$this->sanitizeFields();
+		return true;
+	}
+
+/**
+ * Sanitizes the address fields
+ *
+ * - Cleans white spaces before and after the strings
+ *
+ *
+ * @see OrderAdress::beforeSave();
+ * @return void
+ */
+	public function sanitizeFields() {
+		foreach ($this->data[$this->alias] as $field => $value) {
+			if (is_string($value)) {
+				$this->data[$this->alias][$field] = trim($value);
+			}
+		}
+	}
+
+/**
  * Detects a duplicate address based on the first argument or if null Model::$data
  *
  * - fullReturn: Returns the full record set instead of just the id of the duplicate

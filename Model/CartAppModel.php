@@ -78,9 +78,9 @@ class CartAppModel extends AppModel {
 		foreach ($fields as $field) {
 			if (!empty($data[$this->alias][$field])) {
 				if (!is_array($data[$this->alias][$field])) {
-					$serializedData = serialize($data[$this->alias][$field]);
-				} else {
 					$serializedData = serialize(array());
+				} else {
+					$serializedData = serialize($data[$this->alias][$field]);
 				}
 				$data[$this->alias][$field] = $serializedData;
 			}
@@ -103,6 +103,13 @@ class CartAppModel extends AppModel {
 		return $data;
 	}
 
+/**
+ * Validation method to check if the content of a field is an array
+ *
+ * @param mixed $check
+ * @param boolean $notEmpty
+ * @return boolean
+ */
 	public function isArray($check, $notEmpty = true) {
 		$value = array_values($check);
 		$value = $value[0];
@@ -110,9 +117,25 @@ class CartAppModel extends AppModel {
 			if ($notEmpty === true) {
 				return (!empty($value));
 			}
-			true;
+			return true;
 		}
 		return false;
+	}
+
+/**
+ * Attempts to unserialize a string if it cant, it will return the original value
+ *
+ * @param mixed $value
+ * @return mixed
+ */
+	public function unserializeValue($value) {
+		if (is_string($value)) {
+			$result = @unserialize($value);
+			if ($result !== false) {
+				return $result;
+			}
+		}
+		return $value;
 	}
 
 }

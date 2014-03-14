@@ -305,7 +305,9 @@ class Cart extends CartAppModel {
  * @return array
  */
 	public function applyTaxRules($cartData) {
-		$Event = new CakeEvent('Cart.applyTaxRules', $this, array('cartData' => $cartData));
+		$Event = new CakeEvent('Cart.applyTaxRules', $this, array(
+			'cartData' => $cartData
+		));
 		$this->getEventManager()->dispatch($Event);
 		if (!empty($Event->result)) {
 			return $Event->result;
@@ -320,7 +322,9 @@ class Cart extends CartAppModel {
  * @return array
  */
 	public function applyDiscounts($cartData) {
-		$Event = new CakeEvent('Cart.applyDiscounts', $this, array('cartData' => $cartData));
+		$Event = new CakeEvent('Cart.applyDiscounts', $this, array(
+			'cartData' => $cartData
+		));
 		$this->getEventManager()->dispatch($Event);
 		if (!empty($Event->result)) {
 			return $Event->result;

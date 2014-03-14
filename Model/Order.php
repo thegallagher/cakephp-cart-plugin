@@ -248,23 +248,24 @@ class Order extends CartAppModel {
 /**
  * Returns the data for a user to view an order he made
  *
- * @param  string $orderId Order UUID
- * @param  string $userId User UUId
- * @return array
+ * @param string $orderId Order UUID
+ * @param array $options
  * @throws NotFoundException
+ * @return array
  */
-	public function view($orderId = null, $userId = null) {
-		$order = $this->find('first', array(
+	public function view($orderId = null, $options = array()) {
+		$defaults = array(
 			'contain' => array(
 				'OrderItem',
 				'BillingAddress',
 				'ShippingAddress'
 			),
 			'conditions' => array(
-				$this->alias . '.' . $this->primaryKey => $orderId,
-				$this->alias . '.user_id' => $userId
+				$this->alias . '.' . $this->primaryKey => $orderId
 			)
-		));
+		);
+
+		$order = $this->find('first', Hash::merge($defaults, $options));
 
 		if (empty($order)) {
 			throw new NotFoundException(__d('cart', 'The order does not exist.'));
@@ -297,7 +298,10 @@ class Order extends CartAppModel {
 	}
 
 /**
+ * beforeCreateOrder
  *
+ * @param array $data
+ * @return array
  */
 	public function beforeCreateOrder($data) {
 		$defaults = array(
@@ -514,12 +518,16 @@ class Order extends CartAppModel {
 	public function saveItems($orderId, $data) {
 		foreach ($data['CartsItem'] as $item) {
 			$item['order_id'] = $orderId;
+			if (!empty($item['additional_fields'])) {
+				$item['additional_data'] = $this->unserializeValue($item['additional_data']);
+			}
 			$this->OrderItem->create();
-			$this->OrderItem->save(array(
+			$result = $this->OrderItem->save(array(
 				'OrderItem' => $item
 			));
-			$item['id'] = $this->OrderItem->getLastInsertId();
-			$data['OrderItem'][] = $item;
+			$result['OrderItem']['id'] = $this->OrderItem->getLastInsertId();
+			$result['OrderItem']['additional_data'] = unserialize($result['OrderItem']['additional_data']);
+			$data['OrderItem'][] = $result['OrderItem'];
 		}
 		return $data;
 	}
