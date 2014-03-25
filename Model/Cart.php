@@ -335,6 +335,7 @@ class Cart extends CartAppModel {
 /**
  * Calculates the total amount of the cart
  *
+ * @todo Move the default calculation to an event instead of adding it directly here?
  * @param array $cartData
  * @return array
  */
@@ -346,6 +347,14 @@ class Cart extends CartAppModel {
 				$cartData['CartsItem'][$key]['total'] = (float)$item['quantity'] * (float)$item['price'];
 				$cartData[$this->alias]['total'] += (float)$cartData['CartsItem'][$key]['total'];
 			}
+		}
+
+		$Event = new CakeEvent('Cart.calculateTotals', $this, array(
+			'cartData' => $cartData
+		));
+		$this->getEventManager()->dispatch($Event);
+		if (!empty($Event->result)) {
+			return $Event->result;
 		}
 
 		return $cartData;
