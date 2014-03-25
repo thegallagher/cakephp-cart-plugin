@@ -520,13 +520,17 @@ class Order extends CartAppModel {
 			$item['order_id'] = $orderId;
 			if (!empty($item['additional_fields']) && is_string($item['additional_data'])) {
 				$item['additional_data'] = $this->unserializeValue($item['additional_data']);
+			} else {
+				$item['additional_data'] = array();
 			}
 			$this->OrderItem->create();
 			$result = $this->OrderItem->save(array(
 				'OrderItem' => $item
 			));
 			$result['OrderItem']['id'] = $this->OrderItem->getLastInsertId();
-			$result['OrderItem']['additional_data'] = unserialize($result['OrderItem']['additional_data']);
+			if (is_string($result['OrderItem']['additional_data'])) {
+				$result['OrderItem']['additional_data'] = unserialize($result['OrderItem']['additional_data']);
+			}
 			$data['OrderItem'][] = $result['OrderItem'];
 		}
 		return $data;

@@ -85,20 +85,28 @@ class OrderTest extends CakeTestCase {
 				'requires_shipping' => false,
 				'user_id' => 'user-1',
 				'processor' => 'Paypal.PaypalExpress',
-				'total' => 20.95),
+				'total' => 20.95,
+				//'additional_data' => array()
+			),
 			'CartsItem' => array(
 				array(
 					'name' => 'CakePHP',
 					'foreign_key' => 'item-1',
 					'model' => 'Item',
 					'quantity' => 1,
-					'price' => 10),
+					'price' => 10
+				),
 				array(
 					'name' => 'Developer',
 					'foreign_key' => 'item-2',
 					'model' => 'Item',
 					'quantity' => 2,
-					'price' => 10)));
+					'price' => 10
+				)
+			)
+		);
+
+		$cartData['Order'] = $cartData['Cart'];
 
 		$result = $this->Order->createOrder($cartData);
 		$this->assertTrue($result);
@@ -166,6 +174,7 @@ class OrderTest extends CakeTestCase {
 		);
 
 		$result = $this->Order->invoiceNumber(array(), '2066-12-12');
+
 		$this->assertEquals('20661212-2', $result);
 
 		$this->Order->create();
