@@ -74,7 +74,7 @@ class CartSessionComponentTest extends CakeTestCase {
 			'foo' => 'bar'));
 
 		$result = $Cart->read();
-		$this->assertEqual($result['CartsItem'], array(
+		$this->assertEquals($result['CartsItem'], array(
 			0 => array(
 				'amount' => 10,
 				'model' => 'Item',

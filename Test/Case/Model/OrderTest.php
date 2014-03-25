@@ -60,8 +60,8 @@ class OrderTest extends CakeTestCase {
 	public function testView() {
 		$result = $this->Order->view('order-1', 'user-1');
 		$this->assertTrue(is_array($result) && !empty($result));
-		$this->assertEqual($result['Order']['user_id'], 'user-1');
-		$this->assertEqual($result['Order']['id'], 'order-1');
+		$this->assertEquals($result['Order']['user_id'], 'user-1');
+		$this->assertEquals($result['Order']['id'], 'order-1');
 	}
 
 /**
@@ -122,7 +122,7 @@ class OrderTest extends CakeTestCase {
 				'callbacks' => true));
 
 		$result = $this->Order->orderNumber(array());
-		$this->assertEqual($count + 1, $result);
+		$this->assertEquals($count + 1, $result);
 
 		$this->Order->create();
 		$this->Order->save(array(
@@ -133,7 +133,7 @@ class OrderTest extends CakeTestCase {
 				'callbacks' => true));
 
 		$result = $this->Order->orderNumber(array());
-		$this->assertEqual($count + 2, $result);
+		$this->assertEquals($count + 2, $result);
 	}
 
 /**
@@ -153,7 +153,7 @@ class OrderTest extends CakeTestCase {
 		);
 
 		$result = $this->Order->invoiceNumber(array(), '2066-12-12');
-		$this->assertEqual('20661212-1', $result);
+		$this->assertEquals('20661212-1', $result);
 
 		$this->Order->create();
 		$this->Order->save(array(
@@ -166,7 +166,7 @@ class OrderTest extends CakeTestCase {
 		);
 
 		$result = $this->Order->invoiceNumber(array(), '2066-12-12');
-		$this->assertEqual('20661212-2', $result);
+		$this->assertEquals('20661212-2', $result);
 
 		$this->Order->create();
 		$this->Order->save(array(
@@ -179,7 +179,7 @@ class OrderTest extends CakeTestCase {
 		);
 
 		$result = $this->Order->invoiceNumber(array(), '2066-12-12');
-		$this->assertEqual('20661212-3', $result);
+		$this->assertEquals('20661212-3', $result);
 	}
 
 /**

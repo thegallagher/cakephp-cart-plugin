@@ -32,6 +32,30 @@ class CartTest extends CakeTestCase {
  */
 	public function setUp() {
 		$this->Cart = ClassRegistry::init('Cart.Cart');
+		$this->_detachAllListeners();
+	}
+
+/**
+ * Detaches all listeners from the Cart events to avoid application level events changing the tests
+ *
+ * @return void
+ */
+	protected function _detachAllListeners() {
+		$EventManager = CakeEventManager::instance();
+		$events = array(
+			'Cart.beforeCalculateCart',
+			'Cart.applyTaxRules',
+			'Cart.applyDiscounts',
+			'Cart.afterCalculateCart'
+		);
+		foreach ($events as $event) {
+			$listeners = $EventManager->listeners($event);
+			foreach ($listeners as $listener) {
+				foreach ($listener['callable'] as $callable) {
+					$EventManager->detach($callable);
+				}
+			}
+		}
 	}
 
 /**
@@ -61,7 +85,7 @@ class CartTest extends CakeTestCase {
 	public function testView() {
 		$result = $this->Cart->view('cart-1');
 		$this->assertTrue(is_array($result));
-		$this->assertEqual($result['Cart']['id'], 'cart-1');
+		$this->assertEquals($result['Cart']['id'], 'cart-1');
 	}
 
 /**
@@ -83,17 +107,18 @@ class CartTest extends CakeTestCase {
 		$this->Cart->cartId = 1;
 		$result = $this->Cart->addItem('cart-1',
 			array(
-				'model' => 'CartsItem',
-				'foreign_key' => '1',
+				'name' => 'Eizo Flexscan S2431W',
+				'model' => 'Item',
+				'foreign_key' => 'item-1',
 				'quantity' => 1,
 				'price' => 52.00,
 			)
 		);
 		$this->assertTrue(is_array($result));
-		$this->assertEqual($result['CartsItem']['model'], 'CartsItem');
-		$this->assertEqual($result['CartsItem']['foreign_key'], 1);
-		$this->assertEqual($result['CartsItem']['quantity'], 1);
-		$this->assertEqual($result['CartsItem']['price'], 52.00);
+		$this->assertEquals($result['CartsItem']['model'], 'Item');
+		$this->assertEquals($result['CartsItem']['foreign_key'], 'item-1');
+		$this->assertEquals($result['CartsItem']['quantity'], 1);
+		$this->assertEquals($result['CartsItem']['price'], 52.00);
 	}
 
 /**
@@ -145,7 +170,8 @@ class CartTest extends CakeTestCase {
 				'active' => true,
 				'item_count' => '1',
 				'created' => '2012-01-01 12:12:12',
-				'modified' => '2012-01-01 12:12:12'
+				'modified' => '2012-01-01 12:12:12',
+				'additional_data' => array()
 			),
 			'CartsItem' => array(
 				0 => array(
@@ -157,12 +183,13 @@ class CartTest extends CakeTestCase {
 					'name' => 'Eizo Flexscan S2431W',
 					'price' => '720.37',
 					'created' => '2012-01-01 12:30:00',
-					'modified' => '2012-01-01 12:30:00'
+					'modified' => '2012-01-01 12:30:00',
+					'additional_data' => 'a:0:{}'
 				)
 			)
 		);
 		$result = $this->Cart->getActive('user-1');
-		$this->assertEqual($result, $expected);
+		$this->assertEquals($result, $expected);
 
 		$result = $this->Cart->getActive('user-does-not-exist', false);
 		$this->assertFalse($result);
@@ -200,7 +227,7 @@ class CartTest extends CakeTestCase {
 			)
 		);
 		$result = $this->Cart->calculateTotals($cart);
-		$this->assertEqual($result['Cart']['total'], 45.12);
+		$this->assertEquals($result['Cart']['total'], 45.12);
 	}
 
 /**
@@ -237,6 +264,7 @@ class CartTest extends CakeTestCase {
 		);
 
 		$result = $this->Cart->mergeItems('cart-1', $sessionData['CartsItem']);
+		$this->assertEquals($result, 1);
 
 		$itemsAfter = $this->Cart->CartsItem->find('all', array(
 			'contain' => array(),
@@ -245,9 +273,12 @@ class CartTest extends CakeTestCase {
 			)
 		));
 
-		$this->assertEqual(count($itemsAfter), $itemCount + 1);
-		$this->assertEqual($itemsAfter[0]['CartsItem']['name'], 'Eizo Flexscan S2431W');
-		$this->assertEqual($itemsAfter[0]['CartsItem']['quantity'], 2);
+		// Sort the items by name so that we can be sure an item is at a certain index in the array
+		$itemsAfter = Hash::sort($itemsAfter, '{n}.CartsItem.name', 'desc');
+
+		$this->assertEquals(count($itemsAfter), $itemCount + 1);
+		$this->assertEquals($itemsAfter[0]['CartsItem']['name'], 'Eizo Flexscan S2431W');
+		$this->assertEquals($itemsAfter[0]['CartsItem']['quantity'], 2);
 	}
 
 /**
@@ -300,7 +331,7 @@ class CartTest extends CakeTestCase {
 		);
 
 		$result = $this->Cart->calculateCart($data);
-		$this->assertEqual($result['Cart']['total'], 729.22);
+		$this->assertEquals($result['Cart']['total'], 729.22);
 	}
 
 }

@@ -360,7 +360,7 @@ class Cart extends CartAppModel {
  *
  * @param integer|string $cartId
  * @param array $cartItems
- * @return void
+ * @return integer Number of merged items
  */
 	public function mergeItems($cartId, $cartItems) {
 		$dbItems = $this->CartsItem->find('all', array(
@@ -370,6 +370,7 @@ class Cart extends CartAppModel {
 			)
 		));
 
+		$mergedItems = 0;
 		foreach ($cartItems as $cartKey => $cartItem) {
 			$matched = false;
 			foreach ($dbItems as $dbItem) {
@@ -380,9 +381,11 @@ class Cart extends CartAppModel {
 				}
 			}
 			if ($matched === false) {
+				$mergedItems++;
 				$this->addItem($cartId, $cartItem);
 			}
 		}
+		return $mergedItems;
 	}
 
 /**
@@ -418,6 +421,20 @@ class Cart extends CartAppModel {
  */
 	public function confirmCheckout($data) {
 		return (isset($data[$this->alias]['confirm_checkout']) && $data[$this->alias]['confirm_checkout'] == 1);
+	}
+
+/**
+ * afterFind callback
+ *
+ * @param array
+ * @param boolean
+ * @return array
+ */
+	public function afterFind($results, $primary = true) {
+		foreach ($results as &$result) {
+			$result = $this->_unserializeFields(array('additional_data'), $result);
+		}
+		return $results;
 	}
 
 }

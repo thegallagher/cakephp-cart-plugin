@@ -93,7 +93,7 @@ class ShippingMethodsControllerTestCase extends CakeTestCase {
  */
 	public function testEdit() {
 		$this->ShippingMethods->edit('shippingmethod-1');
-		$this->assertEqual($this->ShippingMethods->data['ShippingMethod'], $this->record['ShippingMethod']);
+		$this->assertEquals($this->ShippingMethods->data['ShippingMethod'], $this->record['ShippingMethod']);
 
 		$this->ShippingMethods->data = $this->record;
 		$this->expectRedirect($this->ShippingMethods, array('action' => 'view', 'shippingmethod-1'));
@@ -173,7 +173,7 @@ class ShippingMethodsControllerTestCase extends CakeTestCase {
  */
 	public function testAdminEdit() {
 		$this->ShippingMethods->admin_edit('shippingmethod-1');
-		$this->assertEqual($this->ShippingMethods->data['ShippingMethod'], $this->record['ShippingMethod']);
+		$this->assertEquals($this->ShippingMethods->data['ShippingMethod'], $this->record['ShippingMethod']);
 
 		$this->ShippingMethods->data = $this->record;
 		$this->expectRedirect($this->ShippingMethods, array('action' => 'view', 'shippingmethod-1'));

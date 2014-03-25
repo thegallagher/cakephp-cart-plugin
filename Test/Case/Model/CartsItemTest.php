@@ -86,7 +86,7 @@ class CartsItemTest extends CakeTestCase {
 					'model' => 'Foo')));
 
 		$result = $this->CartsItem->mergeItems($data2, $data1);
-		$this->assertEqual($result, array(
+		$this->assertEquals($result, array(
 			'CartsItem' => array(
 				0 => array(
 					'foreign_key' => 'ufsfasf123',
@@ -99,7 +99,7 @@ class CartsItemTest extends CakeTestCase {
 					'model' => 'Foo'))));
 
 		$result = $this->CartsItem->mergeItems($data1, $data2);
-		$this->assertEqual($result, array(
+		$this->assertEquals($result, array(
 			'CartsItem' => array(
 				0 => array(
 					'foreign_key' => 'asf123',
@@ -131,7 +131,7 @@ class CartsItemTest extends CakeTestCase {
 				'CartsItem.model' => 'Item',
 				'CartsItem.cart_id' => 'cart-1')));
 
-		$this->assertEqual($result, 0);
+		$this->assertEquals($result, 0);
 	}
 
 /**
@@ -149,10 +149,10 @@ class CartsItemTest extends CakeTestCase {
 			)
 		);
 		$this->assertTrue(is_array($result));
-		$this->assertEqual($result['CartsItem']['model'], 'CartsItem');
-		$this->assertEqual($result['CartsItem']['foreign_key'], 1);
-		$this->assertEqual($result['CartsItem']['quantity'], 1);
-		$this->assertEqual($result['CartsItem']['price'], 52.00);
+		$this->assertEquals($result['CartsItem']['model'], 'CartsItem');
+		$this->assertEquals($result['CartsItem']['foreign_key'], 1);
+		$this->assertEquals($result['CartsItem']['quantity'], 1);
+		$this->assertEquals($result['CartsItem']['price'], 52.00);
 	}
 
 }
