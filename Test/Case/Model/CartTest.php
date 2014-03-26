@@ -1,5 +1,7 @@
 <?php
 App::uses('Cart', 'Cart.Model');
+App::uses('DefaultCartEventListener', 'Cart.Event');
+
 /**
  * Cart Test
  *
@@ -33,6 +35,7 @@ class CartTest extends CakeTestCase {
 	public function setUp() {
 		$this->Cart = ClassRegistry::init('Cart.Cart');
 		$this->_detachAllListeners();
+		CakeEventManager::instance()->attach(new DefaultCartEventListener());
 	}
 
 /**
