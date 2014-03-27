@@ -156,7 +156,9 @@ class CartsItem extends CartAppModel {
 			'conditions' => array(
 				$this->alias . '.cart_id' => $cartId,
 				$this->alias . '.model' => $itemData['model'],
-				$this->alias . '.foreign_key' => $itemData['foreign_key'])));
+				$this->alias . '.foreign_key' => $itemData['foreign_key']
+			)
+		));
 
 		if (empty($item)) {
 			return false;
@@ -192,7 +194,9 @@ class CartsItem extends CartAppModel {
 		$result = $this->find('first', array(
 			'conditions' => array(
 				'cart_id' => $data[$this->alias]['cart_id'],
-				'foreign_key' => $data[$this->alias]['foreign_key'])));
+				'foreign_key' => $data[$this->alias]['foreign_key']
+			)
+		));
 
 		if (empty($result)) {
 

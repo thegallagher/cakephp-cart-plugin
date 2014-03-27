@@ -518,11 +518,6 @@ class Order extends CartAppModel {
 	public function saveItems($orderId, $data) {
 		foreach ($data['CartsItem'] as $item) {
 			$item['order_id'] = $orderId;
-			if (!empty($item['additional_fields']) && is_string($item['additional_data'])) {
-				$item['additional_data'] = $this->unserializeValue($item['additional_data']);
-			} else {
-				$item['additional_data'] = array();
-			}
 			$this->OrderItem->create();
 			$result = $this->OrderItem->save(array(
 				'OrderItem' => $item
