@@ -495,7 +495,7 @@ class Order extends CartAppModel {
 				$data['ShippingAddress']['type'] = AddressType::SHIPPING;
 				$this->ShippingAddress->create();
 				$this->ShippingAddress->save($data, array('validate' => false));
-				$shippingAddressId = $this->BillingAddress->getLastInsertId();
+				$shippingAddressId = $this->ShippingAddress->getLastInsertId();
 			}
 		} else {
 			$shippingAddressId = $billingAddressId;
