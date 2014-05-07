@@ -22,4 +22,19 @@ class OrderItem extends CartAppModel {
 		)
 	);
 
+/**
+ * beforeSave callback
+ *
+ * @param  array $options, not used
+ * @return boolean
+ */
+	public function beforeSave($options = array()) {
+		$this->data = $this->_serializeFields(
+			array(
+				'additional_data',
+			),
+			$this->data
+		);
+		return true;
+	}
 }

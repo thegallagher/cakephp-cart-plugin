@@ -273,7 +273,8 @@ class Cart extends CartAppModel {
 		if (isset($data['CartsItem'])) {
 			$data[$this->alias]['item_count'] = count($data['CartsItem']);
 		} else {
-			return $data[$this->alias]['total'] = 0.00;
+			$data[$this->alias]['total'] = 0.00;
+			return $data;
 		}
 
 		$cart[$this->alias]['requires_shipping'] = $this->requiresShipping($data['CartsItem']);
@@ -305,7 +306,9 @@ class Cart extends CartAppModel {
  * @return array
  */
 	public function applyTaxRules($cartData) {
-		$Event = new CakeEvent('Cart.applyTaxRules', $this, array('cartData' => $cartData));
+		$Event = new CakeEvent('Cart.applyTaxRules', $this, array(
+			'cartData' => $cartData
+		));
 		$this->getEventManager()->dispatch($Event);
 		if (!empty($Event->result)) {
 			return $Event->result;
@@ -320,7 +323,9 @@ class Cart extends CartAppModel {
  * @return array
  */
 	public function applyDiscounts($cartData) {
-		$Event = new CakeEvent('Cart.applyDiscounts', $this, array('cartData' => $cartData));
+		$Event = new CakeEvent('Cart.applyDiscounts', $this, array(
+			'cartData' => $cartData
+		));
 		$this->getEventManager()->dispatch($Event);
 		if (!empty($Event->result)) {
 			return $Event->result;
@@ -335,15 +340,13 @@ class Cart extends CartAppModel {
  * @return array
  */
 	public function calculateTotals($cartData) {
-		$cartData[$this->alias]['total'] = 0.00;
-
-		if (!empty($cartData['CartsItem'])) {
-			foreach ($cartData['CartsItem'] as $key => $item) {
-				$cartData['CartsItem'][$key]['total'] = (float)$item['quantity'] * (float)$item['price'];
-				$cartData[$this->alias]['total'] += (float)$cartData['CartsItem'][$key]['total'];
-			}
+		$Event = new CakeEvent('Cart.calculateTotals', $this, array(
+			'cartData' => $cartData
+		));
+		$this->getEventManager()->dispatch($Event);
+		if (!empty($Event->result)) {
+			return $Event->result;
 		}
-
 		return $cartData;
 	}
 
@@ -356,7 +359,7 @@ class Cart extends CartAppModel {
  *
  * @param integer|string $cartId
  * @param array $cartItems
- * @return void
+ * @return integer Number of merged items
  */
 	public function mergeItems($cartId, $cartItems) {
 		$dbItems = $this->CartsItem->find('all', array(
@@ -366,6 +369,7 @@ class Cart extends CartAppModel {
 			)
 		));
 
+		$mergedItems = 0;
 		foreach ($cartItems as $cartKey => $cartItem) {
 			$matched = false;
 			foreach ($dbItems as $dbItem) {
@@ -376,9 +380,11 @@ class Cart extends CartAppModel {
 				}
 			}
 			if ($matched === false) {
+				$mergedItems++;
 				$this->addItem($cartId, $cartItem);
 			}
 		}
+		return $mergedItems;
 	}
 
 /**
@@ -414,6 +420,20 @@ class Cart extends CartAppModel {
  */
 	public function confirmCheckout($data) {
 		return (isset($data[$this->alias]['confirm_checkout']) && $data[$this->alias]['confirm_checkout'] == 1);
+	}
+
+/**
+ * afterFind callback
+ *
+ * @param array
+ * @param boolean
+ * @return array
+ */
+	public function afterFind($results, $primary = true) {
+		foreach ($results as &$result) {
+			$result = $this->_unserializeFields(array('additional_data'), $result);
+		}
+		return $results;
 	}
 
 }

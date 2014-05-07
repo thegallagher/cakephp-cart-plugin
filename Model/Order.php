@@ -1,5 +1,6 @@
 <?php
 App::uses('CartAppModel', 'Cart.Model');
+App::uses('AddressType', 'Cart.Model');
 
 /**
  * Order Model
@@ -39,24 +40,18 @@ class Order extends CartAppModel {
  */
 	public $belongsTo = array(
 		'Cart' => array(
-			'className' => 'Cart.Cart'),
+			'className' => 'Cart.Cart'
+		),
 		'User' => array(
-			'className' => 'User'));
-
-/**
- * belongsTo associations
- *
- * @var array
- */
-	public $hasOne = array(
+			'className' => 'User'
+		),
 		'BillingAddress' => array(
 			'className' => 'Cart.OrderAddress',
-			'conditions' => array(
-				'BillingAddress.type' => 'billing')),
+		),
 		'ShippingAddress' => array(
 			'className' => 'Cart.OrderAddress',
-			'conditions' => array(
-				'ShippingAddress.type' => 'shipping')));
+		)
+	);
 
 /**
  * hasMany associations
@@ -65,7 +60,9 @@ class Order extends CartAppModel {
  */
 	public $hasMany = array(
 		'OrderItem' => array(
-			'className' => 'Cart.OrderItem'));
+			'className' => 'Cart.OrderItem'
+		)
+	);
 
 /**
  * Validation rules
@@ -76,23 +73,28 @@ class Order extends CartAppModel {
 		'total' => array(
 			'numeric' => array(
 				'rule' => array('numeric'),
-				'message' => 'This must be a number')),
+				'message' => 'This must be a number'
+			)
+		),
 		'status' => array(
 			'notEmpty' => array(
 				'rule' => array('notEmpty'),
-				'message' => 'The order requires a status')),
+				'message' => 'The order requires a status'
+			)
+		),
 		'currency' => array(
 			'notEmpty' => array(
 				'rule' => array('notEmpty'),
-				'message' => 'You must select a currency')),
-		'processor' => array(
-			'notEmpty' => array(
-				'rule' => array('notEmpty'),
-				'message' => 'The order requires a payment processor')),
+				'message' => 'You must select a currency'
+			)
+		),
 		'cart_snapshot' => array(
 			'notEmpty' => array(
-				'rule' => array('notEmpty'),
-				'message' => 'You must add the cart data to the order')));
+				'rule' => array('isArray', true),
+				'message' => 'You must add the cart data to the order'
+			)
+		)
+	);
 
 /**
  * Filters args for search
@@ -115,7 +117,15 @@ class Order extends CartAppModel {
  */
 	public function beforeSave($options = array()) {
 		$this->_getOrderRecordBeforeSave();
-		$this->_serializeCartSnapshot();
+		$this->data = $this->_serializeFields(
+			array(
+				'cart_snapshot',
+				'additional_data',
+				'shipping_address',
+				'billing_address'
+			),
+			$this->data
+		);
 		return true;
 	}
 
@@ -144,7 +154,7 @@ class Order extends CartAppModel {
 			$this->orderRecordBeforeSave = $this->find('first', array(
 				'contain' => array(),
 				'conditions' => array(
-					$this->alias . '.' . $this->primaryKey = $this->data[$this->alias][$this->primaryKey]
+					$this->alias . '.' . $this->primaryKey => $this->data[$this->alias][$this->primaryKey]
 				)
 			));
 		}
@@ -166,11 +176,13 @@ class Order extends CartAppModel {
 					$changedFields[] = $value;
 				}
 			}
+
 			if (!empty($changedFields)) {
-				CakeEventManager::instance()->dispatch(new CakeEvent('Order.changed', $this, array(
+				$this->getEventManager()->dispatch(new CakeEvent('Order.changed', $this, array(
 					$this->data,
 					$this->orderRecordBeforeSave,
-					$changedFields)));
+					$changedFields
+				)));
 			}
 		}
 	}
@@ -194,14 +206,14 @@ class Order extends CartAppModel {
 
 			$result = $this->save($this->data, array(
 				'validate' => false,
-				'callbacks' => false));
+				'callbacks' => false
+			));
 
 			$this->data = $result;
-			CakeEventManager::instance()->dispatch(new CakeEvent('Order.created', $this, array($this->data)));
+			$this->getEventManager()->dispatch(new CakeEvent('Order.created', $this, array($this->data)));
 		}
 
 		$this->_detectOrderChange();
-
 		$this->orderRecordBeforeSave = null;
 	}
 
@@ -213,7 +225,7 @@ class Order extends CartAppModel {
  * @return array
  */
 	public function afterFind($results, $primary = false) {
-		$results = $this->unserializeCartSnapshot($results);
+		$results = $this->unserializeFields($results);
 		return $results;
 	}
 
@@ -224,12 +236,10 @@ class Order extends CartAppModel {
  * @internal param array $results
  * @return   array modified results array
  */
-	public function unserializeCartSnapshot($results) {
+	public function unserializeFields($results) {
 		if (!empty($results)) {
 			foreach ($results as $key => $result) {
-				if (isset($result[$this->alias]['cart_snapshot'])) {
-					$results[$key][$this->alias]['cart_snapshot'] = unserialize($result[$this->alias]['cart_snapshot']);
-				}
+				$results[$key] = $this->_unserializeFields(array('cart_snapshot'), $result);
 			}
 		}
 		return $results;
@@ -238,18 +248,24 @@ class Order extends CartAppModel {
 /**
  * Returns the data for a user to view an order he made
  *
- * @param  string $orderId Order UUID
- * @param  string $userId User UUId
- * @return array
+ * @param string $orderId Order UUID
+ * @param array $options
  * @throws NotFoundException
+ * @return array
  */
-	public function view($orderId = null, $userId = null) {
-		$order = $this->find('first', array(
+	public function view($orderId = null, $options = array()) {
+		$defaults = array(
 			'contain' => array(
-				'OrderItem'),
+				'OrderItem',
+				'BillingAddress',
+				'ShippingAddress'
+			),
 			'conditions' => array(
-				$this->alias . '.' . $this->primaryKey => $orderId,
-				$this->alias . '.user_id' => $userId)));
+				$this->alias . '.' . $this->primaryKey => $orderId
+			)
+		);
+
+		$order = $this->find('first', Hash::merge($defaults, $options));
 
 		if (empty($order)) {
 			throw new NotFoundException(__d('cart', 'The order does not exist.'));
@@ -268,10 +284,12 @@ class Order extends CartAppModel {
 		$order = $this->find('first', array(
 			'contain' => array(
 				'User',
-				//'OrderItem'
+				'OrderItem'
 			),
 			'conditions' => array(
-				$this->alias . '.' . $this->primaryKey => $orderId)));
+				$this->alias . '.' . $this->primaryKey => $orderId)
+			)
+		);
 
 		if (empty($order)) {
 			throw new NotFoundException(__d('cart', 'The order does not exist.'));
@@ -280,108 +298,90 @@ class Order extends CartAppModel {
 	}
 
 /**
- * Validate Order
+ * beforeCreateOrder
  *
- * Shipping and Billing Address validation if the cart requires shipping
- * by default true, it will get just validated and by this maybe set
- * to invalid, when the cart requires shipping
- *
- * @param  array $order
- * @return mixed
+ * @param array $data
+ * @return array
  */
-	public function validateOrder($order) {
-		$validBillingAddress = true;
-		$validShippingAddress = true;
+	public function beforeCreateOrder($data) {
+		$defaults = array(
+			'cart_id' => empty($data['Cart']['id']) ? null : $data['Cart']['id'],
+			'user_id' => empty($data['Cart']['user_id']) ? null : $data['Cart']['user_id'],
+			'status' => empty($data[$this->alias]['status']) ? 'pending' : $data[$this->alias]['status'],
+			'cart_snapshot' => $data,
+			'total' => $data['Cart']['total'],
+		);
 
-		if (isset($order['Cart']['requires_shipping']) && $order['Cart']['requires_shipping'] == 1) {
-			$this->ShippingAddress->set($order);
-			$validShippingAddress = $this->ShippingAddress->validates();
+		$data[$this->alias] = Hash::merge($data[$this->alias], $defaults);
 
-			if (isset($order['BillingAddress']['same_as_shipping']) && $order['BillingAddress']['same_as_shipping'] == 1) {
-				$order['BillingAddress'] = $order['ShippingAddress'];
-			} else {
-				$this->BillingAddress->set($order);
-				$validBillingAddress = $this->BillingAddress->validates();
-			}
-		}
-
-		$this->set($order);
-		$validOrder = $this->validates();
-
-		if (!$validOrder || !$validBillingAddress || !$validShippingAddress) {
-			return false;
-		}
-
-		return $order;
+		unset($data[$this->alias][$this->primaryKey]);
+		return $data;
 	}
 
 /**
- * This method will create a new order record and does the validation work for
- * the different cases that might apply before you can issue a new order
+ * Turns the cart into an order
  *
- * @param    array $cartData
- * @param    string $processorClass
- * @param    string $paymentStatus
- * @internal param $
- * @internal param $
- * @internal param $
- * @return mixed Array with order data on success, false if not
- * @todo finish me
+ * - validates all data for the order first
+ * - starts a DB transaction
+ * - saves all data
+ * - if no exception thrown commits the DB transaction, else rolls it back
+ *
+ * @throws Exception
+ * @param array $data Post data
+ * @param array $options
+ * @return boolean
  */
-	public function createOrder($cartData, $processorClass, $paymentStatus = 'pending') {
-		$order = array(
-			$this->alias => array(
-				'processor' => $processorClass,
-				'payment_status' => $paymentStatus,
-				'cart_id' => empty($cartData['Cart']['id']) ? null : $cartData['Cart']['id'],
-				'user_id' => empty($cartData['Cart']['user_id']) ? null : $cartData['Cart']['user_id'],
-				'cart_snapshot' => $cartData,
-				'total' => $cartData['Cart']['total']
+	public function createOrder($data, $options = array()) {
+		$data = $this->beforeCreateOrder($data);
+
+		$Event = new CakeEvent(
+			'Order.beforeCreateOrder',
+			$this,
+			array(
+				'order' => $data
 			)
 		);
-
-		$order = Set::merge($cartData, $order);
-
-		CakeEventManager::instance()->dispatch(new CakeEvent('Order.beforeCreateOrder', $this, array($order)));
-
-		$order = $this->validateOrder($order);
-		if ($order === false) {
+		$this->getEventManager()->dispatch($Event);
+		if ($Event->result === false) {
 			return false;
 		}
 
-		$this->data = null;
-		$this->create();
-		$result = $this->save($order);
+		if ($this->beforeOrderValidation($data)) {
+			$DataSource = $this->getDataSource();
+			$DataSource->begin();
 
-		$orderId = $this->getLastInsertId();
-		$result[$this->alias][$this->primaryKey] = $orderId;
+			try {
+				$data = $this->saveAddresses($data);
 
-		foreach ($order['CartsItem'] as $item) {
-			$item['order_id'] = $orderId;
-			$this->OrderItem->create();
-			$this->OrderItem->save($item);
-		}
+				$saveOptions = array(
+					'validate' => false,
+					'callbacks' => true,
+				);
 
-		if (isset($order['Cart']['requires_shipping']) && $order['Cart']['requires_shipping'] == 1) {
-			$order['BillingAddress']['order_id'] = $orderId;
-			$order['ShippingAddress']['order_id'] = $orderId;
-			if (!isset($order['BillingAddress']['id'])) {
-				$this->BillingAddress->create();
+				$this->create();
+				$this->save($data, Hash::merge($options, $saveOptions));
+				$data[$this->alias][$this->primaryKey] = $orderId = $this->getLastInsertId();
+
+				$data = $this->saveItems($orderId, $data);
+			} catch (Exception $e) {
+				$DataSource->rollback();
+				throw $e;
 			}
-			$this->BillingAddress->save($order);
-			if (!isset($order['ShippingAddress']['id'])) {
-				$this->ShippingAddress->create();
-			}
-			$this->ShippingAddress->save($order);
+
+			$DataSource->commit();
+
+			$Event = new CakeEvent(
+				'Order.created',
+				$this, array(
+					'order' => $data
+				)
+			);
+			$this->getEventManager()->dispatch($Event);
+			$this->data = $data;
+			return true;
 		}
 
-		if ($result) {
-			$result[$this->alias][$this->primaryKey] = $this->getLastInsertId();
-			CakeEventManager::instance()->dispatch(new CakeEvent('Order.created', $this, array($result)));
-		}
-
-		$result = Set::merge($result, unserialize($result[$this->alias]['cart_snapshot']));
-		return $result;
+		return false;
 	}
 
 /**
@@ -392,10 +392,16 @@ class Order extends CartAppModel {
  * @return string
  */
 	public function invoiceNumber($data = array(), $date = null) {
-		$Event = new CakeEvent('Order.createInvoiceNumber', $this, array($data));
-		CakeEventManager::instance()->dispatch($Event);
+		$Event = new CakeEvent(
+			'Order.createInvoiceNumber',
+			$this,
+			array(
+				$data
+			)
+		);
+		$this->getEventManager()->dispatch($Event);
 		if ($Event->isStopped()) {
-			return $Event->data['result'];
+			return $Event->result;
 		}
 
 		if (empty($date)) {
@@ -426,6 +432,120 @@ class Order extends CartAppModel {
  */
 	public function orderNumber($data = array()) {
 		return $this->find('count');
+	}
+
+/**
+ * Checks the order data if the shipping address is the same as the billing address
+ *
+ * @param array $data
+ * @param string $field Field in the ShippingAddress data set to be used for the check
+ * @return boolean
+ */
+	public function shippingIsSameAsBilling($data, $field = 'same_as_billing') {
+		if (isset($data['ShippingAddress'][$field])) {
+			return (bool)$data['ShippingAddress'][$field];
+		}
+		return false;
+	}
+
+/**
+ * Validates the shipping and billing address
+ *
+ * @param array $data The order data with the shipping and billing address
+ * @return boolean
+ */
+	public function validateAddresses($data) {
+		if (empty($data['BillingAddress']) && empty($data['ShippingAddress'])) {
+			return true;
+		}
+		$this->BillingAddress->set($data);
+		$validBillingAddress = $this->BillingAddress->validates($data);
+
+		$sameAsBilling = $this->shippingIsSameAsBilling($data);
+
+		if ($sameAsBilling === true) {
+			$validShippingAddress = true;
+		} else {
+			$this->ShippingAddress->set($data);
+			$validShippingAddress = $this->ShippingAddress->validates($data);
+		}
+
+		return ($validBillingAddress && $validShippingAddress);
+	}
+
+/**
+ * saveAddresses
+ *
+ * @param $data
+ * @return array
+ */
+	public function saveAddresses($data) {
+		$billingAddressId = $this->BillingAddress->findDuplicate($data);
+		if ($billingAddressId === false) {
+			$data['BillingAddress']['type'] = AddressType::BILLING;
+			$this->BillingAddress->create();
+			$this->BillingAddress->save($data, array('validate' => false));
+			$billingAddressId = $this->BillingAddress->getLastInsertId();
+		}
+
+		$sameAsBilling = $this->shippingIsSameAsBilling($data);
+		if ($sameAsBilling === false) {
+			$shippingAddressId = $this->ShippingAddress->findDuplicate($data);
+			if ($shippingAddressId === false) {
+				$data['ShippingAddress']['type'] = AddressType::SHIPPING;
+				$this->ShippingAddress->create();
+				$this->ShippingAddress->save($data, array('validate' => false));
+				$shippingAddressId = $this->ShippingAddress->getLastInsertId();
+			}
+		} else {
+			$shippingAddressId = $billingAddressId;
+			$data['ShippingAddress'] = $data['BillingAddress'];
+		}
+
+		$data[$this->alias]['shipping_address_id'] = $shippingAddressId;
+		$data[$this->alias]['billing_address_id'] = $billingAddressId;
+
+		return $data;
+	}
+
+/**
+ * Saves all the items for the order in the persistent order_items table
+ *
+ * @param $orderId
+ * @param array $data
+ * @return void
+ */
+	public function saveItems($orderId, $data) {
+		foreach ($data['CartsItem'] as $item) {
+			$item['order_id'] = $orderId;
+			$this->OrderItem->create();
+			$result = $this->OrderItem->save(array(
+				'OrderItem' => $item
+			));
+			$result['OrderItem']['id'] = $this->OrderItem->getLastInsertId();
+			if (is_string($result['OrderItem']['additional_data'])) {
+				$result['OrderItem']['additional_data'] = unserialize($result['OrderItem']['additional_data']);
+			}
+			$data['OrderItem'][] = $result['OrderItem'];
+		}
+		return $data;
+	}
+
+/**
+ * This method validates all data, the order and all associated data
+ *
+ * All associated data is validates as well and not skipped on the first
+ * false result to get the errors displayed in the form.
+ *
+ * @param array $data
+ * @param array $options
+ * @return boolean
+ */
+	public function beforeOrderValidation($data, $options = array()) {
+		$this->set($data);
+		$validOrder = $this->validates();
+		$validAddresses = $this->validateAddresses($data);
+		return ($validOrder && $validAddresses);
 	}
 
 }

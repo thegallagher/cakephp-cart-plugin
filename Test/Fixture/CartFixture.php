@@ -55,7 +55,7 @@ class CartFixture extends CakeTestFixture {
 			'total' => 720.37,
 			'active' => 1,
 			'item_count' => 1,
-			'additional_data' => null,
+			'additional_data' => array(),
 			'created' => '2012-01-01 12:12:12',
 			'modified' => '2012-01-01 12:12:12'
 		),
@@ -66,7 +66,7 @@ class CartFixture extends CakeTestFixture {
 			'total' => '1000.00',
 			'active' => 0,
 			'item_count' => 3,
-			'additional_data' => null,
+			'additional_data' => array(),
 			'created' => '2012-01-01 12:12:12',
 			'modified' => '2012-01-01 12:12:12'
 		),
@@ -77,10 +77,23 @@ class CartFixture extends CakeTestFixture {
 			'total' => '1000.00',
 			'active' => 0,
 			'item_count' => 1,
-			'additional_data' => null,
+			'additional_data' => array(),
 			'created' => '2012-01-01 12:12:12',
 			'modified' => '2012-01-01 12:12:12'
 		),
 	);
 
+/**
+ * Constructor
+ *
+ * @return CartFixture
+ */
+	public function __construct() {
+		parent::__construct();
+		foreach ($this->records as &$record) {
+			$record['additional_data'] = serialize($record['additional_data']);
+		}
+	}
+
 }
+

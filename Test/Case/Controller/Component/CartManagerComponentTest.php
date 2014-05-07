@@ -74,7 +74,7 @@ class CartManagerComponentTest extends CakeTestCase {
 		$this->CartManager->initialize($this->Controller, array());
 
 		$this->assertTrue(is_a($this->CartManager->CartModel, 'Cart'));
-		$this->assertEqual($this->CartManager->sessionKey, 'Cart');
+		$this->assertEquals($this->CartManager->sessionKey, 'Cart');
 	}
 
 /**
@@ -111,7 +111,7 @@ class CartManagerComponentTest extends CakeTestCase {
 
 		$result = $this->CartManager->getBuy();
 
-		$this->assertEqual($result, array(
+		$this->assertEquals($result, array(
 			'CartsItem' => array(
 				'model' => 'Item',
 				'quantity' => 1,
@@ -142,7 +142,7 @@ class CartManagerComponentTest extends CakeTestCase {
 			->will($this->returnValue(true));
 
 		$result = $this->CartManager->postBuy();
-		$this->assertEqual($result, array(
+		$this->assertEquals($result, array(
 			'CartsItem' => array(
 				'model' => 'Item',
 				'quantity' => 1,

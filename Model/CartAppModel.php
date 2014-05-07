@@ -67,4 +67,75 @@ class CartAppModel extends AppModel {
 		}
 	}
 
+	protected function _serializeFields($fields = array(), $data = null) {
+		if (empty($fields)) {
+			return $data;
+		}
+		if (empty($data)) {
+			$data = $this->data;
+		}
+
+		foreach ($fields as $field) {
+			if (!empty($data[$this->alias][$field])) {
+				if (!is_array($data[$this->alias][$field])) {
+					$serializedData = serialize(array());
+				} else {
+					$serializedData = serialize($data[$this->alias][$field]);
+				}
+				$data[$this->alias][$field] = $serializedData;
+			}
+		}
+		return $data;
+	}
+
+	protected function _unserializeFields($fields = array(), $data = null) {
+		if (empty($fields)) {
+			return $data;
+		}
+		if (empty($data)) {
+			$data = $this->data;
+		}
+		foreach ($fields as $field) {
+			if (isset($data[$this->alias][$field])) {
+				$data[$this->alias][$field] = unserialize($data[$this->alias][$field]);
+			}
+		}
+		return $data;
+	}
+
+/**
+ * Validation method to check if the content of a field is an array
+ *
+ * @param mixed $check
+ * @param boolean $notEmpty
+ * @return boolean
+ */
+	public function isArray($check, $notEmpty = true) {
+		$value = array_values($check);
+		$value = $value[0];
+		if (is_array($value)) {
+			if ($notEmpty === true) {
+				return (!empty($value));
+			}
+			return true;
+		}
+		return false;
+	}
+
+/**
+ * Attempts to unserialize a string if it cant, it will return the original value
+ *
+ * @param mixed $value
+ * @return mixed
+ */
+	public function unserializeValue($value) {
+		if (is_string($value)) {
+			$result = @unserialize($value);
+			if ($result !== false) {
+				return $result;
+			}
+		}
+		return $value;
+	}
+
 }

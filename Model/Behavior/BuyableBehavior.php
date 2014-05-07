@@ -159,7 +159,7 @@ class BuyableBehavior extends ModelBehavior {
 			'additional_data' => serialize($Model->additionalBuyData($record))
 		);
 
-		return Set::merge($cartsItem['CartsItem'], $result);
+		return Hash::merge($cartsItem['CartsItem'], $result);
 	}
 
 }

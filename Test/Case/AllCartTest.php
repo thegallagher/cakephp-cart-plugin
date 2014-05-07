@@ -1,12 +1,13 @@
 <?php
 /**
- * AllModelTest
+ * AllCartTest
  *
  * @author Florian Krämer
  * @copyright 2012 - 2013 Florian Krämer
  * @license MIT
  */
-class AllTest extends PHPUnit_Framework_TestSuite {
+
+class AllCartTest extends PHPUnit_Framework_TestSuite {
 
 /**
  * suite method, defines tests for this suite.

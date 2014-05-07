@@ -84,4 +84,16 @@ class CartsItemFixture extends CakeTestFixture {
 		),
 	);
 
+/**
+ * Constructor
+ *
+ * @return CartsItemFixture
+ */
+	public function __construct() {
+		parent::__construct();
+		foreach ($this->records as &$record) {
+			$record['additional_data'] = serialize($record['additional_data']);
+		}
+	}
+
 }

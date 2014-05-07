@@ -106,7 +106,7 @@ class CartsItem extends CartAppModel {
 		$defaults = array(
 			'validates' => true
 		);
-		$options = Set::merge($defaults, $options);
+		$options = Hash::merge($defaults, $options);
 
 		if (isset($itemData[$this->alias])) {
 			$itemData = $itemData[$this->alias];
@@ -130,7 +130,7 @@ class CartsItem extends CartAppModel {
 			$item[$this->alias]['cart_id'] = $cartId;
 			$this->create();
 		} else {
-			$item[$this->alias] = Set::merge($item[$this->alias], $itemData);
+			$item[$this->alias] = Hash::merge($item[$this->alias], $itemData);
 		}
 
 		return $this->save($item, array(
@@ -156,7 +156,9 @@ class CartsItem extends CartAppModel {
 			'conditions' => array(
 				$this->alias . '.cart_id' => $cartId,
 				$this->alias . '.model' => $itemData['model'],
-				$this->alias . '.foreign_key' => $itemData['foreign_key'])));
+				$this->alias . '.foreign_key' => $itemData['foreign_key']
+			)
+		));
 
 		if (empty($item)) {
 			return false;
@@ -192,7 +194,9 @@ class CartsItem extends CartAppModel {
 		$result = $this->find('first', array(
 			'conditions' => array(
 				'cart_id' => $data[$this->alias]['cart_id'],
-				'foreign_key' => $data[$this->alias]['foreign_key'])));
+				'foreign_key' => $data[$this->alias]['foreign_key']
+			)
+		));
 
 		if (empty($result)) {
 
@@ -241,4 +245,21 @@ class CartsItem extends CartAppModel {
 
 		return $array1;
 	}
+
+/**
+ * beforeSave callback
+ *
+ * @param  array $options, not used
+ * @return boolean
+ */
+	public function beforeSave($options = array()) {
+		$this->data = $this->_serializeFields(
+			array(
+				'additional_data',
+			),
+			$this->data
+		);
+		return true;
+	}
+
 }

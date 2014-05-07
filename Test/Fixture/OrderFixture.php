@@ -31,6 +31,8 @@ class OrderFixture extends CakeTestFixture {
 		'id' => array('type' => 'string', 'null' => false, 'default' => null, 'length' => 36, 'key' => 'primary'),
 		'user_id' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 36),
 		'cart_id' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 36),
+		'shipping_address_id' => array('type' => 'string', 'null' => true, 'default' => null, 'lenght' => 36),
+		'billing_address_id' => array('type' => 'string', 'null' => true, 'default' => null, 'lenght' => 36),
 		'cart_snapshot' => array('type' => 'text', 'null' => true, 'default' => null),
 		'token' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 32),
 		'processor' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 32),
@@ -42,6 +44,8 @@ class OrderFixture extends CakeTestFixture {
 		'billing_address' => array('type' => 'text', 'null' => true, 'default' => null),
 		'shipping_address' => array('type' => 'text', 'null' => true, 'default' => null),
 		'total' => array('type' => 'float', 'null' => true, 'default' => null),
+		'shipping_rate' => array('float' => 'string', 'null' => false, 'default' => 0.00),
+		'gross' => array('type' => 'float', 'null' => false, 'default' => 0.00),
 		'currency' => array('type' => 'integer', 'null' => true, 'default' => null),
 		'order_item_count' => array('type' => 'integer', 'null' => false, 'default' => '0', 'length' => 8),
 		'order_number' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 64),
@@ -64,11 +68,16 @@ class OrderFixture extends CakeTestFixture {
 			'id' => 'order-1',
 			'user_id' => 'user-1',
 			'cart_id' => null,
+			'shipping_address_id' => null,
+			'billing_address_id' => null,
 			'cart_snapshot' => array(
 				'Cart' => array(
-					),
+
+				),
 				'CartsItem' => array(
-					)),
+
+				)
+			),
 			'token' => 'token-1',
 			'processor' => 'Paypal',
 			'status' => 'pending',
@@ -79,6 +88,8 @@ class OrderFixture extends CakeTestFixture {
 			'invoice_number' => '20120101-1',
 			'shipping_address' => null,
 			'total' => 12.00,
+			'shipping_rate' => 0.00,
+			'gross' => 0.00,
 			'currency' => 'EUR',
 			'order_item_count' => 0,
 			'order_number' => 1,
@@ -98,4 +109,5 @@ class OrderFixture extends CakeTestFixture {
 			$record['cart_snapshot'] = serialize($record['cart_snapshot']);
 		}
 	}
+
 }

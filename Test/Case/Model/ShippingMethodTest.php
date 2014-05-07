@@ -16,7 +16,8 @@ class ShippingMethodTestCase extends CakeTestCase {
 		'plugin.Cart.CartsItem',
 		'plugin.Cart.OrderAddress',
 		'plugin.Cart.User',
-		'plugin.Cart.ShippingMethod');
+		'plugin.Cart.ShippingMethod'
+	);
 
 /**
  * Test to run for the test case (e.g array('testFind', 'testView'))
@@ -33,7 +34,7 @@ class ShippingMethodTestCase extends CakeTestCase {
  * @return void
  */
 	public function setUp() {
-		$this->ShippingMethod = ClassRegistry::init('ShippingMethod');
+		$this->ShippingMethod = ClassRegistry::init('Cart.ShippingMethod');
 		$fixture = new ShippingMethodFixture();
 		$this->record = array('ShippingMethod' => $fixture->records[0]);
 	}
