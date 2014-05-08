@@ -46,6 +46,15 @@ To contribute to this plugin please follow a few basic rules.
 * Contributions **must** follow the [CakePHP coding standard](http://book.cakephp.org/2.0/en/contributing/cakephp-coding-conventions.html).
 * [Unit tests](http://book.cakephp.org/2.0/en/development/testing.html) **are required**.
 
+Versioning
+----------
+
+Given a version number MAJOR.MINOR.PATCH, increment the:
+
+MAJOR version when incompatible API changes are made,
+MINOR version when functionality in a backwards-compatible manner is changed, and
+PATCH version when backwards-compatible bug fixes are made.
+
 License
 -------
 
