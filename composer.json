@@ -17,6 +17,7 @@
 		"cakedc/migrations": "The migrations plugin is required to create the database tables"
 	},
 	"suggest": {
-		"cakedc/Search": "Required for the search filters, implements the PRG pattern"
+		"cakedc/search": "Required for the search filters, implements the PRG pattern",
+		"omnipay/omnipay": "Payment processing library with lots of adapters for most, if not all popular payment providers."
 	}
 }
