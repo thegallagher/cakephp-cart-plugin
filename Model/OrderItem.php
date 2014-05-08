@@ -5,7 +5,7 @@ App::uses('CartAppModel', 'Cart.Model');
  * OrderItem Model
  *
  * @author Florian Krämer
- * @copyright 2012 - 2013 Florian Krämer
+ * @copyright 2012 - 2014 Florian Krämer
  * @license MIT
  */
 class OrderItem extends CartAppModel {

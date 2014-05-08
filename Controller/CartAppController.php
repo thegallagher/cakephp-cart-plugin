@@ -4,7 +4,7 @@ App::uses('AppController', 'Controller');
  * Cart App Controller
  *
  * @author Florian Krämer
- * @copyright 2012 - 2013 Florian Krämer
+ * @copyright 2012 - 2014 Florian Krämer
  * @license MIT
  */
 class CartAppController extends AppController {
@@ -17,6 +17,7 @@ class CartAppController extends AppController {
 	public $components = array(
 		'Security',
 		'Session',
-		'Auth');
+		'Auth'
+	);
 
 }

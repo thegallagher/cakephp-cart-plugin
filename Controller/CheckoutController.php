@@ -8,7 +8,8 @@ App::uses('CakeEvent', 'Event');
  * Checkout Controller
  *
  * @author Florian Krämer
- * @copyright 2012 - 2013 Florian Krämer
+ * @copyright 2012 - 2014 Florian Krämer
+ * @deprecated Legacy code, use Omnipay or implement your own checkout logic
  */
 class CheckoutController extends CartAppController {
 
@@ -293,7 +294,7 @@ class CheckoutController extends CartAppController {
  * @return boolean
  */
 	protected function _anonymousCheckoutIsAllowed($redirect = true) {
-		if (Configure::read('Cart.anonymousCheckout') === false && is_null($this->Auth->user())) {#
+		if (Configure::read('Cart.anonymousCheckout') === false && is_null($this->Auth->user())) {
 			$this->Session->setFlash(__d('cart', 'Sorry, but you have to login to check this cart out.'));
 			if ($redirect) {
 				$this->redirect(array('action' => 'view'));

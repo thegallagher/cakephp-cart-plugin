@@ -4,7 +4,7 @@ App::uses('Security', 'Utility');
  * User Fixture
  *
  * @author Florian Krämer
- * @copyright 2012 - 2013 Florian Krämer
+ * @copyright 2012 - 2014 Florian Krämer
  * @license MIT
  */
 class UserFixture extends CakeTestFixture {

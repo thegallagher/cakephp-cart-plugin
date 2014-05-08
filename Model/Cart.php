@@ -6,7 +6,7 @@ App::uses('CakeEventManager', 'Event');
  * Cart Model
  *
  * @author Florian Krämer
- * @copyright 2012 - 2013 Florian Krämer
+ * @copyright 2012 - 2014 Florian Krämer
  * @license MIT
  *
  * @property CartsItem CartsItem

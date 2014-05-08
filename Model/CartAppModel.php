@@ -4,7 +4,7 @@ App::uses('AppModel', 'Model');
  * Cart App Model
  *
  * @author Florian Krämer
- * @copyright 2012 - 2013 Florian Krämer
+ * @copyright 2012 - 2014 Florian Krämer
  * @license MIT
  */
 class CartAppModel extends AppModel {

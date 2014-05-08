@@ -4,7 +4,7 @@ App::uses('CartAppController', 'Cart.Controller');
  * Orders Controller
  *
  * @author Florian Krämer
- * @copyright 2012 - 2013 Florian Krämer
+ * @copyright 2012 - 2014 Florian Krämer
  */
 class OrdersController extends CartAppController {
 

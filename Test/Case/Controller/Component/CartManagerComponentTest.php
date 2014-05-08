@@ -16,7 +16,7 @@ class CartTestItemsController extends Controller {
  * Cart Manager Component Test
  * 
  * @author Florian Krämer
- * @copyright 2012 - 2013 Florian Krämer
+ * @copyright 2012 - 2014 Florian Krämer
  * @license MIT
  */
 class CartManagerComponentTest extends CakeTestCase {

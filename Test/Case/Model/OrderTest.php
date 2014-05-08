@@ -4,7 +4,7 @@ App::uses('Order', 'Cart.Model');
  * OrderTest
  *
  * @author Florian Krämer
- * @copyright 2012 - 2013 Florian Krämer
+ * @copyright 2012 - 2014 Florian Krämer
  * @license MIT
  */
 class OrderTest extends CakeTestCase {
